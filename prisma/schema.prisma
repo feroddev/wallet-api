@@ -4,11 +4,73 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  expenses  Expense[]
+  salaries  Salary[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Expense {
+  id          String        @id @default(uuid())
+  amount      Float
+  description String?
+  category    Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId  String    @map("category_id")
+  dueDate     DateTime?   @map("due_date")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      String      @map("user_id")
+  installment Installment[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("expenses")
+}
+
+model Salary {
+  id        String   @id @default(uuid())
+  amount    Float
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("salaries")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  expenses  Expense[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Installment {
+  id        String   @id @default(uuid())
+  amount    Float
+  dueDate   DateTime  @map("due_date")
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  expenseId String  @map("expense_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("installments")
 }
