@@ -331,11 +331,6 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@bankme-tech/eslint-config-pattern@^1.2.0":
-  version "1.2.0"
-  resolved "https://npm.pkg.github.com/download/@bankme-tech/eslint-config-pattern/1.2.0/234491d2e2e6381d03cca3e4fb712cb60860095f#234491d2e2e6381d03cca3e4fb712cb60860095f"
-  integrity sha512-kLAMAJhU+8ovu4gstofQRIX9uCW+wWhddbofleqFWEBAh11mQrPpWsiug2SQk66ZZwQle/htOKVUSIHV7gUX0g==
-
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -1577,6 +1572,11 @@ base64-js@^1.3.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
+
+bcryptjs@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/bcryptjs/-/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
+  integrity sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==
 
 binary-extensions@^2.0.0:
   version "2.3.0"
