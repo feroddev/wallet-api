@@ -14,14 +14,15 @@ generator client {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  expenses  Expense[]
-  salaries  Salary[]
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  expenses     Expense[]
+  installments Installment[]
+  salaries     Salary[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -69,6 +70,8 @@ model Installment {
   amount             Float
   dueDate            DateTime @map("due_date")
   currentInstallment Int      @default(1) @map("current_installment")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId             String   @map("user_id")
   expense            Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   expenseId          String   @map("expense_id")
   createdAt          DateTime @default(now()) @map("created_at")
