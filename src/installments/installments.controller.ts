@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Req, UseGuards } from '@nestjs/common';
 import { InstallmentsService } from './installments.service';
 import { CustomAuthGuard } from 'src/auth/guards/CustomAuthGuard';
 
@@ -23,5 +23,11 @@ export class InstallmentsController {
   async findByMonth(@Req() {user}, @Param('month') month: string) {
     const userId = user.id;
     return await this.installmentsService.findByMonth(userId, month);
+  }
+
+  @Patch(':id/paid')
+  async updatePaid(@Req() {user}, @Param('id') id: string) {
+    const userId = user.id;
+    return await this.installmentsService.updatePaid(userId, id);
   }
 }
