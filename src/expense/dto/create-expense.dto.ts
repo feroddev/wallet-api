@@ -1,4 +1,4 @@
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 
 export class CreateExpenseDto {
@@ -19,7 +19,7 @@ export class CreateExpenseDto {
   
   @IsNotEmpty()
   @IsDate()
-  @Transform(({ value }) => new Date(value).toLocaleDateString())
+  @Type(() => Date)
   dueDate: Date;
 
   @IsOptional()
