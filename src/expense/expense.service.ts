@@ -49,10 +49,11 @@ export class ExpenseService {
         recurringExpense.push(
           this.prisma.installment.create({
             data: {
+              currentInstallment: i + 1,
               amount: Number((expense.amount / expense.recurring).toFixed(2)),
               dueDate: new Date(
                 new Date(expense.dueDate).setMonth(
-                  new Date(expense.dueDate).getMonth() + i + 1,
+                  new Date(expense.dueDate).getMonth() + i,
                 ),
               ),
               expense: {
@@ -168,7 +169,7 @@ export class ExpenseService {
               amount: Number((expense.amount / recurring).toFixed(2)),
               dueDate: new Date(
                 new Date(expense.dueDate).setMonth(
-                  new Date(expense.dueDate).getMonth() + i + 1,
+                  new Date(expense.dueDate).getMonth() + i,
                 ),
               ),
               expense: {
