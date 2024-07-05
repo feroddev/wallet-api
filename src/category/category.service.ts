@@ -10,20 +10,32 @@ export class CategoryService {
     return await this.prisma.category.create({
       data: createCategoryDto,
       select: {
-        name: true,
         id: true,
+        name: true,
       }
       });
   }
 
   async findAll() {
-    return await this.prisma.category.findMany();
+    return await this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      }
+    });
   }
 
   async findOne(name: string) {
-    return await this.prisma.category.findUnique({
+    return await this.prisma.category.findMany({
       where: {
-        name,
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        }
+      },
+      select: {
+        id: true,
+        name: true,
       }
     });
   }
@@ -31,8 +43,13 @@ export class CategoryService {
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     return await this.prisma.category.update({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+      },
       data: updateCategoryDto,
-      });
+      }
+    );
   }
 
   async remove(id: string) {
