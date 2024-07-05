@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { InstallmentsService } from './installments.service';
-import { AuthGuard } from '@nestjs/passport';
+import { CustomAuthGuard } from 'src/auth/guards/CustomAuthGuard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(CustomAuthGuard)
 @Controller('installments')
 export class InstallmentsController {
   constructor(private readonly installmentsService: InstallmentsService) {}
@@ -17,5 +17,11 @@ export class InstallmentsController {
   async findOne(@Req() {user},@Param('id') id: string) {
     const userId = user.id;
     return await this.installmentsService.findOne(userId, id);
+  }
+
+  @Get('month/:month')
+  async findByMonth(@Req() {user}, @Param('month') month: string) {
+    const userId = user.id;
+    return await this.installmentsService.findByMonth(userId, month);
   }
 }

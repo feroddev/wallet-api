@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Http
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { CustomAuthGuard } from 'src/auth/guards/CustomAuthGuard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(CustomAuthGuard)
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}

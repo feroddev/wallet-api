@@ -25,4 +25,15 @@ export class InstallmentsService {
     }
   }
 
+  async findByMonth(userId: string, month: string) {
+    return await this.prisma.installment.findMany({
+      where: {
+        userId,
+        dueDate: {
+          gte: new Date(`${month}-01`),
+          lt: new Date(`${month}-31`),
+        },
+      },
+    });
+  }
 }
