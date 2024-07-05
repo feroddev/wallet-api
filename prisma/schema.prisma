@@ -35,9 +35,8 @@ model Expense {
   dueDate     DateTime?     @map("due_date")
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId      String        @map("user_id")
-  isRecurring Boolean       @default(false) @map("is_recurring")
-  recurring   Int?          
-  installment Installment[]
+  recurring   Int           @default(1)
+  installments Installment[]
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
