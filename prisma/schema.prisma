@@ -31,10 +31,12 @@ model Expense {
   amount      Float
   description String?
   category    Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId  String    @map("category_id")
-  dueDate     DateTime?   @map("due_date")
+  categoryId  String        @map("category_id")
+  dueDate     DateTime?     @map("due_date")
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      String      @map("user_id")
+  userId      String        @map("user_id")
+  isRecurring Boolean       @default(false) @map("is_recurring")
+  recurring   Int?          
   installment Installment[]
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
@@ -46,7 +48,7 @@ model Salary {
   id        String   @id @default(uuid())
   amount    Float
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId    String  @map("user_id")
+  userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -66,9 +68,9 @@ model Category {
 model Installment {
   id        String   @id @default(uuid())
   amount    Float
-  dueDate   DateTime  @map("due_date")
+  dueDate   DateTime @map("due_date")
   expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  expenseId String  @map("expense_id")
+  expenseId String   @map("expense_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
