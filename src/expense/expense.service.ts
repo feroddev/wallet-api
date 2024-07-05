@@ -11,13 +11,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
   async create(userId: string, createExpenseDto: CreateExpenseDto) {
-    const { amount, categoryId, dueDate, description } = createExpenseDto;
+    const { amount, categoryId, dueDate, description, recurring } = createExpenseDto;
     try {
-      return await this.prisma.expense.create({
+      const expense = await this.prisma.expense.create({
         data: {
           amount,
           description,
           dueDate,
+          recurring: recurring || 1,
           category: {
             connect: {
               id: categoryId,
@@ -40,8 +41,31 @@ export class ExpenseService {
               name: true,
             },
           },
+          recurring: true,
         },
       });
+
+      const recurringExpense = [];
+      for (let i = 0; i < expense.recurring; i++) {
+        recurringExpense.push(
+          this.prisma.installment.create({
+            data: {
+              amount: Number((expense.amount / expense.recurring).toFixed(2)),
+              dueDate: new Date(
+                new Date(expense.dueDate).setMonth(
+                  new Date(expense.dueDate).getMonth() + i + 1,
+                ),
+              ),
+              expense: {
+                connect: {
+                  id: expense.id,
+                },
+              },
+            },
+          }),
+        );
+      }
+      await Promise.all(recurringExpense);
     } catch (error) {
       throw new BadRequestException('Something went wrong');
     }
@@ -62,6 +86,13 @@ export class ExpenseService {
             name: true,
           },
         },
+        installments: {
+          select: {
+            id: true,
+            amount: true,
+            dueDate: true,
+          },
+        },
       },
     });
   }
@@ -80,6 +111,13 @@ export class ExpenseService {
               name: true,
             },
           },
+          installments: {
+            select: {
+              id: true,
+              amount: true,
+              dueDate: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -93,8 +131,10 @@ export class ExpenseService {
   }
 
   async update(userId: string, id: string, updateExpenseDto: UpdateExpenseDto) {
+    const { recurring } = updateExpenseDto;
     try {
-      return await this.prisma.expense.update({
+      // Update the expense
+      const expense = await this.prisma.expense.update({
         where: { id, userId },
         data: {
           ...updateExpenseDto,
@@ -109,8 +149,51 @@ export class ExpenseService {
               name: true,
             },
           },
+          installments: {
+            select: {
+              id: true,
+              amount: true,
+              dueDate: true,
+            },
+          },
         },
       });
+
+      // If the expense is not recurring, return the expense
+      if (!recurring) {
+        return expense;
+      }
+
+      // Delete all installments and create new ones
+      await this.prisma.installment.deleteMany({
+        where: {
+          expenseId: expense.id,
+        },
+      });
+
+      // Create new installments
+      const recurringExpense = [];
+      for (let i = 0; i < recurring; i++) {
+        recurringExpense.push(
+          this.prisma.installment.create({
+            data: {
+              amount: Number((expense.amount / recurring).toFixed(2)),
+              dueDate: new Date(
+                new Date(expense.dueDate).setMonth(
+                  new Date(expense.dueDate).getMonth() + i + 1,
+                ),
+              ),
+              expense: {
+                connect: {
+                  id: expense.id,
+                },
+              },
+            },
+          }),
+        );
+      }
+      await Promise.all(recurringExpense);
+      return expense;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new UnauthorizedException(
@@ -122,10 +205,10 @@ export class ExpenseService {
   }
 
   async remove(userId: string, id: string) {
-    try{
+    try {
       return await this.prisma.expense.delete({
-      where: { id, userId },
-      })
+        where: { id, userId },
+      });
     } catch (error) {
       if (error.code === 'P2025') {
         throw new UnauthorizedException(
