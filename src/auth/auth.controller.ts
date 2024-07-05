@@ -10,8 +10,8 @@ export class AuthController {
     private readonly service: AuthService
   ) {}
 
-  @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Req() req: any) {
     return await this.service.login(req.user);
