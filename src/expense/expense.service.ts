@@ -11,7 +11,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
   async create(userId: string, createExpenseDto: CreateExpenseDto) {
-    const { amount, categoryId, dueDate, description, recurring } = createExpenseDto;
+    const { amount, categoryId, dueDate, description, recurring } =
+      createExpenseDto;
     try {
       const expense = await this.prisma.expense.create({
         data: {
@@ -59,6 +60,11 @@ export class ExpenseService {
               expense: {
                 connect: {
                   id: expense.id,
+                },
+              },
+              user: {
+                connect: {
+                  id: userId,
                 },
               },
             },
@@ -177,13 +183,17 @@ export class ExpenseService {
                   id: expense.id,
                 },
               },
+              user: {
+                connect: {
+                  id: userId,
+                },
+              },
             },
           }),
         );
       }
       await Promise.all(recurringExpense);
       return expense;
-
     } catch (error) {
       if (error.code === 'P2025') {
         throw new UnauthorizedException(
