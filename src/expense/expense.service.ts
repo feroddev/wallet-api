@@ -37,7 +37,6 @@ export class ExpenseService {
           dueDate: true,
           category: {
             select: {
-              id: true,
               name: true,
             },
           },
@@ -66,6 +65,7 @@ export class ExpenseService {
         );
       }
       await Promise.all(recurringExpense);
+      return expense;
     } catch (error) {
       throw new BadRequestException('Something went wrong');
     }
@@ -86,13 +86,7 @@ export class ExpenseService {
             name: true,
           },
         },
-        installments: {
-          select: {
-            id: true,
-            amount: true,
-            dueDate: true,
-          },
-        },
+        recurring: true,
       },
     });
   }
@@ -111,13 +105,7 @@ export class ExpenseService {
               name: true,
             },
           },
-          installments: {
-            select: {
-              id: true,
-              amount: true,
-              dueDate: true,
-            },
-          },
+          recurring: true,
         },
       });
     } catch (error) {
@@ -194,6 +182,7 @@ export class ExpenseService {
       }
       await Promise.all(recurringExpense);
       return expense;
+
     } catch (error) {
       if (error.code === 'P2025') {
         throw new UnauthorizedException(
