@@ -49,6 +49,11 @@ export class SalaryService {
           userId,
         },
         data: updateSalaryDto,
+        select: {
+          id: true,
+          amount: true,
+          description: true,
+        },
       });
     } catch (error) {
       if (error.code === 'P2025') {
