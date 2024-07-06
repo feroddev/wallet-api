@@ -3,13 +3,7 @@
   "builds": [
     {
       "src": "src/main.ts",
-      "use": "@vercel/node",
-      "env": {
-        "DATABASE_URL": "postgresql://wallet_owner:hdH7FILrjX6G@ep-delicate-sun-a4ggi6ct.us-east-1.aws.neon.tech/wallet?sslmode=require"
-      },
-      "config": {
-        "includeFiles": ["prisma/**/*"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
