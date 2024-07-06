@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignInDto } from './dto/sign.dto';
@@ -26,7 +26,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @UseGuards(CustomAuthGuard)
-  @Post('name')
+  @Get('name')
   async name(@Req() req: any) {
     return await this.service.name(req.user);
   }
