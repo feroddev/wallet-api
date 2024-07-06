@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { SalaryService } from './salary.service';
 import { CreateSalaryDto } from './dto/create-salary.dto';
 import { UpdateSalaryDto } from './dto/update-salary.dto';
+import { CustomAuthGuard } from 'src/auth/guards/CustomAuthGuard';
 
+@UseGuards(CustomAuthGuard)
 @Controller('salary')
 export class SalaryController {
   constructor(private readonly salaryService: SalaryService) {}
 
   @Post()
-  create(@Body() createSalaryDto: CreateSalaryDto) {
-    return this.salaryService.create(createSalaryDto);
+  async create(@Req() {user}, @Body() createSalaryDto: CreateSalaryDto) {
+    const userId = user.id;
+    return await this.salaryService.create(userId, createSalaryDto);
   }
 
   @Get()
-  findAll() {
-    return this.salaryService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.salaryService.findOne(+id);
+  async findAll(@Req() {user}) {
+    const userId = user.id;
+    return await this.salaryService.findAll(userId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSalaryDto: UpdateSalaryDto) {
-    return this.salaryService.update(+id, updateSalaryDto);
+  async update(@Req() {user}, @Param('id') id: string, @Body() updateSalaryDto: UpdateSalaryDto) {
+    const userId = user.id;
+    return await this.salaryService.update(userId, id, updateSalaryDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salaryService.remove(+id);
+  async remove(@Req() {user}, @Param('id') id: string) {
+    const userId = user.id;
+    return await this.salaryService.remove(userId, id);
   }
 }

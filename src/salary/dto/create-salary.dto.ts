@@ -9,7 +9,4 @@ export class CreateSalaryDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsString()
-  userId: string;
 }
