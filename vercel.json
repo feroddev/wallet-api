@@ -6,36 +6,11 @@
       "use": "@vercel/node"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/installments",
-      "destination": "https://wallet-api-six.vercel.app/installments"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-      "dest": "src/main.ts"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "http://localhost:3000"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, content-type, Authorization"
-        }
-      ]
+      "dest": "src/main.ts",
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"]
     }
   ]
 }
