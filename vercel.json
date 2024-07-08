@@ -31,5 +31,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/installments",
+      "destination": "https://wallet-api-six.vercel.app/installments"
+    }
   ]
 }
