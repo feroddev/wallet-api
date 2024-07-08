@@ -11,6 +11,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
