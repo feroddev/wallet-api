@@ -13,14 +13,10 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix('api');
-  // app.enableCors({
-  //   origin: ['http://localhost:3000', 'https://wallet-web-six.vercel.app'],
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  // });
-  app.use(cors({
+  app.enableCors({
     origin: ['http://localhost:3000', 'https://wallet-web-six.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  }))
+  });
   await app.listen(3001);
 }
 bootstrap();
