@@ -2,7 +2,7 @@ import { Controller, Get, Param, Patch, Req, UseGuards } from '@nestjs/common';
 import { InstallmentsService } from './installments.service';
 import { CustomAuthGuard } from 'src/auth/guards/CustomAuthGuard';
 
-@UseGuards(CustomAuthGuard)
+/* @UseGuards(CustomAuthGuard) */
 @Controller('installments')
 export class InstallmentsController {
   constructor(private readonly installmentsService: InstallmentsService) {}
