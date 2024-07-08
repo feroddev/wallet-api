@@ -6,13 +6,6 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "src/main.ts",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
