@@ -73,6 +73,7 @@ model Installment {
   dueDate            DateTime @map("due_date")
   currentInstallment Int      @default(1) @map("current_installment")
   paid               Boolean  @default(false)
+  isRecurring        Boolean  @default(false) @map("is_recurring")
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId             String   @map("user_id")
   expense            Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
