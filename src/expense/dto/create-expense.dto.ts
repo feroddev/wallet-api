@@ -27,4 +27,8 @@ export class CreateExpenseDto {
   @IsPositive()
   @Transform(({ value }) => Number(value))
   recurring?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
 }

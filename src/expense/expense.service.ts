@@ -11,15 +11,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
   async create(userId: string, createExpenseDto: CreateExpenseDto) {
-    const { amount, categoryId, dueDate, description, recurring } =
+    const { amount, categoryId, dueDate, description, recurring, isRecurring } =
       createExpenseDto;
+    const correctRecurring = isRecurring ? 1 : recurring || 1;
     try {
       const expense = await this.prisma.expense.create({
         data: {
           amount,
           description,
           dueDate,
-          recurring: recurring || 1,
+          recurring: correctRecurring,
+          isRecurring: isRecurring || false,
           category: {
             connect: {
               id: categoryId,
