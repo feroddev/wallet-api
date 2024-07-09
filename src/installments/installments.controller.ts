@@ -19,12 +19,6 @@ export class InstallmentsController {
     return await this.installmentsService.findOne(userId, id);
   }
 
-  @Get('month/:month')
-  async findByMonth(@Req() {user}, @Param('month') month: string) {
-    const userId = user.id;
-    return await this.installmentsService.findByMonth(userId, month);
-  }
-
   @Patch(':id/paid')
   async updatePaid(@Req() {user}, @Param('id') id: string) {
     const userId = user.id;

@@ -5,6 +5,26 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+const select = {
+  id: true,
+  amount: true,
+  dueDate: true,
+  currentInstallment: true,
+  paid: true,
+  isRecurring: true,
+  expense: {
+    select: {
+      description: true,
+      recurring: true,
+      category: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+};
+
 @Injectable()
 export class InstallmentsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -14,24 +34,7 @@ export class InstallmentsService {
         userId,
       },
       orderBy: [{ expense: { id: 'asc' } }, { currentInstallment: 'asc' }],
-      select: {
-        id: true,
-        amount: true,
-        dueDate: true,
-        currentInstallment: true,
-        paid: true,
-        expense: {
-          select: {
-            description: true,
-            recurring: true,
-            category: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
+      select,
     });
   }
 
@@ -43,59 +46,11 @@ export class InstallmentsService {
           userId,
         },
         orderBy: [{ expense: { id: 'asc' } }, { currentInstallment: 'asc' }],
-        select: {
-          id: true,
-          amount: true,
-          dueDate: true,
-          currentInstallment: true,
-          paid: true,
-          expense: {
-            select: {
-              description: true,
-              recurring: true,
-              category: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
+        select,
       });
     } catch (error) {
       throw new NotFoundException('Installment not found');
     }
-  }
-
-  async findByMonth(userId: string, month: string) {
-    return await this.prisma.installment.findMany({
-      where: {
-        userId,
-        dueDate: {
-          gte: new Date(`${month}-01`),
-          lt: new Date(`${month}-31`),
-        },
-      },
-      orderBy: [{ expense: { id: 'asc' } }, { currentInstallment: 'asc' }],
-      select: {
-        id: true,
-        amount: true,
-        dueDate: true,
-        currentInstallment: true,
-        paid: true,
-        expense: {
-          select: {
-            description: true,
-            category: {
-              select: {
-                name: true,
-              },
-            },
-            recurring: true,
-          },
-        },
-      },
-    });
   }
 
   async updatePaid(userId: string, id: string) {
