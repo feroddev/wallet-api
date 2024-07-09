@@ -59,6 +59,7 @@ export class ExpenseService {
                   new Date(expense.dueDate).getMonth() + i,
                 ),
               ),
+              isRecurring: isRecurring || false,
               expense: {
                 connect: {
                   id: expense.id,
