@@ -3,9 +3,9 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSalaryDto } from './dto/create-salary.dto';
 import { UpdateSalaryDto } from './dto/update-salary.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SalaryService {
@@ -24,6 +24,7 @@ export class SalaryService {
         id: true,
         amount: true,
         description: true,
+        month: true,
       },
     });
   }
@@ -37,6 +38,7 @@ export class SalaryService {
         id: true,
         amount: true,
         description: true,
+        month: true,
       },
     });
   }
@@ -53,6 +55,7 @@ export class SalaryService {
           id: true,
           amount: true,
           description: true,
+          month: true,
         },
       });
     } catch (error) {

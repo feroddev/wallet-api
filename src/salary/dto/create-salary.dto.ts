@@ -1,5 +1,5 @@
-import { Transform } from "class-transformer";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateSalaryDto {
   @IsNumber()
@@ -8,5 +8,5 @@ export class CreateSalaryDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  description: string;
 }
