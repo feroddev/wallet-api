@@ -3,9 +3,9 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ExpenseService {
@@ -13,7 +13,7 @@ export class ExpenseService {
   async create(userId: string, createExpenseDto: CreateExpenseDto) {
     const { amount, categoryId, dueDate, description, recurring, isRecurring } =
       createExpenseDto;
-    const correctRecurring = isRecurring ? 1 : recurring || 1;
+    const correctRecurring = isRecurring ? 12 : recurring || 1;
     try {
       const expense = await this.prisma.expense.create({
         data: {
@@ -21,7 +21,6 @@ export class ExpenseService {
           description,
           dueDate,
           recurring: correctRecurring,
-          isRecurring: isRecurring || false,
           category: {
             connect: {
               id: categoryId,
