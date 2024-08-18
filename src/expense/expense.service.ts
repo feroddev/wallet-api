@@ -52,7 +52,9 @@ export class ExpenseService {
           this.prisma.installment.create({
             data: {
               currentInstallment: i + 1,
-              amount: Number((expense.amount / expense.recurring).toFixed(2)),
+              amount: isRecurring
+                ? expense.amount
+                : Number((expense.amount / expense.recurring).toFixed(2)),
               dueDate: new Date(
                 new Date(expense.dueDate).setMonth(
                   new Date(expense.dueDate).getMonth() + i,
@@ -96,6 +98,7 @@ export class ExpenseService {
           },
         },
         recurring: true,
+        isRecurring: true,
       },
     });
   }
@@ -115,6 +118,7 @@ export class ExpenseService {
             },
           },
           recurring: true,
+          isRecurring: true,
         },
       });
     } catch (error) {
