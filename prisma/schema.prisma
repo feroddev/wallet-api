@@ -14,73 +14,119 @@ generator client {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  password     String
-  expenses     Expense[]
-  installments Installment[]
-  salaries     Salary[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                     String    @id @default(uuid())
+  name                   String
+  email                  String    @unique
+  password               String
+  plan                   Plan      @default(FREE)
+  createdAt              DateTime  @default(now()) @map("created_at")
+  subscriptionExpiration DateTime? @map("subscription_expiration")
+
+  transactions Transaction[]
+  creditCards  CreditCard[]
 
   @@map("users")
 }
 
-model Expense {
-  id           String        @id @default(uuid())
-  amount       Float
-  description  String?
-  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId   String        @map("category_id")
-  dueDate      DateTime      @default(now()) @map("due_date")
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId       String        @map("user_id")
-  isRecurring  Boolean       @default(false) @map("is_recurring")
-  recurring    Int           @default(1)
-  installments Installment[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+model Transaction {
+  id                 String              @id @default(uuid())
+  userId             String              @map("user_id")
+  categoryId         String              @map("category_id")
+  creditCardId       String?             @map("credit_card_id")
+  description        String
+  totalAmount        Float               @map("total_amount")
+  type               TransactionType
+  isInstallment      Boolean             @default(false) @map("is_installment")
+  totalInstallments  Int?                @map("total_installments")
+  isRecurring        Boolean             @default(false) @map("is_recurring")
+  recurrenceInterval RecurrenceInterval? @map("recurrence_interval")
+  recurrenceStart    DateTime?           @map("recurrence_start")
+  recurrenceEnd      DateTime?           @map("recurrence_end")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
 
-  @@map("expenses")
+  category      Category      @relation(fields: [categoryId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+  creditCard    CreditCard?   @relation(fields: [creditCardId], references: [id])
+  paymentMethod PaymentMethod @map("payment_method")
+  installments  Installment[]
+
+  @@map("transactions")
 }
 
-model Salary {
-  id          String   @id @default(uuid())
-  description String
-  amount      Float
-  month       DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      String   @map("user_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+  BANK_SLIP
+  BANK_TRANSFER
+  PIX
+  OTHER
+}
 
-  @@map("salaries")
+model Installment {
+  id                String        @id @default(uuid())
+  transactionId     String        @map("transaction_id")
+  transaction       Transaction   @relation(fields: [transactionId], references: [id])
+  amount            Float
+  installmentNumber Int?          @map("installment_number")
+  dueDate           DateTime      @map("due_date")
+  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
+  paidAt            DateTime?     @map("paid_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  @@map("installments")
+}
+
+model CreditCard {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  cardName   String   @map("card_name")
+  limit      Float
+  closingDay Int      @map("closing_day")
+  dueDay     Int      @map("due_day")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  transactions Transaction[]
+
+  @@map("credit_cards")
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  expenses  Expense[]
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id        String       @id @default(uuid())
+  name      String
+  type      CategoryType
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  transactions Transaction[]
 
   @@map("categories")
 }
 
-model Installment {
-  id                 String   @id @default(uuid())
-  amount             Float
-  dueDate            DateTime @map("due_date")
-  currentInstallment Int      @default(1) @map("current_installment")
-  paid               Boolean  @default(false)
-  isRecurring        Boolean  @default(false) @map("is_recurring")
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId             String   @map("user_id")
-  expense            Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  expenseId          String   @map("expense_id")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+enum Plan {
+  FREE
+  PREMIUM
+}
 
-  @@map("installments")
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum RecurrenceInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
 }
