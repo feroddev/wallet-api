@@ -1,8 +1,10 @@
+import { Auth } from '@app/auth/jwt/decorators/auth.decorator'
 import { CreateUserUseCase } from '@app/user/use-cases/create-user.use-case'
 import { Body, Controller, Post } from '@nestjs/common'
 import { CreateUserDto } from '../dto/create-user.dto'
 
-@Controller('user')
+@Auth()
+@Controller('/user')
 export class UserController {
   constructor(private readonly createUserUseCase: CreateUserUseCase) {}
 

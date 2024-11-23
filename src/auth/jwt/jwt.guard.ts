@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
+import { errors } from 'constants/errors'
 import * as jwt from 'jsonwebtoken'
 import { JwtPayload } from './interfaces/jwt-payload.interface'
 
@@ -29,7 +30,7 @@ export class JwtGuard extends AuthGuard('jwt') {
       const token = request.headers.authorization?.split(' ')[1]
 
       if (!token) {
-        throw new ForbiddenException()
+        throw new ForbiddenException(errors.TOKEN_NOT_FOUND)
       }
 
       const payload: JwtPayload = jwt.verify(

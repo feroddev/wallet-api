@@ -34,7 +34,7 @@ export class AuthService {
       userId: user.id,
       user: {
         email: user.email,
-        plan: user.name,
+        plan: user.plan,
         name: user.name
       }
     } as JwtPayload)

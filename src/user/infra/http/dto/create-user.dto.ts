@@ -1,16 +1,19 @@
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreateUserDto {
   @IsString()
-  name: string;
+  @IsNotEmpty()
+  name: string
 
   @IsString()
-  email: string;
+  @IsNotEmpty()
+  email: string
 
   @IsString()
-  password: string;
+  @IsNotEmpty()
+  password: string
 
   @IsDate()
   @IsOptional()
-  subscriptionExpiration?: Date;
+  subscriptionExpiration?: Date
 }
