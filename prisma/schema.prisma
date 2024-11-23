@@ -35,7 +35,6 @@ model Transaction {
   creditCardId       String?             @map("credit_card_id")
   description        String
   totalAmount        Float               @map("total_amount")
-  type               TransactionType
   isInstallment      Boolean             @default(false) @map("is_installment")
   totalInstallments  Int?                @map("total_installments")
   isRecurring        Boolean             @default(false) @map("is_recurring")
