@@ -1,14 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
-  "compilerOptions": {
-    "outDir": "./dist",
-    "paths": {
-      "@app/*": ["src/*"],
-      "@user/*": ["src/user/*"],
-      "@credit-card": ["src/credit-card"],
-      "@transactions": ["src/transactions"],
-      "@prisma-client": ["src/prisma/*"]
-    }
-  }
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
