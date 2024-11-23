@@ -2,8 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/main.js",
-      "use": "@vercel/node"
+      "src": "package.json",
+      "use": "@vercel/nft",
+      "config": {
+        "buildCommand": "npm run build"
+      }
     }
   ],
   "rewrites": [
