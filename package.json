@@ -68,6 +68,11 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
   },
+  "_moduleAliases": {
+    "@modules": "dist/modules",
+    "@common": "dist/common",
+    "@config": "dist/config"
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
