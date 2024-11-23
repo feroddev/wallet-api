@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
+import { CreateUserDto } from 'src/user/infra/http/dto/create-user.dto'
 import { errors } from '../../constants/errors'
 import { UserRepository } from '../user/repositories/user.repository'
 import { LoginDto } from './dtos/login.dto'
@@ -29,6 +30,33 @@ export class AuthService {
     if (!isValidPassword) {
       throw new BadRequestException(errors.INVALID_PASSWORD)
     }
+
+    const token = this.jwtService.sign({
+      userId: user.id,
+      user: {
+        email: user.email,
+        plan: user.plan,
+        name: user.name
+      }
+    } as JwtPayload)
+
+    return { token }
+  }
+
+  async register(data: CreateUserDto) {
+    const { email } = data
+    const isUser = await this.userRepository.find({ email })
+
+    if (isUser) {
+      throw new BadRequestException(errors.EMAIL_ALREADY_REGISTERED)
+    }
+
+    const password = await bcrypt.hash(
+      data.password,
+      Number(process.env.SALT_ROUNDS)
+    )
+
+    const user = await this.userRepository.create({ ...data, password })
 
     const token = this.jwtService.sign({
       userId: user.id,
