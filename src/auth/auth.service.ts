@@ -1,4 +1,3 @@
-import { UserRepository } from '@app/user/repositories/user.repository'
 import {
   BadRequestException,
   Injectable,
@@ -7,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { errors } from 'constants/errors'
+import { UserRepository } from '../user/repositories/user.repository'
 import { LoginDto } from './dtos/login.dto'
 import { JwtPayload } from './jwt/interfaces/jwt-payload.interface'
 

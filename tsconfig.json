@@ -16,13 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@app/*": ["src/*"],
-      "@user/*": ["src/user/*"],
-      "@credit-card": ["src/credit-card"],
-      "@transactions": ["src/transactions"],
-      "@prisma-client": ["src/prisma/*"]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }
