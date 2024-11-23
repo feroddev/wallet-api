@@ -6,5 +6,6 @@
     "dist",
     "**/*spec.ts",
     "**/vitest.config.mts"
-  ]
+  ],
+  "paths": {}
 }
