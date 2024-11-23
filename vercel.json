@@ -2,17 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/nft",
-      "config": {
-        "buildCommand": "npm run build"
-      }
+      "src": "src/main.ts",
+      "use": "@vercel/node"
     }
   ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/dist/main.js"
+      "destination": "/src/main.ts"
     }
   ],
   "headers": [
