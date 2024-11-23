@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
-import { errors } from 'constants/errors'
+import { errors } from '../../constants/errors'
 import { UserRepository } from '../user/repositories/user.repository'
 import { LoginDto } from './dtos/login.dto'
 import { JwtPayload } from './jwt/interfaces/jwt-payload.interface'

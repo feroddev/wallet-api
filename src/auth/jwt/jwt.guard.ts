@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
-import { errors } from 'constants/errors'
 import * as jwt from 'jsonwebtoken'
+import { errors } from '../../../constants/errors'
 import { JwtPayload } from './interfaces/jwt-payload.interface'
 
 @Injectable()
