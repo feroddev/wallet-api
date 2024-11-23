@@ -1,5 +1,5 @@
 import { User } from '@prisma/client'
-import { CreateUserDto } from '@user/infra/http/dto/create-user.dto'
+import { CreateUserDto } from '../infra/http/dto/create-user.dto'
 
 export abstract class UserRepository {
   abstract create(data: CreateUserDto): Promise<Omit<User, 'password'>>
