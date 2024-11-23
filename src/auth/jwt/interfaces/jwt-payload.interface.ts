@@ -5,6 +5,7 @@ export interface JwtPayload {
   userId: string
   user: {
     email: string
+    name: string
     plan: string
   }
 }
