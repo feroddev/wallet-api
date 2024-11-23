@@ -1,6 +1,5 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
-import 'tsconfig-paths/register'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './utils/http-exception.filter'
 
