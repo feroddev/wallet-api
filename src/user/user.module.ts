@@ -6,6 +6,7 @@ import { PrismaUserRepository } from '../user/infra/database/prisma/prisma-user.
 import { UserController } from '../user/infra/http/controllers/users.controller'
 import { UserRepository } from '../user/repositories/user.repository'
 import { GetUserUseCase } from './use-cases/get-user.use-case'
+import { UpdateUserUseCase } from './use-cases/update-user.use-case'
 
 @Module({
   controllers: [UserController],
@@ -13,6 +14,7 @@ import { GetUserUseCase } from './use-cases/get-user.use-case'
   providers: [
     PrismaService,
     GetUserUseCase,
+    UpdateUserUseCase,
     {
       provide: UserRepository,
       useClass: PrismaUserRepository
