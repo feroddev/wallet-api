@@ -4,11 +4,15 @@ import { PrismaUserRepository } from '../user/infra/database/prisma/prisma-user.
 import { UserRepository } from '../user/repositories/user.repository'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { JwtStrategy } from './jwt/jwt.strategy'
+import { JwtValidationUseCase } from './jwt/use-cases/jwt-validation.use-case'
 
 @Module({
   controllers: [AuthController],
   providers: [
     AuthService,
+    JwtStrategy,
+    JwtValidationUseCase,
     {
       provide: UserRepository,
       useClass: PrismaUserRepository
