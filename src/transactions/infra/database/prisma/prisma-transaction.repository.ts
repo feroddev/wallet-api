@@ -1,7 +1,8 @@
+import { Injectable } from '@nestjs/common'
 import { Transaction } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { TransactionRepository } from '../../../repositories/transaction.repository'
-
+@Injectable()
 export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -11,8 +12,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async find(data: Partial<Transaction>): Promise<Transaction> {
-    return this.prisma.transaction.findFirst({
+  async find(data: Partial<Transaction>): Promise<Transaction[]> {
+    return this.prisma.transaction.findMany({
       where: data
     })
   }
