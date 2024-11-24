@@ -41,14 +41,14 @@ model Transaction {
   recurrenceInterval RecurrenceInterval? @map("recurrence_interval")
   recurrenceStart    DateTime?           @map("recurrence_start")
   recurrenceEnd      DateTime?           @map("recurrence_end")
+  paymentMethod      PaymentMethod       @map("payment_method")
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
 
-  category      Category      @relation(fields: [categoryId], references: [id])
-  user          User          @relation(fields: [userId], references: [id])
-  creditCard    CreditCard?   @relation(fields: [creditCardId], references: [id])
-  paymentMethod PaymentMethod @map("payment_method")
-  installments  Installment[]
+  category     Category      @relation(fields: [categoryId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  creditCard   CreditCard?   @relation(fields: [creditCardId], references: [id])
+  installments Installment[]
 
   @@map("transactions")
 }

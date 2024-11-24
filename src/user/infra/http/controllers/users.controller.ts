@@ -15,12 +15,12 @@ export class UserController {
   ) {}
 
   @Get()
-  async getUser(@Jwt() jwt: JwtPayload) {
-    return this.getUserUseCase.execute(jwt.userId)
+  async getUser(@Jwt() { userId }: JwtPayload) {
+    return this.getUserUseCase.execute(userId)
   }
 
   @Put()
-  async updateUser(@Body() data: UpdateUserDto, @Jwt() jwt: JwtPayload) {
-    return this.updateUserUseCase.execute(jwt.userId, data)
+  async updateUser(@Body() data: UpdateUserDto, @Jwt() { userId }: JwtPayload) {
+    return this.updateUserUseCase.execute(userId, data)
   }
 }
