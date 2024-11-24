@@ -1,7 +1,17 @@
-import { Controller } from '@nestjs/common'
-import { CreateUserUseCase } from '../../../../user/use-cases/create-user.use-case'
+import { Controller, Get } from '@nestjs/common'
+import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
+import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
+import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
 
+@Auth()
 @Controller('/user')
 export class UserController {
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {}
+  constructor() {}
+
+  @Get()
+  async getUser(@Jwt() jwt: JwtPayload) {
+    console.log({ jwt })
+
+    return 'User data'
+  }
 }
