@@ -45,9 +45,10 @@ model Transaction {
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
 
-  category     Category      @relation(fields: [categoryId], references: [id])
-  user         User          @relation(fields: [userId], references: [id])
-  creditCard   CreditCard?   @relation(fields: [creditCardId], references: [id])
+  category   Category    @relation(fields: [categoryId], references: [id])
+  user       User        @relation(fields: [userId], references: [id])
+  creditCard CreditCard? @relation(fields: [creditCardId], references: [id])
+
   installments Installment[]
 
   @@map("transactions")

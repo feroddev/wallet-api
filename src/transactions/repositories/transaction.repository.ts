@@ -1,7 +1,11 @@
 import { Transaction } from '@prisma/client'
+import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
 
 export abstract class TransactionRepository {
-  abstract create(data: Transaction): Promise<Transaction>
+  abstract create(
+    userId: string,
+    data: CreateTransactionDto
+  ): Promise<Transaction>
 
   abstract find(data: Partial<Transaction>): Promise<Transaction[]>
 
