@@ -1,11 +1,12 @@
 import { Installment } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InstallmentRepository } from '../../../repositories/installment.repository'
+import { CreateInstallmentDto } from '../../http/dto/create-installment.dto'
 
 export class PrismaInstallmentRepository implements InstallmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: Installment): Promise<Installment> {
+  async create(data: CreateInstallmentDto): Promise<Installment> {
     return this.prisma.installment.create({
       data
     })

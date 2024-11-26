@@ -1,7 +1,8 @@
 import { Installment } from '@prisma/client'
+import { CreateInstallmentDto } from '../infra/http/dto/create-installment.dto'
 
 export abstract class InstallmentRepository {
-  abstract create(data: Installment): Promise<Installment>
+  abstract create(data: CreateInstallmentDto): Promise<Installment>
 
   abstract find(data: Partial<Installment>): Promise<Installment>
 
