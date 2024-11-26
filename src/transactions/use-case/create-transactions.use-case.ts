@@ -40,16 +40,19 @@ export class CreateTransactionsUseCase {
 
     const installmentAmount = data.totalAmount / totalInstallments
 
-    for (let i = 0; i < totalInstallments; i++) {
-      const nextDueDate = new Date(data.dueDate)
-      nextDueDate.setMonth(nextDueDate.getMonth() + i)
-      await this.installmentsRepository.create({
-        transactionId: transaction.id,
-        installmentNumber: i + 1,
-        amount: installmentAmount,
-        dueDate: nextDueDate
-      })
-    }
+    const installments = Array.from({ length: totalInstallments }).map(
+      (_, index) => {
+        const nextDueDate = new Date(data.dueDate)
+        nextDueDate.setMonth(nextDueDate.getMonth() + index)
+        return {
+          transactionId: transaction.id,
+          installmentNumber: index + 1,
+          amount: installmentAmount,
+          dueDate: data.dueDate
+        }
+      }
+    )
+    await this.installmentsRepository.createMany(installments)
 
     return transaction
   }

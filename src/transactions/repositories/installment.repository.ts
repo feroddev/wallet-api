@@ -11,4 +11,6 @@ export abstract class InstallmentRepository {
   abstract update(id: string, data: Partial<Installment>): Promise<Installment>
 
   abstract delete(id: string): Promise<void>
+
+  abstract createMany(data: CreateInstallmentDto[]): Promise<Installment[]>
 }

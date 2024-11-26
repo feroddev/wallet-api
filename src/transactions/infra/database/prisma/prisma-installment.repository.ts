@@ -38,4 +38,16 @@ export class PrismaInstallmentRepository implements InstallmentRepository {
       }
     })
   }
+
+  async createMany(data: CreateInstallmentDto[]): Promise<Installment[]> {
+    const createdInstallments = await Promise.all(
+      data.map((installment) =>
+        this.prisma.installment.create({
+          data: installment
+        })
+      )
+    )
+
+    return createdInstallments
+  }
 }
