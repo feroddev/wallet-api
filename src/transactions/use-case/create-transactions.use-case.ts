@@ -19,7 +19,6 @@ export class CreateTransactionsUseCase {
       totalAmount: data.totalAmount,
       paymentMethod: data.paymentMethod
     })
-
     return transaction
   }
 
@@ -27,19 +26,17 @@ export class CreateTransactionsUseCase {
     userId: string,
     data: CreateTransactionDto
   ) {
-    const totalInstallments = data.totalInstallments || 1
-
+    const totalInstallments = data.totalInstallments
     const transaction = await this.transactionsRepository.create(userId, {
       categoryId: data.categoryId,
       creditCardId: data.creditCardId,
       description: data.description,
       totalAmount: data.totalAmount,
+      isInstallment: true,
       totalInstallments: totalInstallments,
       paymentMethod: data.paymentMethod
     })
-
     const installmentAmount = data.totalAmount / totalInstallments
-
     const installments = Array.from({ length: totalInstallments }).map(
       (_, index) => {
         const nextDueDate = new Date(data.dueDate)
@@ -48,12 +45,11 @@ export class CreateTransactionsUseCase {
           transactionId: transaction.id,
           installmentNumber: index + 1,
           amount: installmentAmount,
-          dueDate: data.dueDate
+          dueDate: nextDueDate
         }
       }
     )
     await this.installmentsRepository.createMany(installments)
-
     return transaction
   }
 
@@ -67,37 +63,34 @@ export class CreateTransactionsUseCase {
       totalAmount: data.totalAmount,
       paymentMethod: data.paymentMethod
     })
-
     await this.installmentsRepository.create({
       transactionId: transaction.id,
       installmentNumber: 1,
       amount: data.totalAmount,
       dueDate: data.dueDate
     })
-
     return transaction
   }
 
-  private async mapper(
-    paymentMethod: PaymentMethod,
-    userId: string,
-    data: CreateTransactionDto
-  ) {
+  private async transactionFunctionMapper(paymentMethod: PaymentMethod) {
     const paymentMethodMapper = {
-      CREDIT_CARD: this.createTransactionsWithInstallments(userId, data),
-      DEBIT_CARD: this.createTransactions(userId, data),
-      CASH: this.createTransactions(userId, data),
-      BANK_SLIP: this.createTransactionsBankSlip(userId, data),
-      BANK_TRANSFER: this.createTransactions(userId, data),
-      PIX: this.createTransactions(userId, data),
-      OTHER: this.createTransactions(userId, data)
+      CREDIT_CARD: this.createTransactionsWithInstallments.bind(this),
+      DEBIT_CARD: this.createTransactions.bind(this),
+      CASH: this.createTransactions.bind(this),
+      BANK_SLIP: this.createTransactionsBankSlip.bind(this),
+      BANK_TRANSFER: this.createTransactions.bind(this),
+      PIX: this.createTransactions.bind(this),
+      OTHER: this.createTransactions.bind(this)
     }
 
-    return paymentMethodMapper[paymentMethod]
+    const transactionFunction = await paymentMethodMapper[paymentMethod]
+
+    return transactionFunction
   }
 
   async execute(userId: string, data: CreateTransactionDto) {
     const { paymentMethod } = data
-    return this.mapper(paymentMethod, userId, data)
+    const transaction = await this.transactionFunctionMapper(paymentMethod)
+    return transaction(userId, data)
   }
 }

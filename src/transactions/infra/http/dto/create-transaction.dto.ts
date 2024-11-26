@@ -19,6 +19,7 @@ export class CreateTransactionDto {
 
   @IsDate()
   @IsOptional()
+  @Transform(({ value }) => new Date(value))
   dueDate?: Date
 
   @IsString()
@@ -42,14 +43,17 @@ export class CreateTransactionDto {
   isRecurring?: boolean
 
   @IsEnum(RecurrenceInterval)
+  @IsOptional()
   recurrenceInterval?: RecurrenceInterval
 
   @IsDate()
   @IsOptional()
+  @Transform(({ value }) => new Date(value))
   recurrenceStart?: Date
 
   @IsDate()
   @IsOptional()
+  @Transform(({ value }) => new Date(value))
   recurrenceEnd?: Date
 
   @IsEnum(PaymentMethod)

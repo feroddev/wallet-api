@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common'
 import { Installment } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InstallmentRepository } from '../../../repositories/installment.repository'
 import { CreateInstallmentDto } from '../../http/dto/create-installment.dto'
 
+@Injectable()
 export class PrismaInstallmentRepository implements InstallmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 

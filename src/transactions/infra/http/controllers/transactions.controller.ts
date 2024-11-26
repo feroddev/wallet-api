@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
+import { CreateTransactionsUseCase } from '../../../use-case/create-transactions.use-case'
 import { GetTransactionsUseCase } from '../../../use-case/get-transactions.use-case'
 import { CreateTransactionDto } from '../dto/create-transaction.dto'
 import { GetTransactionsDto } from '../dto/get-transactions.dto'
@@ -9,7 +10,10 @@ import { GetTransactionsDto } from '../dto/get-transactions.dto'
 @Auth()
 @Controller('/transactions')
 export class TransactionsController {
-  constructor(private readonly getTransationsUseCase: GetTransactionsUseCase) {}
+  constructor(
+    private readonly getTransationsUseCase: GetTransactionsUseCase,
+    private readonly createTransactionsUseCase: CreateTransactionsUseCase
+  ) {}
 
   @Get()
   async getTransactions(
@@ -24,6 +28,6 @@ export class TransactionsController {
     @Jwt() { userId }: JwtPayload,
     @Body() body: CreateTransactionDto
   ) {
-    return
+    return this.createTransactionsUseCase.execute(userId, body)
   }
 }
