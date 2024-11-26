@@ -7,7 +7,7 @@ export abstract class TransactionRepository {
     data: CreateTransactionDto
   ): Promise<Transaction>
 
-  abstract find(data: Partial<Transaction>): Promise<Transaction[]>
+  abstract find(data: Partial<Transaction>): Promise<Transaction>
 
   abstract findMany(data: Partial<Transaction>): Promise<Transaction[]>
 

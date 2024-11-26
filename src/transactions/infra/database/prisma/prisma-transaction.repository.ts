@@ -19,14 +19,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async find(data: Partial<Transaction>): Promise<Transaction[]> {
-    return this.prisma.transaction.findMany({
-      where: data,
-      include: {
-        category: true,
-        creditCard: true,
-        installments: true
-      }
+  async find(data: Partial<Transaction>): Promise<Transaction> {
+    return this.prisma.transaction.findFirst({
+      where: data
     })
   }
 
