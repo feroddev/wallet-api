@@ -9,7 +9,7 @@ export class GetTransactionsUseCase {
   async execute(userId: string, query: GetTransactionsDto) {
     const { categoryId, creditCardId } = query
 
-    const transactions = await this.transactionsRepository.find({
+    const transactions = await this.transactionsRepository.findMany({
       userId,
       ...(categoryId ? { categoryId } : {}),
       ...(creditCardId ? { creditCardId } : {})
