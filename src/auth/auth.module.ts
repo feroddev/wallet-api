@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { PrismaUserRepository } from '../user/infra/database/prisma/prisma-user.repository'
 import { UserRepository } from '../user/repositories/user.repository'
@@ -19,9 +20,13 @@ import { JwtValidationUseCase } from './jwt/use-cases/jwt-validation.use-case'
     }
   ],
   imports: [
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET')
+      })
     })
   ],
   exports: [JwtModule]
