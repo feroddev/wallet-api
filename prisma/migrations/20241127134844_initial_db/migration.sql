@@ -34,19 +34,19 @@ CREATE TABLE "transactions" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "category_id" TEXT NOT NULL,
-    "credit_card_id" TEXT,
     "description" TEXT NOT NULL,
-    "total_amount" DOUBLE PRECISION NOT NULL,
-    "type" "TransactionType" NOT NULL,
+    "payment_method" "PaymentMethod" NOT NULL,
+    "transaction_date" TIMESTAMP(3) NOT NULL,
+    "totalAmount" MONEY NOT NULL,
     "is_installment" BOOLEAN NOT NULL DEFAULT false,
     "total_installments" INTEGER,
+    "credit_card_id" TEXT,
     "is_recurring" BOOLEAN NOT NULL DEFAULT false,
     "recurrence_interval" "RecurrenceInterval",
     "recurrence_start" TIMESTAMP(3),
     "recurrence_end" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "payment_method" "PaymentMethod" NOT NULL,
 
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id")
 );
@@ -55,8 +55,8 @@ CREATE TABLE "transactions" (
 CREATE TABLE "installments" (
     "id" TEXT NOT NULL,
     "transaction_id" TEXT NOT NULL,
-    "amount" DOUBLE PRECISION NOT NULL,
-    "installment_number" INTEGER,
+    "installment_number" INTEGER NOT NULL,
+    "amount" MONEY NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
     "payment_status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "paid_at" TIMESTAMP(3),
@@ -71,7 +71,7 @@ CREATE TABLE "credit_cards" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "card_name" TEXT NOT NULL,
-    "limit" DOUBLE PRECISION NOT NULL,
+    "limit" MONEY NOT NULL,
     "closing_day" INTEGER NOT NULL,
     "due_day" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -97,10 +97,10 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "transactions" ADD CONSTRAINT "transactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_credit_card_id_fkey" FOREIGN KEY ("credit_card_id") REFERENCES "credit_cards"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "transactions" ADD CONSTRAINT "transactions_credit_card_id_fkey" FOREIGN KEY ("credit_card_id") REFERENCES "credit_cards"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "installments" ADD CONSTRAINT "installments_transaction_id_fkey" FOREIGN KEY ("transaction_id") REFERENCES "transactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

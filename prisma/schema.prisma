@@ -25,19 +25,19 @@ model Transaction {
   id                 String              @id @default(uuid())
   userId             String              @map("user_id")
   categoryId         String              @map("category_id")
-  creditCardId       String?             @map("credit_card_id")
   description        String
+  paymentMethod      PaymentMethod       @map("payment_method")
   transactionDate    DateTime            @map("transaction_date")
   totalAmount        Decimal             @db.Money
   isInstallment      Boolean             @default(false) @map("is_installment")
   totalInstallments  Int?                @map("total_installments")
+  creditCardId       String?             @map("credit_card_id")
   isRecurring        Boolean             @default(false) @map("is_recurring")
   recurrenceInterval RecurrenceInterval? @map("recurrence_interval")
   recurrenceStart    DateTime?           @map("recurrence_start")
   recurrenceEnd      DateTime?           @map("recurrence_end")
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
-  paymentMethod      PaymentMethod       @map("payment_method")
   installments       Installment[]
   category           Category            @relation(fields: [categoryId], references: [id])
   creditCard         CreditCard?         @relation(fields: [creditCardId], references: [id])
@@ -49,8 +49,8 @@ model Transaction {
 model Installment {
   id                String        @id @default(uuid())
   transactionId     String        @map("transaction_id")
-  amount            Decimal       @db.Money
   installmentNumber Int           @map("installment_number")
+  amount            Decimal       @db.Money
   dueDate           DateTime      @map("due_date")
   paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
   paidAt            DateTime?     @map("paid_at")
