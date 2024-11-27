@@ -60,6 +60,7 @@ export class CreateTransactionsUseCase {
     const transaction = await this.transactionsRepository.create(userId, {
       categoryId: data.categoryId,
       description: data.description,
+      isInstallment: true,
       totalAmount: data.totalAmount,
       paymentMethod: data.paymentMethod
     })

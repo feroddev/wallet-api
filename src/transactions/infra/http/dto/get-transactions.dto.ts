@@ -8,4 +8,8 @@ export class GetTransactionsDto {
   @IsOptional()
   @IsString()
   creditCardId?: string
+
+  @IsOptional()
+  @IsString()
+  paymentMethod?: string
 }
