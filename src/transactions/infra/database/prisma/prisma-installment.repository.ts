@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { Installment } from '@prisma/client'
+import { errors } from 'constants/errors'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InstallmentRepository } from '../../../repositories/installment.repository'
 import { CreateInstallmentDto } from '../../http/dto/create-installment.dto'
+import { GetInstallmentsDto } from '../../http/dto/get-installments.dto'
 
 @Injectable()
 export class PrismaInstallmentRepository implements InstallmentRepository {
@@ -20,9 +22,36 @@ export class PrismaInstallmentRepository implements InstallmentRepository {
     })
   }
 
-  async findMany(data: Partial<Installment>): Promise<Installment[]> {
+  async findMany(
+    userId: string,
+    data: GetInstallmentsDto
+  ): Promise<Installment[]> {
+    const { creditCardId, fromDueDate, paymentStatus, toDueDate } = data
+
+    if (fromDueDate && toDueDate && fromDueDate > toDueDate) {
+      throw new BadRequestException(errors.INVALID_FROM_DATE_AFTER_TO_DATE)
+    }
+
     return this.prisma.installment.findMany({
-      where: data
+      where: {
+        transaction: {
+          isInstallment: true,
+          userId,
+          ...(creditCardId ? { creditCardId } : {})
+        },
+        ...(fromDueDate ? { dueDate: { gte: fromDueDate } } : {}),
+        ...(toDueDate ? { dueDate: { lte: toDueDate } } : {}),
+        ...(paymentStatus
+          ? {
+              paymentStatus: {
+                equals: paymentStatus
+              }
+            }
+          : {})
+      },
+      include: {
+        transaction: true
+      }
     })
   }
 

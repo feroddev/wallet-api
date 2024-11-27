@@ -4,5 +4,6 @@ export const errors = {
   TOKEN_NOT_FOUND: 'Token not found',
   INVALID_TOKEN: 'Invalid token',
   EMAIL_ALREADY_REGISTERED: 'Email already registered',
-  GENERIC_ERROR: 'Something went wrong'
+  GENERIC_ERROR: 'Something went wrong',
+  INVALID_FROM_DATE_AFTER_TO_DATE: 'From date cannot be after to date'
 }

@@ -1,4 +1,5 @@
 {
   "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
