@@ -22,6 +22,10 @@ export class CreateTransactionDto {
   @Transform(({ value }) => new Date(value))
   dueDate?: Date
 
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  transactionDate: Date
+
   @IsString()
   description: string
 

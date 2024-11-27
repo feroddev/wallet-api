@@ -13,6 +13,7 @@ export class CreateTransactionsUseCase {
 
   private async createTransactions(userId: string, data: CreateTransactionDto) {
     const transaction = await this.transactionsRepository.create(userId, {
+      transactionDate: data.transactionDate,
       categoryId: data.categoryId,
       description: data.description,
       isInstallment: false,
@@ -28,6 +29,7 @@ export class CreateTransactionsUseCase {
   ) {
     const totalInstallments = data.totalInstallments
     const transaction = await this.transactionsRepository.create(userId, {
+      transactionDate: data.transactionDate,
       categoryId: data.categoryId,
       creditCardId: data.creditCardId,
       description: data.description,
@@ -58,6 +60,7 @@ export class CreateTransactionsUseCase {
     data: CreateTransactionDto
   ) {
     const transaction = await this.transactionsRepository.create(userId, {
+      transactionDate: data.transactionDate,
       categoryId: data.categoryId,
       description: data.description,
       isInstallment: true,
