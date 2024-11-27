@@ -1,29 +1,22 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id                     String    @id @default(uuid())
+  id                     String        @id @default(uuid())
   name                   String
-  email                  String    @unique
+  email                  String        @unique
   password               String
-  plan                   Plan      @default(FREE)
-  createdAt              DateTime  @default(now()) @map("created_at")
-  subscriptionExpiration DateTime? @map("subscription_expiration")
-
-  transactions Transaction[]
-  creditCards  CreditCard[]
+  plan                   Plan          @default(FREE)
+  createdAt              DateTime      @default(now()) @map("created_at")
+  subscriptionExpiration DateTime?     @map("subscription_expiration")
+  creditCards            CreditCard[]
+  transactions           Transaction[]
 
   @@map("users")
 }
@@ -34,24 +27,62 @@ model Transaction {
   categoryId         String              @map("category_id")
   creditCardId       String?             @map("credit_card_id")
   description        String
-  totalAmount        Float               @map("total_amount")
+  totalAmount        Decimal             @db.Money
   isInstallment      Boolean             @default(false) @map("is_installment")
   totalInstallments  Int?                @map("total_installments")
   isRecurring        Boolean             @default(false) @map("is_recurring")
   recurrenceInterval RecurrenceInterval? @map("recurrence_interval")
   recurrenceStart    DateTime?           @map("recurrence_start")
   recurrenceEnd      DateTime?           @map("recurrence_end")
-  paymentMethod      PaymentMethod       @map("payment_method")
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
-
-  category   Category    @relation(fields: [categoryId], references: [id])
-  user       User        @relation(fields: [userId], references: [id])
-  creditCard CreditCard? @relation(fields: [creditCardId], references: [id])
-
-  installments Installment[]
+  paymentMethod      PaymentMethod       @map("payment_method")
+  installments       Installment[]
+  category           Category            @relation(fields: [categoryId], references: [id])
+  creditCard         CreditCard?         @relation(fields: [creditCardId], references: [id])
+  user               User                @relation(fields: [userId], references: [id])
 
   @@map("transactions")
+}
+
+model Installment {
+  id                String        @id @default(uuid())
+  transactionId     String        @map("transaction_id")
+  amount            Decimal       @db.Money
+  installmentNumber Int           @map("installment_number")
+  dueDate           DateTime      @map("due_date")
+  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
+  paidAt            DateTime?     @map("paid_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  transaction       Transaction   @relation(fields: [transactionId], references: [id])
+
+  @@map("installments")
+}
+
+model CreditCard {
+  id           String        @id @default(uuid())
+  userId       String        @map("user_id")
+  cardName     String        @map("card_name")
+  limit        Decimal       @db.Money
+  closingDay   Int           @map("closing_day")
+  dueDay       Int           @map("due_day")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@map("credit_cards")
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  type         CategoryType
+  createdAt    DateTime      @default(now()) @map("created_at")
+  transactions Transaction[]
+
+  @@map("categories")
 }
 
 enum PaymentMethod {
@@ -62,48 +93,6 @@ enum PaymentMethod {
   BANK_TRANSFER
   PIX
   OTHER
-}
-
-model Installment {
-  id                String        @id @default(uuid())
-  transactionId     String        @map("transaction_id")
-  transaction       Transaction   @relation(fields: [transactionId], references: [id])
-  amount            Float
-  installmentNumber Int           @map("installment_number")
-  dueDate           DateTime      @map("due_date")
-  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
-  paidAt            DateTime?     @map("paid_at")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-
-  @@map("installments")
-}
-
-model CreditCard {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
-  cardName   String   @map("card_name")
-  limit      Float
-  closingDay Int      @map("closing_day")
-  dueDay     Int      @map("due_day")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  transactions Transaction[]
-
-  @@map("credit_cards")
-}
-
-model Category {
-  id        String       @id @default(uuid())
-  name      String
-  type      CategoryType
-  createdAt DateTime     @default(now()) @map("created_at")
-
-  transactions Transaction[]
-
-  @@map("categories")
 }
 
 enum Plan {
