@@ -14,6 +14,7 @@ import { CreateTransactionsUseCase } from './use-case/create-transactions.use-ca
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetInstallmentsUseCase } from './use-case/get-installments.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
+import { PayInstallmentUseCase } from './use-case/pay-installment.use-case'
 
 @Module({
   controllers: [
@@ -27,6 +28,7 @@ import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
     CreateTransactionsUseCase,
     GetInstallmentsUseCase,
     GetCategoriesUseCase,
+    PayInstallmentUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository

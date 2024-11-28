@@ -12,7 +12,11 @@ export abstract class InstallmentRepository {
     data: GetInstallmentsDto
   ): Promise<Installment[]>
 
-  abstract update(id: string, data: Partial<Installment>): Promise<Installment>
+  abstract update(
+    id: string,
+    userId: string,
+    data: Partial<Installment>
+  ): Promise<Installment>
 
   abstract delete(id: string): Promise<void>
 

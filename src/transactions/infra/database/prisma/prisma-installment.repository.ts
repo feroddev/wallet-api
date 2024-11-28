@@ -58,9 +58,28 @@ export class PrismaInstallmentRepository implements InstallmentRepository {
     })
   }
 
-  async update(id: string, data: Partial<Installment>): Promise<Installment> {
+  async update(
+    id: string,
+    userId: string,
+    data: Partial<Installment>
+  ): Promise<Installment> {
+    const installment = await this.prisma.installment.findFirst({
+      where: {
+        id,
+        transaction: {
+          userId
+        }
+      }
+    })
+
+    if (!installment) {
+      throw new BadRequestException(errors.INSTALLMENT_NOT_FOUND)
+    }
+
     return this.prisma.installment.update({
-      where: { id },
+      where: {
+        id
+      },
       data
     })
   }
