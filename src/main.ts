@@ -4,7 +4,9 @@ import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './utils/http-exception.filter'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: true
+  })
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -49,6 +49,9 @@ export class PrismaInstallmentRepository implements InstallmentRepository {
             }
           : {})
       },
+      orderBy: {
+        dueDate: 'asc'
+      },
       include: {
         transaction: true
       }

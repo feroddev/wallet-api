@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres_db
+    environment:
+      POSTGRES_USER: neath # Substitua com seu usuário
+      POSTGRES_PASSWORD: 1234 # Substitua com sua senha
+      POSTGRES_DB: wallet # Nome do banco de dados
+    ports:
+      - '5432:5432' # Porta exposta no seu localhost
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volumes persistentes para os dados
+    networks:
+      - postgres_network
+
+volumes:
+  postgres_data: {}
+
+networks:
+  postgres_network:
+    driver: bridge
