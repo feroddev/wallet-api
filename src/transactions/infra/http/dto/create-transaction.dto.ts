@@ -6,7 +6,8 @@ import {
   IsEnum,
   IsNumber,
   IsOptional,
-  IsString
+  IsString,
+  ValidateIf
 } from 'class-validator'
 
 export class CreateTransactionDto {
@@ -14,7 +15,7 @@ export class CreateTransactionDto {
   categoryId: string
 
   @IsString()
-  @IsOptional()
+  @ValidateIf((o) => o.paymentMethod === 'CREDIT_CARD')
   creditCardId?: string
 
   @IsDate()
@@ -37,8 +38,8 @@ export class CreateTransactionDto {
   @IsOptional()
   isInstallment?: boolean
 
+  @ValidateIf((o) => o.isInstallment === true)
   @IsNumber()
-  @IsOptional()
   @Transform(({ value }) => Number(value))
   totalInstallments?: number
 
@@ -46,15 +47,17 @@ export class CreateTransactionDto {
   @IsOptional()
   isRecurring?: boolean
 
+  @ValidateIf((o) => o.isRecurring === true)
   @IsEnum(RecurrenceInterval)
-  @IsOptional()
   recurrenceInterval?: RecurrenceInterval
 
+  @ValidateIf((o) => o.isRecurring === true)
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => new Date(value))
   recurrenceStart?: Date
 
+  @ValidateIf((o) => o.isRecurring === true)
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => new Date(value))
