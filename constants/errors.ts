@@ -5,5 +5,6 @@ export const errors = {
   INVALID_TOKEN: 'Invalid token',
   EMAIL_ALREADY_REGISTERED: 'Email already registered',
   GENERIC_ERROR: 'Something went wrong',
-  INVALID_FROM_DATE_AFTER_TO_DATE: 'From date cannot be after to date'
+  INVALID_FROM_DATE_AFTER_TO_DATE: 'From date cannot be after to date',
+  INSTALLMENT_NOT_FOUND: 'Installment not found'
 }

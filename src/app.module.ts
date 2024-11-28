@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
+import { CreditCardModule } from './credit-card/credit-card.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { TransactionsModule } from './transactions/transactions.module'
 import { UserModule } from './user/user.module'
@@ -13,6 +14,7 @@ import { UserModule } from './user/user.module'
     AuthModule,
     UserModule,
     TransactionsModule,
+    CreditCardModule,
     ConfigModule.forRoot({
       isGlobal: true
     })

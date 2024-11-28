@@ -1,13 +1,18 @@
+import { Injectable } from '@nestjs/common'
 import { CreditCard } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { CreditCardRepository } from '../../../repositories/credit-card.repository'
-
+import { CreateCreditCardDto } from '../../http/dto/create-credit-card.dto'
+@Injectable()
 export class PrismaCreditCardRepository implements CreditCardRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreditCard): Promise<CreditCard> {
+  async create(userId: string, data: CreateCreditCardDto): Promise<CreditCard> {
     return this.prisma.creditCard.create({
-      data
+      data: {
+        ...data,
+        userId
+      }
     })
   }
 
