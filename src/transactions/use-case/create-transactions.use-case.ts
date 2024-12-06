@@ -93,7 +93,7 @@ export class CreateTransactionsUseCase {
           installmentDate.setMonth(installmentDate.getUTCMonth() + index)
 
           return {
-            amount: data.totalAmount / data.totalInstallments,
+            amount: data.totalAmount,
             transactionId: transactionCreated.id,
             installmentNumber: index + 1,
             totalInstallments: data.totalInstallments,
