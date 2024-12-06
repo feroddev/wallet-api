@@ -13,6 +13,7 @@ import { SplitOrRecurrenceRepository } from './repositories/split-or-recurrence.
 import { TransactionRepository } from './repositories/transaction.repository'
 import { CreateTransactionsUseCase } from './use-case/create-transactions.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
+import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
 
 @Module({
   controllers: [TransactionsController, CategoriesController],
@@ -20,6 +21,7 @@ import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
     PrismaService,
     CreateTransactionsUseCase,
     GetCategoriesUseCase,
+    GetTransactionsUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
