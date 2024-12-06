@@ -7,85 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                     String        @id @default(uuid())
-  name                   String
-  email                  String        @unique
-  password               String
-  plan                   Plan          @default(FREE)
-  createdAt              DateTime      @default(now()) @map("created_at")
-  subscriptionExpiration DateTime?     @map("subscription_expiration")
-  creditCards            CreditCard[]
-  transactions           Transaction[]
-
-  @@map("users")
-}
-
-model Transaction {
-  id                 String              @id @default(uuid())
-  userId             String              @map("user_id")
-  categoryId         String              @map("category_id")
-  description        String
-  paymentMethod      PaymentMethod       @map("payment_method")
-  transactionDate    DateTime            @map("transaction_date")
-  totalAmount        Decimal             @db.Money
-  isInstallment      Boolean             @default(false) @map("is_installment")
-  totalInstallments  Int?                @map("total_installments")
-  creditCardId       String?             @map("credit_card_id")
-  isRecurring        Boolean             @default(false) @map("is_recurring")
-  recurrenceInterval RecurrenceInterval? @map("recurrence_interval")
-  recurrenceStart    DateTime?           @map("recurrence_start")
-  recurrenceEnd      DateTime?           @map("recurrence_end")
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  installments       Installment[]
-  category           Category            @relation(fields: [categoryId], references: [id])
-  creditCard         CreditCard?         @relation(fields: [creditCardId], references: [id])
-  user               User                @relation(fields: [userId], references: [id])
-
-  @@map("transactions")
-}
-
-model Installment {
-  id                String        @id @default(uuid())
-  transactionId     String        @map("transaction_id")
-  installmentNumber Int           @map("installment_number")
-  amount            Decimal       @db.Money
-  dueDate           DateTime      @map("due_date")
-  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
-  paidAt            DateTime?     @map("paid_at")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-  transaction       Transaction   @relation(fields: [transactionId], references: [id])
-
-  @@map("installments")
-}
-
-model CreditCard {
-  id           String        @id @default(uuid())
-  userId       String        @map("user_id")
-  cardName     String        @map("card_name")
-  limit        Decimal       @db.Money
-  closingDay   Int           @map("closing_day")
-  dueDay       Int           @map("due_day")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
-
-  @@map("credit_cards")
-}
-
-model Category {
-  id           String        @id @default(uuid())
-  name         String
-  type         CategoryType
-  createdAt    DateTime      @default(now()) @map("created_at")
-  transactions Transaction[]
-
-  @@map("categories")
-}
-
 enum PaymentMethod {
   CREDIT_CARD
   DEBIT_CARD
@@ -119,4 +40,100 @@ enum PaymentStatus {
 enum CategoryType {
   INCOME
   EXPENSE
+}
+
+enum RecurrenceType {
+  INSTALLMENT
+  RECURRING
+}
+
+model User {
+  id                     String        @id @default(uuid())
+  name                   String
+  email                  String        @unique
+  password               String
+  plan                   Plan          @default(FREE)
+  createdAt              DateTime      @default(now()) @map("created_at")
+  subscriptionExpiration DateTime?     @map("subscription_expiration")
+  creditCards            CreditCard[]
+  transactions           Transaction[]
+  userPlan               UserPlan[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id                  String              @id @default(uuid())
+  userId              String              @map("user_id")
+  categoryId          String              @map("category_id")
+  name                String
+  description         String?
+  paymentMethod       PaymentMethod       @map("payment_method")
+  date                DateTime            @map("date")
+  totalAmount         Decimal             @db.Money
+  isSplitOrRecurring  Boolean             @default(false) @map("is_split_or_recurring")
+  creditCardId        String?             @map("credit_card_id")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  user                User                @relation(fields: [userId], references: [id])
+  category            Category            @relation(fields: [categoryId], references: [id])
+  creditCard          CreditCard?         @relation(fields: [creditCardId], references: [id])
+  splitsOrRecurrences SplitOrRecurrence[]
+
+  @@map("transactions")
+}
+
+model SplitOrRecurrence {
+  id                String         @id @default(uuid())
+  transactionId     String         @map("transaction_id")
+  type              RecurrenceType
+  installmentNumber Int?           @map("installment_number")
+  amount            Decimal        @db.Money
+  dueDate           DateTime       @map("due_date")
+  paymentStatus     PaymentStatus  @default(PENDING) @map("payment_status")
+  paidAt            DateTime?      @map("paid_at")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  transaction       Transaction    @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId], name: "idx_transaction_id")
+  @@map("split_or_recurrence")
+}
+
+model CreditCard {
+  id           String        @id @default(uuid())
+  userId       String        @map("user_id")
+  cardName     String        @map("card_name")
+  limit        Decimal       @db.Money
+  closingDay   Int           @map("closing_day")
+  dueDay       Int           @map("due_day")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@map("credit_cards")
+}
+
+model UserPlan {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  plan      Plan
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("user_plans")
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  type         CategoryType
+  createdAt    DateTime      @default(now()) @map("created_at")
+  transactions Transaction[]
+
+  @@map("categories")
 }

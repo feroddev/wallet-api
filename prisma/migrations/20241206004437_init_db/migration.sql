@@ -16,6 +16,9 @@ CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PAID');
 -- CreateEnum
 CREATE TYPE "CategoryType" AS ENUM ('INCOME', 'EXPENSE');
 
+-- CreateEnum
+CREATE TYPE "RecurrenceType" AS ENUM ('INSTALLMENT', 'RECURRING');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -34,17 +37,13 @@ CREATE TABLE "transactions" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "category_id" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
     "payment_method" "PaymentMethod" NOT NULL,
-    "transaction_date" TIMESTAMP(3) NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
     "totalAmount" MONEY NOT NULL,
-    "is_installment" BOOLEAN NOT NULL DEFAULT false,
-    "total_installments" INTEGER,
+    "is_split_or_recurring" BOOLEAN NOT NULL DEFAULT false,
     "credit_card_id" TEXT,
-    "is_recurring" BOOLEAN NOT NULL DEFAULT false,
-    "recurrence_interval" "RecurrenceInterval",
-    "recurrence_start" TIMESTAMP(3),
-    "recurrence_end" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -52,10 +51,11 @@ CREATE TABLE "transactions" (
 );
 
 -- CreateTable
-CREATE TABLE "installments" (
+CREATE TABLE "split_or_recurrence" (
     "id" TEXT NOT NULL,
     "transaction_id" TEXT NOT NULL,
-    "installment_number" INTEGER NOT NULL,
+    "type" "RecurrenceType" NOT NULL,
+    "installment_number" INTEGER,
     "amount" MONEY NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
     "payment_status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
@@ -63,7 +63,7 @@ CREATE TABLE "installments" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "installments_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "split_or_recurrence_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,6 +81,19 @@ CREATE TABLE "credit_cards" (
 );
 
 -- CreateTable
+CREATE TABLE "user_plans" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "plan" "Plan" NOT NULL,
+    "start_date" TIMESTAMP(3) NOT NULL,
+    "end_date" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "user_plans_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -93,6 +106,12 @@ CREATE TABLE "categories" (
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
+-- CreateIndex
+CREATE INDEX "idx_transaction_id" ON "split_or_recurrence"("transaction_id");
+
+-- AddForeignKey
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -100,10 +119,10 @@ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_category_id_fkey" FOREIG
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_credit_card_id_fkey" FOREIGN KEY ("credit_card_id") REFERENCES "credit_cards"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "transactions" ADD CONSTRAINT "transactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "installments" ADD CONSTRAINT "installments_transaction_id_fkey" FOREIGN KEY ("transaction_id") REFERENCES "transactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "split_or_recurrence" ADD CONSTRAINT "split_or_recurrence_transaction_id_fkey" FOREIGN KEY ("transaction_id") REFERENCES "transactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "credit_cards" ADD CONSTRAINT "credit_cards_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_plans" ADD CONSTRAINT "user_plans_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

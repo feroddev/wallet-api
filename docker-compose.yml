@@ -5,13 +5,13 @@ services:
     image: postgres:latest
     container_name: my_postgres_db
     environment:
-      POSTGRES_USER: neath # Substitua com seu usuário
-      POSTGRES_PASSWORD: 1234 # Substitua com sua senha
-      POSTGRES_DB: wallet # Nome do banco de dados
+      POSTGRES_USER: neath
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: wallet
     ports:
-      - '5432:5432' # Porta exposta no seu localhost
+      - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Volumes persistentes para os dados
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - postgres_network
 

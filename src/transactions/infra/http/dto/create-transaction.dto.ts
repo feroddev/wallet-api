@@ -25,7 +25,7 @@ export class CreateTransactionDto {
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  transactionDate: Date
+  date: Date
 
   @IsString()
   description: string
