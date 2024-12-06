@@ -1,68 +1,52 @@
-import { PaymentMethod, RecurrenceInterval } from '@prisma/client'
+import { PaymentMethod } from '@prisma/client'
 import { Transform } from 'class-transformer'
 import {
   IsBoolean,
   IsDate,
   IsEnum,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  Min,
   ValidateIf
 } from 'class-validator'
 
 export class CreateTransactionDto {
+  @IsNotEmpty()
   @IsString()
   categoryId: string
 
+  @IsNotEmpty()
   @IsString()
-  @ValidateIf((o) => o.paymentMethod === 'CREDIT_CARD')
-  creditCardId?: string
+  name: string
 
-  @IsDate()
   @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  dueDate?: Date
-
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  date: Date
-
   @IsString()
-  description: string
-
-  @IsNumber()
-  @Transform(({ value }) => Number(value))
-  totalAmount: number
-
-  @IsBoolean()
-  @IsOptional()
-  isInstallment?: boolean
-
-  @ValidateIf((o) => o.isInstallment === true)
-  @IsNumber()
-  @Transform(({ value }) => Number(value))
-  totalInstallments?: number
-
-  @IsBoolean()
-  @IsOptional()
-  isRecurring?: boolean
-
-  @ValidateIf((o) => o.isRecurring === true)
-  @IsEnum(RecurrenceInterval)
-  recurrenceInterval?: RecurrenceInterval
-
-  @ValidateIf((o) => o.isRecurring === true)
-  @IsDate()
-  @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  recurrenceStart?: Date
-
-  @ValidateIf((o) => o.isRecurring === true)
-  @IsDate()
-  @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  recurrenceEnd?: Date
+  description?: string
 
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod
+
+  @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
+  @IsString()
+  @IsNotEmpty()
+  creditCardId?: string
+
+  @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
+  @IsNumber()
+  @Min(1)
+  totalInstallments?: number
+
+  @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
+  @IsOptional()
+  @IsBoolean()
+  isSplitOrRecurring?: boolean
+
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  date: string
+
+  @IsNumber()
+  totalAmount: number
 }

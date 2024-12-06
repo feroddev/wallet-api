@@ -1,17 +1,10 @@
-import { Transaction } from '@prisma/client'
+import { Prisma, Transaction } from '@prisma/client'
 import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
 
 export abstract class TransactionRepository {
-  abstract create(
+  abstract createWithTransaction(
     userId: string,
-    data: CreateTransactionDto
+    data: CreateTransactionDto,
+    transaction: Prisma.TransactionClient
   ): Promise<Transaction>
-
-  abstract find(data: Partial<Transaction>): Promise<Transaction>
-
-  abstract findMany(data: Partial<Transaction>): Promise<Transaction[]>
-
-  abstract update(id: string, data: Partial<Transaction>): Promise<Transaction>
-
-  abstract delete(id: string): Promise<void>
 }

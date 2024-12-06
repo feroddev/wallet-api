@@ -80,37 +80,42 @@ model Transaction {
   creditCard          CreditCard?         @relation(fields: [creditCardId], references: [id])
   splitsOrRecurrences SplitOrRecurrence[]
 
+  @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
 }
 
 model SplitOrRecurrence {
   id                String         @id @default(uuid())
   transactionId     String         @map("transaction_id")
+  creditCardId      String?        @map("credit_card_id")
   type              RecurrenceType
   installmentNumber Int?           @map("installment_number")
   amount            Decimal        @db.Money
+  totalInstallments Int?           @map("total_installments")
   dueDate           DateTime       @map("due_date")
   paymentStatus     PaymentStatus  @default(PENDING) @map("payment_status")
   paidAt            DateTime?      @map("paid_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
   transaction       Transaction    @relation(fields: [transactionId], references: [id])
+  creditCard        CreditCard?    @relation(fields: [creditCardId], references: [id])
 
   @@index([transactionId], name: "idx_transaction_id")
   @@map("split_or_recurrence")
 }
 
 model CreditCard {
-  id           String        @id @default(uuid())
-  userId       String        @map("user_id")
-  cardName     String        @map("card_name")
-  limit        Decimal       @db.Money
-  closingDay   Int           @map("closing_day")
-  dueDay       Int           @map("due_day")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
+  id                String              @id @default(uuid())
+  userId            String              @map("user_id")
+  cardName          String              @map("card_name")
+  limit             Decimal             @db.Money
+  closingDay        Int                 @map("closing_day")
+  dueDay            Int                 @map("due_day")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  user              User                @relation(fields: [userId], references: [id])
+  transactions      Transaction[]
+  SplitOrRecurrence SplitOrRecurrence[]
 
   @@map("credit_cards")
 }
