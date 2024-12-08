@@ -17,3 +17,8 @@ export enum PaymentStatus {
   PENDING = 'PENDING',
   PAID = 'PAID'
 }
+
+export enum TransactionType {
+  EXPENSE = 'EXPENSE',
+  INCOME = 'INCOME'
+}

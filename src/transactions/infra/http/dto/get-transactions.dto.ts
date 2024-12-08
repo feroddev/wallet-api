@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from 'class-validator'
-import { PaymentMethod } from './enum'
+import { PaymentMethod, TransactionType } from './enum'
 
 export class GetTransactionsDto {
   @IsOptional()
@@ -13,4 +13,8 @@ export class GetTransactionsDto {
   @IsOptional()
   @IsString()
   paymentMethod?: PaymentMethod
+
+  @IsOptional()
+  @IsString()
+  type?: TransactionType
 }

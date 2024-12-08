@@ -67,6 +67,7 @@ model Transaction {
   userId              String              @map("user_id")
   categoryId          String              @map("category_id")
   name                String
+  type                TransactionType     @map("type")
   description         String?
   paymentMethod       PaymentMethod       @map("payment_method")
   date                DateTime            @map("date")

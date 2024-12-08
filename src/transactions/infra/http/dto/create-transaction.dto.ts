@@ -11,6 +11,7 @@ import {
   Min,
   ValidateIf
 } from 'class-validator'
+import { TransactionType } from './enum'
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -49,4 +50,7 @@ export class CreateTransactionDto {
 
   @IsNumber()
   totalAmount: number
+
+  @IsEnum(TransactionType)
+  type: TransactionType
 }

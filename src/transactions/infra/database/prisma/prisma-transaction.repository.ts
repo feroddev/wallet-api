@@ -30,6 +30,18 @@ export class PrismaTransactionRepository implements TransactionRepository {
         ...(categoryId && { categoryId }),
         ...(creditCardId && { creditCardId }),
         ...(paymentMethod && { paymentMethod })
+      },
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        },
+        creditCard: {
+          select: {
+            cardName: true
+          }
+        }
       }
     })
   }
