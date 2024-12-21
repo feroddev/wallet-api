@@ -19,4 +19,9 @@ export class CreateCreditCardDto {
   @IsPositive()
   @Transform(({ value }) => Number(value))
   dueDay: number
+
+  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
+  lastDigits: number
 }
