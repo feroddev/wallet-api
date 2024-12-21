@@ -8,8 +8,10 @@ import { CreditCardController } from './infra/http/controllers/credit-card.contr
 import { CreditCardRepository } from './repositories/credit-card.repository'
 import { CreateCreditCardUseCase } from './use-case/create-credit-card.use-case'
 import { DeleteCreditCardUseCase } from './use-case/delete-credit-card.use-case'
+import { FindCreditCardUseCase } from './use-case/find-credit-card.use-case'
 import { GetCreditCardUseCase } from './use-case/get-credit-card.use-case'
 import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
+import { UpdateCreditCardUseCase } from './use-case/update-credit-card.use-case'
 
 @Module({
   controllers: [CreditCardController],
@@ -19,6 +21,8 @@ import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
     CreateCreditCardUseCase,
     GetInvoicesUseCase,
     DeleteCreditCardUseCase,
+    FindCreditCardUseCase,
+    UpdateCreditCardUseCase,
     {
       provide: CreditCardRepository,
       useClass: PrismaCreditCardRepository
