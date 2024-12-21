@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { Decimal } from '@prisma/client/runtime/library'
-import { CreateCreditCardDto } from '../infra/http/dto/create-credit-card.dto'
+import { UpdateCreditCardDto } from '../infra/http/dto/update-credit-card.dto'
 import { CreditCardRepository } from '../repositories/credit-card.repository'
 
 @Injectable()
@@ -9,7 +8,7 @@ export class UpdateCreditCardUseCase {
   async execute(
     userId: string,
     creditCardId: string,
-    data: Partial<CreateCreditCardDto>
+    data: UpdateCreditCardDto
   ) {
     const creditCard = await this.creditCardRepository.find({
       id: creditCardId,
@@ -21,8 +20,7 @@ export class UpdateCreditCardUseCase {
     }
 
     return this.creditCardRepository.update(creditCardId, {
-      ...data,
-      limit: new Decimal(data.limit)
+      ...data
     })
   }
 }
