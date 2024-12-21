@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query
+} from '@nestjs/common'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
 import { CreateCreditCardUseCase } from '../../../use-case/create-credit-card.use-case'
+import { DeleteCreditCardUseCase } from '../../../use-case/delete-credit-card.use-case'
 import { GetCreditCardUseCase } from '../../../use-case/get-credit-card.use-case'
 import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
 import { CreateCreditCardDto } from '../dto/create-credit-card.dto'
@@ -14,7 +23,8 @@ export class CreditCardController {
   constructor(
     private readonly getCreditCardUseCase: GetCreditCardUseCase,
     private readonly createCreditCardUseCase: CreateCreditCardUseCase,
-    private readonly getInvoiceUseCase: GetInvoicesUseCase
+    private readonly getInvoiceUseCase: GetInvoicesUseCase,
+    private readonly deleteCreditCardUseCase: DeleteCreditCardUseCase
   ) {}
 
   @Get()
@@ -37,5 +47,13 @@ export class CreditCardController {
     @Query() query: GetInvoicesDto
   ) {
     return this.getInvoiceUseCase.execute(userId, creditCardId, query)
+  }
+
+  @Delete('/:creditCardId')
+  async deleteCreditCard(
+    @Jwt() { userId }: JwtPayload,
+    @Param('creditCardId') creditCardId: string
+  ) {
+    return this.deleteCreditCardUseCase.execute(userId, creditCardId)
   }
 }

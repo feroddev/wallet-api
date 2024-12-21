@@ -7,6 +7,7 @@ import { PrismaCreditCardRepository } from './infra/database/prisma/prisma-credi
 import { CreditCardController } from './infra/http/controllers/credit-card.controller'
 import { CreditCardRepository } from './repositories/credit-card.repository'
 import { CreateCreditCardUseCase } from './use-case/create-credit-card.use-case'
+import { DeleteCreditCardUseCase } from './use-case/delete-credit-card.use-case'
 import { GetCreditCardUseCase } from './use-case/get-credit-card.use-case'
 import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 
@@ -17,6 +18,7 @@ import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
     GetCreditCardUseCase,
     CreateCreditCardUseCase,
     GetInvoicesUseCase,
+    DeleteCreditCardUseCase,
     {
       provide: CreditCardRepository,
       useClass: PrismaCreditCardRepository

@@ -76,9 +76,9 @@ model Transaction {
   creditCardId        String?             @map("credit_card_id")
   createdAt           DateTime            @default(now()) @map("created_at")
   updatedAt           DateTime            @updatedAt @map("updated_at")
-  user                User                @relation(fields: [userId], references: [id])
-  category            Category            @relation(fields: [categoryId], references: [id])
-  creditCard          CreditCard?         @relation(fields: [creditCardId], references: [id])
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category            Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  creditCard          CreditCard?         @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
   splitsOrRecurrences SplitOrRecurrence[]
 
   @@index([userId, date], name: "idx_user_date")
@@ -98,8 +98,8 @@ model SplitOrRecurrence {
   paidAt            DateTime?      @map("paid_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
-  transaction       Transaction    @relation(fields: [transactionId], references: [id])
-  creditCard        CreditCard?    @relation(fields: [creditCardId], references: [id])
+  transaction       Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  creditCard        CreditCard?    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
 
   @@index([transactionId], name: "idx_transaction_id")
   @@map("split_or_recurrence")
@@ -109,12 +109,13 @@ model CreditCard {
   id                String              @id @default(uuid())
   userId            String              @map("user_id")
   cardName          String              @map("card_name")
+  lastDigits        Int?                @map("last_digits")
   limit             Decimal             @db.Money
   closingDay        Int                 @map("closing_day")
   dueDay            Int                 @map("due_day")
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
-  user              User                @relation(fields: [userId], references: [id])
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions      Transaction[]
   SplitOrRecurrence SplitOrRecurrence[]
 
@@ -129,7 +130,7 @@ model UserPlan {
   endDate   DateTime? @map("end_date")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_plans")
 }
