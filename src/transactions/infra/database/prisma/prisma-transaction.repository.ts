@@ -45,4 +45,23 @@ export class PrismaTransactionRepository implements TransactionRepository {
       }
     })
   }
+
+  async find(data: Partial<Transaction>): Promise<any> {
+    return this.prisma.transaction.findFirst({
+      where: data,
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        },
+        creditCard: {
+          select: {
+            cardName: true
+          }
+        },
+        splitsOrRecurrences: true
+      }
+    })
+  }
 }

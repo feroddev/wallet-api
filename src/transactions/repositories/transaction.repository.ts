@@ -10,4 +10,6 @@ export abstract class TransactionRepository {
   ): Promise<Transaction>
 
   abstract findMany(userId: string, payload: GetTransactionsDto): Promise<any>
+
+  abstract find(data: Partial<Transaction>): Promise<any>
 }

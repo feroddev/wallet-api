@@ -12,6 +12,7 @@ import { CategoryRepository } from './repositories/category.repository'
 import { SplitOrRecurrenceRepository } from './repositories/split-or-recurrence.repository'
 import { TransactionRepository } from './repositories/transaction.repository'
 import { CreateTransactionsUseCase } from './use-case/create-transactions.use-case'
+import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
 
@@ -22,6 +23,7 @@ import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
     CreateTransactionsUseCase,
     GetCategoriesUseCase,
     GetTransactionsUseCase,
+    FindTransactionUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
