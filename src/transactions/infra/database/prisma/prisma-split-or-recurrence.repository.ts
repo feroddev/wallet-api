@@ -4,6 +4,7 @@ import { GetInvoicesDto } from '../../../../credit-card/infra/http/dto/get-invoi
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { SplitOrRecurrenceRepository } from '../../../repositories/split-or-recurrence.repository'
 import { SplitOrRecurrenceDto } from '../../http/dto/create-split-or-recurrence.dto'
+import { PaymentStatus } from '../../http/dto/enum'
 
 @Injectable()
 export class PrismaSplitOrRecurrenceRepository
@@ -65,5 +66,17 @@ export class PrismaSplitOrRecurrenceRepository
       total,
       installments
     }
+  }
+
+  async pay(id: string, userId: string, paidAt: Date) {
+    return this.prisma.splitOrRecurrence.update({
+      where: {
+        id
+      },
+      data: {
+        paymentStatus: PaymentStatus.PAID,
+        paidAt: paidAt
+      }
+    })
   }
 }

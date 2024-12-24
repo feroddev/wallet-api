@@ -37,11 +37,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: {
-          select: {
-            cardName: true
-          }
-        }
+        creditCard: true
       }
     })
   }
@@ -55,11 +51,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: {
-          select: {
-            cardName: true
-          }
-        },
+        creditCard: true,
         splitsOrRecurrences: true
       }
     })

@@ -13,4 +13,6 @@ export abstract class SplitOrRecurrenceRepository {
     creditCardId: string,
     query: GetInvoicesDto
   ): Promise<any>
+
+  abstract pay(id: string, userId: string, paidAt: Date): Promise<any>
 }
