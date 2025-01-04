@@ -24,15 +24,17 @@ export class PrismaTransactionRepository implements TransactionRepository {
 
   async findMany(userId: string, payload: GetTransactionsDto): Promise<any> {
     const { categoryId, creditCardId, paymentMethod } = payload
-    const month = payload.month || new Date().getUTCMonth() + 1
+    const month = payload.month || new Date().getUTCMonth()
     const year = payload.year || new Date().getUTCFullYear()
+    const startDate = new Date(year, month, 1)
+    const endDate = new Date(year, month + 1, 0)
 
     return this.prisma.transaction.findMany({
       where: {
         userId,
         date: {
-          gte: new Date(year, month, 1),
-          lte: new Date(year, month + 1, 0)
+          gte: startDate,
+          lte: endDate
         },
         ...(categoryId && { categoryId }),
         ...(creditCardId && { creditCardId }),
