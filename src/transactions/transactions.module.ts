@@ -17,6 +17,7 @@ import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
 import { PaidSplitOrRecurrencyUseCase } from './use-case/paid-split-or-recurrency.use-case'
+import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
 
 @Module({
   controllers: [
@@ -31,6 +32,7 @@ import { PaidSplitOrRecurrencyUseCase } from './use-case/paid-split-or-recurrenc
     GetTransactionsUseCase,
     FindTransactionUseCase,
     PaidSplitOrRecurrencyUseCase,
+    PayCreditCardUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository

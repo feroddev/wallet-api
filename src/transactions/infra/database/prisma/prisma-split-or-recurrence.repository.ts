@@ -68,7 +68,7 @@ export class PrismaSplitOrRecurrenceRepository
     }
   }
 
-  async pay(id: string, userId: string, paidAt: Date) {
+  async pay(id: string, paidAt: Date) {
     return this.prisma.splitOrRecurrence.update({
       where: {
         id
@@ -76,6 +76,18 @@ export class PrismaSplitOrRecurrenceRepository
       data: {
         paymentStatus: PaymentStatus.PAID,
         paidAt: paidAt
+      }
+    })
+  }
+
+  async payByCreditCard(creditCardId: string, paidAt: Date): Promise<any> {
+    return this.prisma.splitOrRecurrence.updateMany({
+      where: {
+        creditCardId
+      },
+      data: {
+        paymentStatus: PaymentStatus.PAID,
+        paidAt
       }
     })
   }
