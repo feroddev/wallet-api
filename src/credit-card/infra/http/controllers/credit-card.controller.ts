@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -6,8 +15,10 @@ import { CreateCreditCardUseCase } from '../../../use-case/create-credit-card.us
 import { DeleteCreditCardUseCase } from '../../../use-case/delete-credit-card.use-case'
 import { FindCreditCardUseCase } from '../../../use-case/find-credit-card.use-case'
 import { GetCreditCardUseCase } from '../../../use-case/get-credit-card.use-case'
+import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
 import { UpdateCreditCardUseCase } from '../../../use-case/update-credit-card.use-case'
 import { CreateCreditCardDto } from '../dto/create-credit-card.dto'
+import { GetInvoicesDto } from '../dto/get-invoice.dto'
 import { UpdateCreditCardDto } from '../dto/update-credit-card.dto'
 
 @Auth()
@@ -18,7 +29,8 @@ export class CreditCardController {
     private readonly createCreditCardUseCase: CreateCreditCardUseCase,
     private readonly deleteCreditCardUseCase: DeleteCreditCardUseCase,
     private readonly findCreditCardUseCase: FindCreditCardUseCase,
-    private readonly updateCreditCardUseCase: UpdateCreditCardUseCase
+    private readonly updateCreditCardUseCase: UpdateCreditCardUseCase,
+    private readonly getInvoicesUseCase: GetInvoicesUseCase
   ) {}
 
   @Get()
@@ -57,5 +69,14 @@ export class CreditCardController {
     @Param('creditCardId') creditCardId: string
   ) {
     return this.deleteCreditCardUseCase.execute(userId, creditCardId)
+  }
+
+  @Get('/:creditCardId/invoices')
+  async getInvoices(
+    @Jwt() { userId }: JwtPayload,
+    @Param('creditCardId') creditCardId: string,
+    @Query() query: GetInvoicesDto
+  ) {
+    return this.getInvoicesUseCase.execute(userId, creditCardId, query)
   }
 }
