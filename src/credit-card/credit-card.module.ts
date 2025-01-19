@@ -10,7 +10,6 @@ import { CreateCreditCardUseCase } from './use-case/create-credit-card.use-case'
 import { DeleteCreditCardUseCase } from './use-case/delete-credit-card.use-case'
 import { FindCreditCardUseCase } from './use-case/find-credit-card.use-case'
 import { GetCreditCardUseCase } from './use-case/get-credit-card.use-case'
-import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 import { UpdateCreditCardUseCase } from './use-case/update-credit-card.use-case'
 
 @Module({
@@ -19,7 +18,6 @@ import { UpdateCreditCardUseCase } from './use-case/update-credit-card.use-case'
     PrismaService,
     GetCreditCardUseCase,
     CreateCreditCardUseCase,
-    GetInvoicesUseCase,
     DeleteCreditCardUseCase,
     FindCreditCardUseCase,
     UpdateCreditCardUseCase,

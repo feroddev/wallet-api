@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
 import { PrismaCreditCardRepository } from '../credit-card/infra/database/prisma/prisma-credit-card.repository'
 import { CreditCardRepository } from '../credit-card/repositories/credit-card.repository'
+import { GetInvoicesUseCase } from '../credit-card/use-case/get-invoices.use-case'
 import { PrismaService } from '../prisma/prisma.service'
 import { PrismaCategoryRepository } from './infra/database/prisma/prisma-category.repository'
 import { PrismaSplitOrRecurrenceRepository } from './infra/database/prisma/prisma-split-or-recurrence.repository'
@@ -33,6 +34,7 @@ import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
     FindTransactionUseCase,
     PaidSplitOrRecurrencyUseCase,
     PayCreditCardUseCase,
+    GetInvoicesUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
