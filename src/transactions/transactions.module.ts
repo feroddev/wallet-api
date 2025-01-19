@@ -14,6 +14,7 @@ import { SplitOrRecurrenceRepository } from './repositories/split-or-recurrence.
 import { TransactionRepository } from './repositories/transaction.repository'
 import { CreateTransactionsUseCase } from './use-case/create-transactions.use-case'
 import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
+import { GetBillsUseCase } from './use-case/get-bills.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
@@ -35,6 +36,7 @@ import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
     PaidSplitOrRecurrencyUseCase,
     PayCreditCardUseCase,
     GetInvoicesUseCase,
+    GetBillsUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
