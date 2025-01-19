@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { SplitOrRecurrenceRepository } from '../../transactions/repositories/split-or-recurrence.repository'
-import { GetInvoicesDto } from '../infra/http/dto/get-invoice.dto'
+import { GetInvoicesDto } from '../../credit-card/infra/http/dto/get-invoice.dto'
+import { SplitOrRecurrenceRepository } from '../repositories/split-or-recurrence.repository'
 
 @Injectable()
 export class GetInvoicesUseCase {
