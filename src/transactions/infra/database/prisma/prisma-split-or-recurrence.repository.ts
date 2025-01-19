@@ -50,6 +50,11 @@ export class PrismaSplitOrRecurrenceRepository
               lte: endDate
             }
           }
+        },
+        category: {
+          select: {
+            name: true
+          }
         }
       }
     })
