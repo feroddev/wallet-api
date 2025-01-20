@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer'
 import { IsNumber, IsOptional, IsString } from 'class-validator'
 import { PaymentMethod, TransactionType } from './enum'
 
@@ -20,9 +21,11 @@ export class GetTransactionsDto {
 
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => Number(value))
   month?: number
 
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => Number(value))
   year?: number
 }
