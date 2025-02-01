@@ -74,3 +74,19 @@ Este repositório contém o código-fonte do **backend** do **Sábio Financeiro*
 
 7. **Acesse a API:**
    - A API estará disponível em http://localhost:3001.
+
+## Estrutura do Projeto
+
+```
+wallet-api/
+├── src/
+│   ├── auth/              # Módulo de autenticação
+│   ├── users/             # Módulo de usuários
+│   ├── transactions/      # Módulo de transações (despesas/receitas)
+│   ├── categories/        # Módulo de categorias
+│   └── main.ts            # Ponto de entrada da aplicação
+├── prisma/                # Schema e migrações do Prisma
+├── .env.example           # Exemplo de variáveis de ambiente
+├── docker-compose.yml     # Configuração do Docker
+└── README.md              # Este arquivo
+```
