@@ -38,7 +38,6 @@ export class PrismaTransactionRepository implements TransactionRepository {
           gte: startDate,
           lte: endDate
         },
-
         ...(categoryId && { categoryId }),
         ...(creditCardId && { creditCardId }),
         ...(paymentMethod && { paymentMethod }),
@@ -51,6 +50,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
           }
         },
         creditCard: true
+      },
+      orderBy: {
+        date: 'asc'
       }
     })
   }
