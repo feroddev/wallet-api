@@ -10,7 +10,17 @@ export class PayCreditCardUseCase {
     private readonly creditCardRepository: CreditCardRepository
   ) {}
 
-  async execute(creditCardId: string, userId: string, paidAt: Date) {
+  async execute({
+    creditCardId,
+    userId,
+    paidAt,
+    dueDate
+  }: {
+    creditCardId: string
+    userId: string
+    paidAt: Date
+    dueDate: Date
+  }) {
     const creditCard = await this.creditCardRepository.find({
       userId,
       id: creditCardId
@@ -20,9 +30,10 @@ export class PayCreditCardUseCase {
       throw new NotFoundException(errors.CREDIT_CARD_NOT_FOUND)
     }
 
-    return this.splitOrRecurrenceRepository.payByCreditCard(
+    return this.splitOrRecurrenceRepository.payByCreditCard({
       creditCardId,
-      paidAt
-    )
+      paidAt,
+      dueDate
+    })
   }
 }

@@ -5,4 +5,8 @@ export class PaySplitOrRecurrenceDto {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   paidAt: Date
+
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  dueDate: Date
 }

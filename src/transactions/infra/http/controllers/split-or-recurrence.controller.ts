@@ -30,11 +30,16 @@ export class SplitOrRecurrenceController {
 
   @Patch('/credit-card/:creditCardId/pay')
   async payCreditCard(
-    @Param('creditCardId') creditcardId,
+    @Param('creditCardId') creditCardId,
     @Jwt() { userId }: JwtPayload,
-    @Body() { paidAt }: PaySplitOrRecurrenceDto
+    @Body() { paidAt, dueDate }: PaySplitOrRecurrenceDto
   ) {
-    return this.payCreditCardUseCase.execute(creditcardId, userId, paidAt)
+    return this.payCreditCardUseCase.execute({
+      creditCardId,
+      userId,
+      paidAt,
+      dueDate
+    })
   }
 
   @Get('/:creditCardId/invoices')

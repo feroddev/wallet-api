@@ -87,14 +87,77 @@ export class PrismaSplitOrRecurrenceRepository
     })
   }
 
-  async payByCreditCard(creditCardId: string, paidAt: Date): Promise<any> {
-    return this.prisma.splitOrRecurrence.updateMany({
+  async payByCreditCard({ creditCardId, paidAt, dueDate }): Promise<any> {
+    const month = new Date(dueDate).getUTCMonth()
+    const year = new Date(dueDate).getUTCFullYear()
+    const startDate = new Date(year, month, 1)
+    const endDate = new Date(year, month + 1, 0)
+
+    const bills = await this.prisma.splitOrRecurrence.findMany({
       where: {
-        creditCardId
+        creditCardId,
+        paymentStatus: PaymentStatus.PENDING,
+        dueDate: {
+          gte: startDate,
+          lte: endDate
+        }
+      },
+      include: {
+        transaction: {
+          select: {
+            userId: true
+          }
+        },
+        creditCard: {
+          select: {
+            cardName: true
+          }
+        }
+      }
+    })
+
+    if (!bills.length) {
+      return { message: 'No bills to pay' }
+    }
+
+    await this.prisma.splitOrRecurrence.updateMany({
+      where: {
+        creditCardId,
+        dueDate: {
+          gte: startDate,
+          lte: endDate
+        }
       },
       data: {
         paymentStatus: PaymentStatus.PAID,
         paidAt
+      }
+    })
+
+    const { id: categoryId } = await this.prisma.category.findFirst({
+      where: {
+        name: {
+          equals: 'Despesas Diversas'
+        }
+      },
+      select: {
+        id: true
+      }
+    })
+
+    const total = bills.reduce((acc, curr) => {
+      return acc + Number(curr.amount)
+    }, 0)
+
+    return this.prisma.transaction.create({
+      data: {
+        userId: bills[0].transaction.userId,
+        date: paidAt,
+        name: `Pagamento de fatura do cartão: ${bills[0].creditCard.cardName}`,
+        paymentMethod: PaymentMethod.INVOICE,
+        totalAmount: total,
+        type: 'EXPENSE',
+        categoryId
       }
     })
   }

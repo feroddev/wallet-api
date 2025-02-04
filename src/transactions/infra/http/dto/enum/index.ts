@@ -5,6 +5,7 @@ export enum PaymentMethod {
   BANK_SLIP = 'BANK_SLIP',
   BANK_TRANSFER = 'BANK_TRANSFER',
   PIX = 'PIX',
+  INVOICE = 'INVOICE',
   OTHER = 'OTHER'
 }
 

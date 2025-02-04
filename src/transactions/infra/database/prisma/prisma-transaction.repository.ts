@@ -14,6 +14,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     transaction: Prisma.TransactionClient
   ): Promise<Transaction> {
     const { totalInstallments, ...payload } = data
+
     return transaction.transaction.create({
       data: {
         ...payload,
@@ -41,7 +42,17 @@ export class PrismaTransactionRepository implements TransactionRepository {
         ...(categoryId && { categoryId }),
         ...(creditCardId && { creditCardId }),
         ...(paymentMethod && { paymentMethod }),
-        ...(type && { type })
+        ...(type && { type }),
+        NOT: {
+          paymentMethod: 'CREDIT_CARD',
+          splitsOrRecurrences: {
+            some: {
+              dueDate: {
+                gt: endDate
+              }
+            }
+          }
+        }
       },
       include: {
         category: {
