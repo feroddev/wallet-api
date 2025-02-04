@@ -25,10 +25,10 @@ export class PrismaTransactionRepository implements TransactionRepository {
 
   async findMany(userId: string, payload: GetTransactionsDto): Promise<any> {
     const { categoryId, creditCardId, paymentMethod, type } = payload
-    const month =
-      new Date(2021, payload.month, 1).getUTCMonth() || new Date().getUTCMonth()
-    const year =
-      new Date(payload.year, 1, 1).getFullYear() || new Date().getUTCFullYear()
+    const date = payload.date || new Date()
+    const month = new Date(date).getUTCMonth()
+    const year = new Date(date).getUTCFullYear()
+
     const startDate = new Date(year, month, 1)
     const endDate = new Date(year, month + 1, 0)
 
