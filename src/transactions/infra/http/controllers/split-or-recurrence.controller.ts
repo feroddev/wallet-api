@@ -8,6 +8,7 @@ import { GetBillsUseCase } from '../../../use-case/get-bills.use-case'
 import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
 import { PaidSplitOrRecurrencyUseCase } from '../../../use-case/paid-split-or-recurrency.use-case'
 import { PayCreditCardUseCase } from '../../../use-case/pay-credit-card.use-case'
+import { PayIncomeDto } from '../dto/pay-income.dto'
 import { PaySplitOrRecurrenceDto } from '../dto/pay-split-or-recurrence.dto'
 
 @Auth()
@@ -32,7 +33,7 @@ export class SplitOrRecurrenceController {
   async payCreditCard(
     @Param('creditCardId') creditCardId,
     @Jwt() { userId }: JwtPayload,
-    @Body() { paidAt, dueDate }: PaySplitOrRecurrenceDto
+    @Body() { paidAt, dueDate }: PayIncomeDto
   ) {
     return this.payCreditCardUseCase.execute({
       creditCardId,
