@@ -153,7 +153,8 @@ export class PrismaSplitOrRecurrenceRepository
       data: {
         userId: bills[0].transaction.userId,
         date: paidAt,
-        name: `Pagamento de fatura do cartão: ${bills[0].creditCard.cardName}`,
+        name: `Fatura do cartão`,
+        description: `Cartão ${bills[0].creditCard.cardName}`,
         paymentMethod: PaymentMethod.INVOICE,
         totalAmount: total,
         type: 'EXPENSE',
