@@ -49,16 +49,16 @@ enum RecurrenceType {
 }
 
 model User {
-  id                     String        @id @default(uuid())
-  name                   String
-  email                  String        @unique
-  password               String
-  plan                   Plan          @default(FREE)
-  createdAt              DateTime      @default(now()) @map("created_at")
-  subscriptionExpiration DateTime?     @map("subscription_expiration")
-  creditCards            CreditCard[]
-  transactions           Transaction[]
-  userPlan               UserPlan[]
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  password       String
+  plan           Plan             @default(FREE)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  CreditCards    CreditCard[]
+  Transactions   Transaction[]
+  UserPlan       UserPlan[]
+  PendingPayment PendingPayment[]
 
   @@map("users")
 }
@@ -144,4 +144,20 @@ model Category {
   transactions Transaction[]
 
   @@map("categories")
+}
+
+model PendingPayment {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  description   String         @map("description")
+  totalAmount   Decimal        @db.Money
+  dueDate       DateTime       @map("due_date")
+  status        PaymentStatus  @default(PENDING) @map("status")
+  paymentMethod PaymentMethod? @map("payment_method")
+  paidAt        DateTime?      @map("paid_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("pending_payments")
 }
