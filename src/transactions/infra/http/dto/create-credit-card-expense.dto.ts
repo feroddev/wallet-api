@@ -26,4 +26,14 @@ export class CreditCardExpenseDto {
 
   @IsString()
   creditCardId: string
+
+  @IsString()
+  categoryId: string
+
+  @IsString()
+  name: string
+
+  @IsOptional()
+  @IsString()
+  description?: string
 }

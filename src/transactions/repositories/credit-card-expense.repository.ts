@@ -14,13 +14,9 @@ export abstract class CreditCardExpenseRepository {
     query: GetInvoicesDto
   ): Promise<any>
 
-  abstract pay(id: string, paidAt: Date): Promise<any>
-
   abstract payByCreditCard(payload: {
     creditCardId: string
     paidAt: Date
     dueDate: Date
   }): Promise<any>
-
-  abstract findBills(userId: string, query: GetInvoicesDto): Promise<any>
 }
