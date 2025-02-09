@@ -55,13 +55,13 @@ export class CreateTransactionsUseCase {
       installmentDate.setMonth(installmentDate.getUTCMonth() + index)
 
       return {
+        userId,
         name: data.name,
         description: data.description,
         totalAmount: data.totalAmount,
-        totalInstallments: data.totalInstallments,
         dueDate: installmentDate.toISOString(),
-        userId,
-        categoryId: data.categoryId
+        categoryId: data.categoryId,
+        paymentMethod: 'BANK_SLIP'
       }
     })
 

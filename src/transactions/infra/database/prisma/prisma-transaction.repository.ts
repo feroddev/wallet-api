@@ -13,7 +13,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     data: CreateTransactionDto,
     transaction: Prisma.TransactionClient
   ): Promise<Transaction> {
-    const { totalInstallments, isRecurring, ...payload } = data
+    const { totalInstallments, isRecurring, creditCardId, ...payload } = data
 
     return transaction.transaction.create({
       data: {

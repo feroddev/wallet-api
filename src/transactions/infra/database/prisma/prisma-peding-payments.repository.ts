@@ -18,10 +18,7 @@ export class PrismaPendingPaymentsRepository
     transaction: Prisma.TransactionClient
   ) {
     return transaction.pendingPayment.createMany({
-      data: {
-        ...data,
-        paymentMethod: 'BANK_SLIP'
-      }
+      data
     })
   }
 
@@ -90,8 +87,6 @@ export class PrismaPendingPaymentsRepository
         id: pendingPayments.userId
       }
     })
-
-    console.log({ pendingPayments, user })
 
     await this.prisma.transaction.create({
       data: {

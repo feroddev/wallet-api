@@ -4,11 +4,13 @@ import {
   IsEnum,
   IsNumber,
   IsOptional,
-  IsString
+  IsString,
+  IsUUID
 } from 'class-validator'
 
 export class CreatePendingPaymentDto {
   @IsString()
+  @IsUUID()
   userId: string
 
   @IsString()
