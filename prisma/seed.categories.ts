@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
   const categories = [
@@ -16,31 +16,32 @@ async function main() {
     'Tecnologia',
     'Serviços',
     'Despesas Diversas',
-    'Outros',
-  ];
+    'Fatura do Cartão',
+    'Outros'
+  ]
 
   for (const category of categories) {
     await prisma.category.create({
-      data: { name: category, type: 'EXPENSE' },
-    });
+      data: { name: category, type: 'EXPENSE' }
+    })
   }
 
-  const incomes = ['Salário', 'Rendimentos', 'Investimentos', 'Outros'];
+  const incomes = ['Salário', 'Rendimentos', 'Outros']
 
   for (const income of incomes) {
     await prisma.category.create({
-      data: { name: income, type: 'INCOME' },
-    });
+      data: { name: income, type: 'INCOME' }
+    })
   }
 
-  console.log('Categorias criadas com sucesso!');
+  console.log('Categorias criadas com sucesso!')
 }
 
 main()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error(e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })
