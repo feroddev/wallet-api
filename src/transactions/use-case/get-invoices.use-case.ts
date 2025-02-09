@@ -9,10 +9,6 @@ export class GetInvoicesUseCase {
   ) {}
 
   async execute(userId: string, creditCardId: string, query: GetInvoicesDto) {
-    return this.creditCardExpenseRepository.findMany(
-      userId,
-      creditCardId,
-      query
-    )
+    return this.creditCardExpenseRepository.findMany(creditCardId, query)
   }
 }

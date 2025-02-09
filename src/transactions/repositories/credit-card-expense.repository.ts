@@ -8,11 +8,7 @@ export abstract class CreditCardExpenseRepository {
     transaction: Prisma.TransactionClient
   ): Promise<any>
 
-  abstract findMany(
-    userId: string,
-    creditCardId: string,
-    query: GetInvoicesDto
-  ): Promise<any>
+  abstract findMany(creditCardId: string, query: GetInvoicesDto): Promise<any>
 
   abstract payByCreditCard(payload: {
     creditCardId: string
