@@ -18,7 +18,10 @@ export class PrismaPendingPaymentsRepository
     transaction: Prisma.TransactionClient
   ) {
     return transaction.pendingPayment.createMany({
-      data
+      data: {
+        ...data,
+        paymentMethod: 'BANK_SLIP'
+      }
     })
   }
 
@@ -81,6 +84,14 @@ export class PrismaPendingPaymentsRepository
         paidAt
       }
     })
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: pendingPayments.userId
+      }
+    })
+
+    console.log({ pendingPayments, user })
 
     await this.prisma.transaction.create({
       data: {

@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 import { CreditCardExpenseDto } from '../infra/http/dto/create-credit-card-expense.dto'
 import { CreatePendingPaymentDto } from '../infra/http/dto/create-pending-payment.dto'
 import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
-import { PaymentMethod, SplitType } from '../infra/http/dto/enum'
+import { PaymentMethod } from '../infra/http/dto/enum'
 import { CreditCardExpenseRepository } from '../repositories/credit-card-expense.repository'
 import { PendingPaymentsRepository } from '../repositories/pending-payments.repository'
 import { TransactionRepository } from '../repositories/transaction.repository'
@@ -59,7 +59,6 @@ export class CreateTransactionsUseCase {
         description: data.description,
         totalAmount: data.totalAmount,
         totalInstallments: data.totalInstallments,
-        type: SplitType.RECURRING,
         dueDate: installmentDate.toISOString(),
         userId,
         categoryId: data.categoryId
@@ -117,17 +116,18 @@ export class CreateTransactionsUseCase {
         amount: data.totalAmount / data.totalInstallments,
         installmentNumber: index + 1,
         totalInstallments: data.totalInstallments,
-        type: SplitType.INSTALLMENT,
         dueDate: installmentDate.toISOString(),
         creditCardId: creditCard.id,
         categoryId: data.categoryId
       }
     })
 
-    return this.creditCardExpenseRepository.createWithTransaction(
+    await this.creditCardExpenseRepository.createWithTransaction(
       payload,
       transaction
     )
+
+    return { message: 'Credit card expense created' }
   }
 
   private validateTransactionData(data: CreateTransactionDto) {
