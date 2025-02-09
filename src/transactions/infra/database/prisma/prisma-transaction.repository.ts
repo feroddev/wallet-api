@@ -13,7 +13,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     data: CreateTransactionDto,
     transaction: Prisma.TransactionClient
   ): Promise<Transaction> {
-    const { totalInstallments, ...payload } = data
+    const { totalInstallments, isRecurring, ...payload } = data
 
     return transaction.transaction.create({
       data: {
@@ -42,17 +42,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
         ...(categoryId && { categoryId }),
         ...(creditCardId && { creditCardId }),
         ...(paymentMethod && { paymentMethod }),
-        ...(type && { type }),
-        NOT: {
-          paymentMethod: 'CREDIT_CARD',
-          splitsOrRecurrences: {
-            some: {
-              dueDate: {
-                gt: endDate
-              }
-            }
-          }
-        }
+        ...(type && { type })
       },
       include: {
         category: {
@@ -77,8 +67,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: true,
-        splitsOrRecurrences: true
+        creditCard: true
       }
     })
   }
