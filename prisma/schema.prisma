@@ -73,6 +73,7 @@ model Transaction {
   updatedAt     DateTime        @updatedAt @map("updated_at")
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   category      Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  creditCard    CreditCard?     @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
@@ -80,6 +81,8 @@ model Transaction {
 
 model CreditCardExpense {
   id                String        @id @default(uuid())
+  name              String
+  description       String?
   creditCardId      String        @map("credit_card_id")
   categoryId        String        @map("category_id")
   installmentNumber Int           @map("installment_number")
@@ -108,6 +111,7 @@ model CreditCard {
   updatedAt         DateTime            @updatedAt @map("updated_at")
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   SplitOrRecurrence CreditCardExpense[]
+  Transaction       Transaction[]
 
   @@map("credit_cards")
 }
@@ -140,7 +144,8 @@ model Category {
 model PendingPayment {
   id            String         @id @default(uuid())
   userId        String         @map("user_id")
-  description   String         @map("description")
+  name          String
+  description   String?        @map("description")
   categoryId    String         @map("category_id")
   totalAmount   Decimal        @db.Money
   dueDate       DateTime       @map("due_date")
