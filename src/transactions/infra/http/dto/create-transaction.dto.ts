@@ -1,6 +1,7 @@
 import { PaymentMethod } from '@prisma/client'
 import { Transform } from 'class-transformer'
 import {
+  IsBoolean,
   IsDate,
   IsEnum,
   IsNotEmpty,
@@ -27,6 +28,10 @@ export class CreateTransactionDto {
 
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod
+
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean
 
   @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
   @IsString()

@@ -12,7 +12,11 @@ export class CreatePendingPaymentDto {
   userId: string
 
   @IsString()
-  description: string
+  name: string
+
+  @IsOptional()
+  @IsString()
+  description?: string
 
   @IsDateString()
   dueDate: string
@@ -23,4 +27,7 @@ export class CreatePendingPaymentDto {
   @IsOptional()
   @IsEnum(PaymentStatus)
   paymentStatus?: PaymentStatus
+
+  @IsString()
+  categoryId: string
 }
