@@ -21,7 +21,7 @@ export class PrismaCreditCardExpenseRepository
     })
   }
 
-  async findMany(userId: string, creditCardId: string, query: GetInvoicesDto) {
+  async findMany(creditCardId: string, query: GetInvoicesDto) {
     const { date } = query
     const month = new Date(date).getUTCMonth()
     const year = new Date(date).getUTCFullYear()

@@ -8,7 +8,8 @@ import { PrismaCreditCardExpenseRepository } from './infra/database/prisma/prism
 import { PrismaPendingPaymentsRepository } from './infra/database/prisma/prisma-peding-payments.repository'
 import { PrismaTransactionRepository } from './infra/database/prisma/prisma-transaction.repository'
 import { CategoriesController } from './infra/http/controllers/categories.controller'
-import { SplitOrRecurrenceController } from './infra/http/controllers/credit-card-expense.controller'
+import { CreditCardExpenseController } from './infra/http/controllers/credit-card-expense.controller'
+import { PendingPaymentController } from './infra/http/controllers/pending-payment.controller'
 import { TransactionsController } from './infra/http/controllers/transactions.controller'
 import { CategoryRepository } from './repositories/category.repository'
 import { CreditCardExpenseRepository } from './repositories/credit-card-expense.repository'
@@ -27,7 +28,8 @@ import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
   controllers: [
     TransactionsController,
     CategoriesController,
-    SplitOrRecurrenceController
+    CreditCardExpenseController,
+    PendingPaymentController
   ],
   providers: [
     PrismaService,
