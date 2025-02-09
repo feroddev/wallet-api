@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { errors } from '../../../constants/errors'
 import { CreditCardRepository } from '../../credit-card/repositories/credit-card.repository'
-import { SplitOrRecurrenceRepository } from '../repositories/split-or-recurrence.repository'
+import { SplitOrRecurrenceRepository } from '../repositories/credit-card-expense.repository'
 
 @Injectable()
 export class PayCreditCardUseCase {

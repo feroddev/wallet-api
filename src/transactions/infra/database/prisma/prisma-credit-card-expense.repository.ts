@@ -3,21 +3,21 @@ import { Prisma } from '@prisma/client'
 import { GetBillsDto } from '../../../../credit-card/infra/http/dto/get-bills.dto'
 import { GetInvoicesDto } from '../../../../credit-card/infra/http/dto/get-invoice.dto'
 import { PrismaService } from '../../../../prisma/prisma.service'
-import { SplitOrRecurrenceRepository } from '../../../repositories/split-or-recurrence.repository'
-import { SplitOrRecurrenceDto } from '../../http/dto/create-split-or-recurrence.dto'
+import { CreditCardExpenseRepository } from '../../../repositories/credit-card-expense.repository'
+import { CreditCardExpenseDto } from '../../http/dto/create-credit-card-expense.dto'
 import { PaymentMethod, PaymentStatus } from '../../http/dto/enum'
 
 @Injectable()
-export class PrismaSplitOrRecurrenceRepository
-  implements SplitOrRecurrenceRepository
+export class PrismaCreditCardExpenseRepository
+  implements CreditCardExpenseRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
   async createWithTransaction(
-    data: SplitOrRecurrenceDto[],
+    data: CreditCardExpenseDto[],
     transaction: Prisma.TransactionClient
   ) {
-    return transaction.splitOrRecurrence.createMany({
+    return transaction.creditCardExpense.createMany({
       data
     })
   }

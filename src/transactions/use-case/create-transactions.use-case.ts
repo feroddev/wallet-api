@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { CreditCardRepository } from '../../credit-card/repositories/credit-card.repository'
 import { PrismaService } from '../../prisma/prisma.service'
-import { SplitOrRecurrenceDto } from '../infra/http/dto/create-split-or-recurrence.dto'
+import { CreditCardExpenseDto } from '../infra/http/dto/create-credit-card-expense.dto'
 import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
 import { PaymentMethod, SplitType } from '../infra/http/dto/enum'
-import { SplitOrRecurrenceRepository } from '../repositories/split-or-recurrence.repository'
+import { CreditCardExpenseRepository } from '../repositories/credit-card-expense.repository'
+import { PendingPaymentsRepository } from '../repositories/pending-payments.repository'
 import { TransactionRepository } from '../repositories/transaction.repository'
 
 @Injectable()
@@ -13,24 +14,15 @@ export class CreateTransactionsUseCase {
     private readonly prisma: PrismaService,
     private readonly transactionsRepository: TransactionRepository,
     private readonly creditCardRepository: CreditCardRepository,
-    private readonly splitOrRecurrenceRepository: SplitOrRecurrenceRepository
+    private readonly creditCardExpenseRepository: CreditCardExpenseRepository,
+    private readonly pendingPaymentsRepository: PendingPaymentsRepository
   ) {}
 
   async execute(userId: string, data: CreateTransactionDto) {
     this.validateTransactionData(data)
 
     return this.prisma.$transaction(async (transaction) => {
-      const transactionCreated =
-        await this.transactionsRepository.createWithTransaction(
-          userId,
-          data,
-          transaction
-        )
-
-      if (
-        data.isSplitOrRecurring &&
-        data.paymentMethod === PaymentMethod.CREDIT_CARD
-      ) {
+      if (data.paymentMethod === PaymentMethod.CREDIT_CARD) {
         const creditCard = await this.creditCardRepository.find({
           id: data.creditCardId
         })
@@ -60,7 +52,7 @@ export class CreateTransactionsUseCase {
           )
         }
 
-        const payload: SplitOrRecurrenceDto[] = Array.from({
+        const payload: CreditCardExpenseDto[] = Array.from({
           length: data.totalInstallments
         }).map((_, index) => {
           const installmentDate = new Date(firstInstallmentDate)
@@ -68,7 +60,6 @@ export class CreateTransactionsUseCase {
 
           return {
             amount: data.totalAmount / data.totalInstallments,
-            transactionId: transactionCreated.id,
             installmentNumber: index + 1,
             totalInstallments: data.totalInstallments,
             type: SplitType.INSTALLMENT,
@@ -77,16 +68,14 @@ export class CreateTransactionsUseCase {
           }
         })
 
-        await this.splitOrRecurrenceRepository.createWithTransaction(
+        return this.creditCardExpenseRepository.createWithTransaction(
           payload,
           transaction
         )
-
-        return transactionCreated
       }
 
-      if (data.isSplitOrRecurring) {
-        const payload: SplitOrRecurrenceDto[] = Array.from({
+      if (data.paymentMethod === PaymentMethod.BANK_SLIP) {
+        const payload = Array.from({
           length: 12
         }).map((_, index) => {
           const installmentDate = new Date(data.date)
@@ -95,20 +84,25 @@ export class CreateTransactionsUseCase {
           return {
             amount: data.totalAmount,
             transactionId: transactionCreated.id,
-            installmentNumber: index + 1,
             totalInstallments: data.totalInstallments,
             type: SplitType.RECURRING,
             dueDate: installmentDate.toISOString()
           }
         })
 
-        await this.splitOrRecurrenceRepository.createWithTransaction(
+        return this.pendingPaymentsRepository.createWithTransaction(
           payload,
           transaction
         )
-
-        return transactionCreated
       }
+      const transactionCreated =
+        await this.transactionsRepository.createWithTransaction(
+          userId,
+          data,
+          transaction
+        )
+
+      return transactionCreated
     })
   }
 

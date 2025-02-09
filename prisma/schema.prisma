@@ -43,11 +43,6 @@ enum CategoryType {
   EXPENSE
 }
 
-enum RecurrenceType {
-  INSTALLMENT
-  RECURRING
-}
-
 model User {
   id             String           @id @default(uuid())
   name           String
@@ -64,46 +59,39 @@ model User {
 }
 
 model Transaction {
-  id                  String              @id @default(uuid())
-  userId              String              @map("user_id")
-  categoryId          String              @map("category_id")
-  name                String
-  type                TransactionType     @map("type")
-  description         String?
-  paymentMethod       PaymentMethod       @map("payment_method")
-  date                DateTime            @map("date")
-  totalAmount         Decimal             @db.Money
-  isSplitOrRecurring  Boolean             @default(false) @map("is_split_or_recurring")
-  creditCardId        String?             @map("credit_card_id")
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category            Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  creditCard          CreditCard?         @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
-  splitsOrRecurrences SplitOrRecurrence[]
+  id            String          @id @default(uuid())
+  userId        String          @map("user_id")
+  categoryId    String          @map("category_id")
+  name          String
+  type          TransactionType @map("type")
+  description   String?
+  paymentMethod PaymentMethod   @map("payment_method")
+  date          DateTime        @map("date")
+  totalAmount   Decimal         @db.Money
+  creditCardId  String?         @map("credit_card_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
 }
 
-model SplitOrRecurrence {
-  id                String         @id @default(uuid())
-  transactionId     String         @map("transaction_id")
-  creditCardId      String?        @map("credit_card_id")
-  type              RecurrenceType
-  installmentNumber Int?           @map("installment_number")
-  amount            Decimal        @db.Money
-  totalInstallments Int?           @map("total_installments")
-  dueDate           DateTime       @map("due_date")
-  paymentStatus     PaymentStatus  @default(PENDING) @map("payment_status")
-  paidAt            DateTime?      @map("paid_at")
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
-  transaction       Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  creditCard        CreditCard?    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
+model CreditCardExpense {
+  id                String        @id @default(uuid())
+  creditCardId      String        @map("credit_card_id")
+  installmentNumber Int           @map("installment_number")
+  amount            Decimal       @db.Money
+  totalInstallments Int           @map("total_installments")
+  dueDate           DateTime      @map("due_date")
+  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
+  paidAt            DateTime?     @map("paid_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  creditCard        CreditCard    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
 
-  @@index([transactionId], name: "idx_transaction_id")
-  @@map("split_or_recurrence")
+  @@map("credit_card_expenses")
 }
 
 model CreditCard {
@@ -117,8 +105,7 @@ model CreditCard {
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions      Transaction[]
-  SplitOrRecurrence SplitOrRecurrence[]
+  SplitOrRecurrence CreditCardExpense[]
 
   @@map("credit_cards")
 }
