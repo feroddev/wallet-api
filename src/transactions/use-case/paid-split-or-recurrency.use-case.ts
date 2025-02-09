@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { SplitOrRecurrenceRepository } from '../repositories/credit-card-expense.repository'
+import { PendingPaymentsRepository } from '../repositories/pending-payments.repository'
 
 @Injectable()
 export class PaidSplitOrRecurrencyUseCase {
   constructor(
-    private readonly splitOrRecurrenceRepository: SplitOrRecurrenceRepository
+    private readonly pendingPaymentsRepository: PendingPaymentsRepository
   ) {}
 
   async execute(id: string, paidAt: Date) {
-    return this.splitOrRecurrenceRepository.pay(id, paidAt)
+    return this.pendingPaymentsRepository.payPendingPayments(id, paidAt)
   }
 }
