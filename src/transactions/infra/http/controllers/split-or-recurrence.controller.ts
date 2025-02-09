@@ -6,7 +6,7 @@ import { GetBillsDto } from '../../../../credit-card/infra/http/dto/get-bills.dt
 import { GetInvoicesDto } from '../../../../credit-card/infra/http/dto/get-invoice.dto'
 import { GetBillsUseCase } from '../../../use-case/get-bills.use-case'
 import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
-import { PaidSplitOrRecurrencyUseCase } from '../../../use-case/paid-split-or-recurrency.use-case'
+import { PaidSplitOrRecurrencyUseCase } from '../../../use-case/paid-pending-payment.use-case'
 import { PayCreditCardUseCase } from '../../../use-case/pay-credit-card.use-case'
 import { PayIncomeDto } from '../dto/pay-income.dto'
 import { PaySplitOrRecurrenceDto } from '../dto/pay-split-or-recurrence.dto'

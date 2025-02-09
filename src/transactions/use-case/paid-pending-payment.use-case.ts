@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { PendingPaymentsRepository } from '../repositories/pending-payments.repository'
 
 @Injectable()
-export class PaidSplitOrRecurrencyUseCase {
+export class PaidPendingPaymentUseCase {
   constructor(
     private readonly pendingPaymentsRepository: PendingPaymentsRepository
   ) {}
 
   async execute(id: string, paidAt: Date) {
-    return this.pendingPaymentsRepository.payPendingPayments(id, paidAt)
+    return this.pendingPaymentsRepository.payPendingPayment(id, paidAt)
   }
 }

@@ -10,5 +10,5 @@ export abstract class PendingPaymentsRepository {
 
   abstract findBills(userId: string, query: GetBillsDto): Promise<any>
 
-  abstract payPendingPayments(id: string, paidAt: Date): Promise<any>
+  abstract payPendingPayment(id: string, paidAt: Date): Promise<any>
 }

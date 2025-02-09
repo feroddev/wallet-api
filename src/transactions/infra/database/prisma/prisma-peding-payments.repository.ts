@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
+import { errors } from '../../../../../constants/errors'
 import { GetBillsDto } from '../../../../credit-card/infra/http/dto/get-bills.dto'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { PendingPaymentsRepository } from '../../../repositories/pending-payments.repository'
 import { CreatePendingPaymentDto } from '../../http/dto/create-pending-payment.dto'
-import { PaymentStatus } from '../../http/dto/enum'
+import { PaymentStatus, TransactionType } from '../../http/dto/enum'
 
 @Injectable()
 export class PrismaPendingPaymentsRepository
@@ -58,5 +59,42 @@ export class PrismaPendingPaymentsRepository
       total,
       installments
     }
+  }
+
+  async payPendingPayment(id: string, paidAt: Date): Promise<any> {
+    const pendingPayments = await this.prisma.pendingPayment.findFirst({
+      where: {
+        id
+      }
+    })
+
+    if (!pendingPayments) {
+      throw new NotFoundException(errors.PENDING_PAYMENT_NOT_FOUND)
+    }
+
+    await this.prisma.pendingPayment.update({
+      where: {
+        id
+      },
+      data: {
+        status: PaymentStatus.PAID,
+        paidAt
+      }
+    })
+
+    await this.prisma.transaction.create({
+      data: {
+        date: paidAt,
+        name: pendingPayments.name,
+        paymentMethod: pendingPayments.paymentMethod,
+        totalAmount: pendingPayments.totalAmount,
+        type: TransactionType.EXPENSE,
+        categoryId: pendingPayments.categoryId,
+        description: pendingPayments.description,
+        userId: pendingPayments.userId
+      }
+    })
+
+    return { message: 'Payment made successfully' }
   }
 }
