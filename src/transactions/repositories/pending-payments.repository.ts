@@ -1,9 +1,12 @@
 import { Prisma } from '@prisma/client'
-import { CreditCardExpenseDto } from '../infra/http/dto/create-credit-card-expense.dto'
+import { GetBillsDto } from '../../credit-card/infra/http/dto/get-bills.dto'
+import { CreatePendingPaymentDto } from '../infra/http/dto/create-pending-payment.dto'
 
 export abstract class PendingPaymentsRepository {
   abstract createWithTransaction(
-    data: CreditCardExpenseDto[],
+    data: CreatePendingPaymentDto[],
     transaction: Prisma.TransactionClient
   ): Promise<any>
+
+  abstract findBills(userId: string, query: GetBillsDto): Promise<any>
 }
