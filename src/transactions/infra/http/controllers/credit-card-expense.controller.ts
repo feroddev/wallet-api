@@ -6,7 +6,7 @@ import { GetBillsDto } from '../../../../credit-card/infra/http/dto/get-bills.dt
 import { GetInvoicesDto } from '../../../../credit-card/infra/http/dto/get-invoice.dto'
 import { GetBillsUseCase } from '../../../use-case/get-bills.use-case'
 import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
-import { PaidSplitOrRecurrencyUseCase } from '../../../use-case/paid-pending-payment.use-case'
+import { PaidPendingPaymentUseCase } from '../../../use-case/paid-pending-payment.use-case'
 import { PayCreditCardUseCase } from '../../../use-case/pay-credit-card.use-case'
 import { PayIncomeDto } from '../dto/pay-income.dto'
 import { PaySplitOrRecurrenceDto } from '../dto/pay-split-or-recurrence.dto'
@@ -15,7 +15,7 @@ import { PaySplitOrRecurrenceDto } from '../dto/pay-split-or-recurrence.dto'
 @Controller('/split-or-recurrence')
 export class SplitOrRecurrenceController {
   constructor(
-    private readonly paidSplitOrRecurrencyUseCase: PaidSplitOrRecurrencyUseCase,
+    private readonly paidPendingPaymentUseCase: PaidPendingPaymentUseCase,
     private readonly payCreditCardUseCase: PayCreditCardUseCase,
     private readonly getInvoicesUseCase: GetInvoicesUseCase,
     private readonly getBillsUseCase: GetBillsUseCase
@@ -26,7 +26,7 @@ export class SplitOrRecurrenceController {
     @Param('id') id: string,
     @Body() { paidAt }: PaySplitOrRecurrenceDto
   ) {
-    return this.paidSplitOrRecurrencyUseCase.execute(id, paidAt)
+    return this.paidPendingPaymentUseCase.execute(id, paidAt)
   }
 
   @Patch('/credit-card/:creditCardId/pay')
