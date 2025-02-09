@@ -69,34 +69,4 @@ export class AuthService {
 
     return { token }
   }
-
-  async forgotPassword({
-    userId,
-    token,
-    password
-  }: {
-    userId: string
-    token: string
-    password: string
-  }) {
-    const payload = this.jwtService.decode(token) as JwtPayload
-    const verifyToken = payload.userId === userId
-
-    if (!verifyToken) {
-      throw new BadRequestException(errors.GENERIC_ERROR)
-    }
-
-    const user = await this.userRepository.find({
-      id: userId,
-      email: payload.user.email
-    })
-
-    if (!user) {
-      throw new NotFoundException(errors.GENERIC_ERROR)
-    }
-
-    await this.userRepository.update(user.id, { password })
-
-    return { message: 'Password updated successfully' }
-  }
 }
