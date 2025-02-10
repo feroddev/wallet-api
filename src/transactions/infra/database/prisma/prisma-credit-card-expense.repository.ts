@@ -127,7 +127,8 @@ export class PrismaCreditCardExpenseRepository
         paymentMethod: PaymentMethod.INVOICE,
         totalAmount: total,
         type: 'EXPENSE',
-        categoryId
+        categoryId,
+        creditCardId: creditCardId
       }
     })
   }

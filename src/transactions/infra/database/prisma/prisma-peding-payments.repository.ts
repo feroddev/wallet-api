@@ -47,7 +47,7 @@ export class PrismaPendingPaymentsRepository
       }
     })
 
-    const total = installments.reduce((acc, curr) => {
+    const pending = installments.reduce((acc, curr) => {
       return (
         acc +
         Number(curr.totalAmount) *
@@ -55,8 +55,17 @@ export class PrismaPendingPaymentsRepository
       )
     }, 0)
 
+    const paid = installments.reduce((acc, curr) => {
+      return (
+        acc +
+        Number(curr.totalAmount) * (curr.status === PaymentStatus.PAID ? 1 : 0)
+      )
+    }, 0)
+
     return {
-      total,
+      pending,
+      paid,
+      total: pending + paid,
       installments
     }
   }
