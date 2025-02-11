@@ -36,4 +36,7 @@ export class CreditCardExpenseDto {
   @IsOptional()
   @IsString()
   description?: string
+
+  @IsDateString()
+  date: string
 }

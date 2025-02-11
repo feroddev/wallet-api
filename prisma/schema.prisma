@@ -89,6 +89,7 @@ model CreditCardExpense {
   amount            Decimal       @db.Money
   totalInstallments Int           @map("total_installments")
   dueDate           DateTime      @map("due_date")
+  date              DateTime      @map("date")
   paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
   paidAt            DateTime?     @map("paid_at")
   createdAt         DateTime      @default(now()) @map("created_at")

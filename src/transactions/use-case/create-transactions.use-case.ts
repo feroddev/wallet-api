@@ -118,7 +118,8 @@ export class CreateTransactionsUseCase {
         totalInstallments: data.totalInstallments,
         dueDate: installmentDate.toISOString(),
         creditCardId: creditCard.id,
-        categoryId: data.categoryId
+        categoryId: data.categoryId,
+        date: data.date
       }
     })
 
