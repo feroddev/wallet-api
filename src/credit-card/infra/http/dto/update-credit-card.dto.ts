@@ -1,22 +1,15 @@
-import { Decimal } from '@prisma/client/runtime/library'
 import { Transform } from 'class-transformer'
-import {
-  IsDecimal,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsString
-} from 'class-validator'
+import { IsNumber, IsOptional, IsPositive, IsString } from 'class-validator'
 
 export class UpdateCreditCardDto {
   @IsString()
   @IsOptional()
   cardName?: string
 
-  @IsDecimal()
+  @IsNumber()
   @IsOptional()
-  @Transform(({ value }) => new Decimal(value))
-  limit?: Decimal
+  @Transform(({ value }) => Number(value))
+  limit?: number
 
   @IsNumber()
   @IsOptional()

@@ -13,6 +13,7 @@ export class PendingPaymentController {
     private readonly paidPendingPaymentUseCase: PaidPendingPaymentUseCase,
     private readonly getBillsUseCase: GetBillsUseCase
   ) {}
+
   @Get()
   async getBills(@Jwt() { userId }: JwtPayload, @Query() query: GetBillsDto) {
     return this.getBillsUseCase.execute(userId, query)
