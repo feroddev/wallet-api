@@ -34,9 +34,7 @@ export class PrismaSubscriptionPlanRepository implements SubscriptionPlanReposit
     await this.prisma.user.update({
       where: { id: userId },
       data: {
-        SubscriptionPlan: {
-          connect: { id: planId }
-        }
+        subscriptionPlanId: planId
       }
     })
   }

@@ -11,6 +11,7 @@ import { DeleteBillUseCase } from './use-case/delete-bill.use-case'
 import { GetBillsUseCase } from './use-case/get-bills.use-case'
 import { PayBillUseCase } from './use-case/pay-bill.use-case'
 import { UpdateBillUseCase } from './use-case/update-bill.use-case'
+import { PrismaTransactionRepository } from '../transactions/infra/database/prisma/prisma-transaction.repository'
 
 @Module({
   imports: [AuthModule, TransactionsModule],
@@ -25,6 +26,10 @@ import { UpdateBillUseCase } from './use-case/update-bill.use-case'
     {
       provide: BillToPayRepository,
       useClass: PrismaBillToPayRepository
+    },
+    {
+      provide: TransactionRepository,
+      useClass: PrismaTransactionRepository
     }
   ],
   exports: [BillToPayRepository]

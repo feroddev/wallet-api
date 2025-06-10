@@ -58,7 +58,8 @@ model User {
   Goal           Goal[]
   BillToPay      BillToPay[]
   Budget         Budget[]
-  SubscriptionPlan SubscriptionPlan[]
+  subscriptionPlanId String?       @map("subscription_plan_id")
+  subscriptionPlan SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
 
   @@map("users")
 }

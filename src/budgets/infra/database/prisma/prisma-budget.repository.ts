@@ -95,7 +95,8 @@ export class PrismaBudgetRepository implements BudgetRepository {
     const startDate = new Date(year, month - 1, 1)
     const endDate = new Date(year, month, 0)
 
-    const result = await this.prisma.transaction.aggregate({
+    // Buscar transações da categoria específica
+    const transactions = await this.prisma.transaction.findMany({
       where: {
         userId,
         categoryId: category,
@@ -105,11 +106,16 @@ export class PrismaBudgetRepository implements BudgetRepository {
           lte: endDate
         }
       },
-      _sum: {
-        value: true
+      select: {
+        totalAmount: true
       }
     })
 
-    return Number(result._sum.value || 0)
+    // Calcular o total manualmente
+    const total = transactions.reduce((sum, transaction) => {
+      return sum + Number(transaction.totalAmount)
+    }, 0)
+
+    return total
   }
 }
