@@ -5,6 +5,7 @@ import { CreditCardRepository } from '../credit-card/repositories/credit-card.re
 import { PrismaService } from '../prisma/prisma.service'
 import { PrismaCategoryRepository } from './infra/database/prisma/prisma-category.repository'
 import { PrismaCreditCardExpenseRepository } from './infra/database/prisma/prisma-credit-card-expense.repository'
+import { RecurringTransactionsCron } from './infra/cron/recurring-transactions.cron'
 import { PrismaPendingPaymentsRepository } from './infra/database/prisma/prisma-peding-payments.repository'
 import { PrismaTransactionRepository } from './infra/database/prisma/prisma-transaction.repository'
 import { CategoriesController } from './infra/http/controllers/categories.controller'
@@ -15,7 +16,9 @@ import { CategoryRepository } from './repositories/category.repository'
 import { CreditCardExpenseRepository } from './repositories/credit-card-expense.repository'
 import { PendingPaymentsRepository } from './repositories/pending-payments.repository'
 import { TransactionRepository } from './repositories/transaction.repository'
+import { CreateRecurringTransactionsUseCase } from './use-case/create-recurring-transactions.use-case'
 import { CreateTransactionsUseCase } from './use-case/create-transactions.use-case'
+import { DeleteTransactionUseCase } from './use-case/delete-transaction.use-case'
 import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
 import { GetBillsUseCase } from './use-case/get-bills.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
@@ -23,6 +26,7 @@ import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
 import { PaidPendingPaymentUseCase } from './use-case/paid-pending-payment.use-case'
 import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
+import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case'
 
 @Module({
   controllers: [
@@ -37,6 +41,10 @@ import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
     GetCategoriesUseCase,
     GetTransactionsUseCase,
     FindTransactionUseCase,
+    UpdateTransactionUseCase,
+    DeleteTransactionUseCase,
+    CreateRecurringTransactionsUseCase,
+    RecurringTransactionsCron,
     PaidPendingPaymentUseCase,
     PayCreditCardUseCase,
     GetInvoicesUseCase,

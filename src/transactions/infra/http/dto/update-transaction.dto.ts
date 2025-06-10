@@ -13,51 +13,46 @@ import {
 } from 'class-validator'
 import { TransactionType } from './enum'
 
-export class CreateTransactionDto {
-  @IsNotEmpty()
+export class UpdateTransactionDto {
+  @IsOptional()
   @IsString()
-  categoryId: string
+  categoryId?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  name: string
+  name?: string
 
   @IsOptional()
   @IsString()
   description?: string
 
-  @IsEnum(PaymentMethod)
-  paymentMethod: PaymentMethod
-
   @IsOptional()
-  @IsBoolean()
-  isRecurring?: boolean
-  
+  @IsEnum(PaymentMethod)
+  paymentMethod?: PaymentMethod
+
   @IsOptional()
   @IsBoolean()
   isPaid?: boolean
 
-  @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
-  @IsString()
-  @IsNotEmpty()
-  creditCardId?: string
-  
   @IsOptional()
-  @IsString()
-  invoiceId?: string
+  @IsBoolean()
+  isRecurring?: boolean
 
+  @IsOptional()
   @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
-  @IsNumber()
-  @Min(1)
-  totalInstallments?: number
+  @IsString()
+  creditCardId?: string
 
+  @IsOptional()
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  date: string
+  date?: string
 
+  @IsOptional()
   @IsNumber()
-  totalAmount: number
+  totalAmount?: number
 
+  @IsOptional()
   @IsEnum(TransactionType)
-  type: TransactionType
+  type?: TransactionType
 }

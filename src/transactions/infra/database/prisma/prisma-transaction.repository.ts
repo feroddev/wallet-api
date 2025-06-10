@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma, Transaction } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { TransactionRepository } from '../../../repositories/transaction.repository'
 import { CreateTransactionDto } from '../../http/dto/create-transaction.dto'
 import { GetTransactionsDto } from '../../http/dto/get-transactions.dto'
+import { UpdateTransactionDto } from '../../http/dto/update-transaction.dto'
 @Injectable()
 export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -18,7 +19,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
     return transaction.transaction.create({
       data: {
         ...payload,
-        userId
+        userId,
+        isRecurring: isRecurring || false,
+        creditCardId
       }
     })
   }
@@ -70,5 +73,83 @@ export class PrismaTransactionRepository implements TransactionRepository {
         creditCard: true
       }
     })
+  }
+
+  async update(id: string, userId: string, data: UpdateTransactionDto): Promise<Transaction> {
+    const transaction = await this.prisma.transaction.findFirst({
+      where: { id, userId }
+    })
+
+    if (!transaction) {
+      throw new NotFoundException('Transação não encontrada')
+    }
+
+    return this.prisma.transaction.update({
+      where: { id },
+      data,
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        },
+        creditCard: true
+      }
+    })
+  }
+
+  async delete(id: string, userId: string): Promise<Transaction> {
+    const transaction = await this.prisma.transaction.findFirst({
+      where: { id, userId }
+    })
+
+    if (!transaction) {
+      throw new NotFoundException('Transação não encontrada')
+    }
+
+    return this.prisma.transaction.delete({
+      where: { id }
+    })
+  }
+
+  async createRecurringTransactions(): Promise<void> {
+    const today = new Date()
+    const currentMonth = today.getMonth()
+    const currentYear = today.getFullYear()
+    
+    const firstDayLastMonth = new Date(currentYear, currentMonth - 1, 1)
+    const lastDayLastMonth = new Date(currentYear, currentMonth, 0)
+
+    const recurringTransactions = await this.prisma.transaction.findMany({
+      where: {
+        isRecurring: true,
+        date: {
+          gte: firstDayLastMonth,
+          lte: lastDayLastMonth
+        }
+      }
+    })
+
+    for (const transaction of recurringTransactions) {
+      const newDate = new Date(transaction.date)
+      newDate.setMonth(newDate.getMonth() + 1)
+
+      await this.prisma.transaction.create({
+        data: {
+          name: transaction.name,
+          description: transaction.description,
+          type: transaction.type,
+          categoryId: transaction.categoryId,
+          totalAmount: transaction.totalAmount,
+          paymentMethod: transaction.paymentMethod,
+          date: newDate,
+          userId: transaction.userId,
+          isRecurring: true,
+          isPaid: false,
+          creditCardId: transaction.creditCardId,
+          invoiceId: transaction.invoiceId
+        }
+      })
+    }
   }
 }

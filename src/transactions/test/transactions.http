@@ -1,0 +1,66 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Criar nova transação
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "categoryId": "id_da_categoria",
+  "name": "Salário",
+  "description": "Pagamento mensal",
+  "paymentMethod": "PIX",
+  "isRecurring": true,
+  "isPaid": true,
+  "date": "2025-06-10T00:00:00.000Z",
+  "totalAmount": 5000,
+  "type": "INCOME"
+}
+
+### Criar nova transação com cartão de crédito
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "categoryId": "id_da_categoria",
+  "name": "Compra Supermercado",
+  "description": "Compras mensais",
+  "paymentMethod": "CREDIT_CARD",
+  "creditCardId": "id_do_cartao",
+  "isRecurring": false,
+  "isPaid": true,
+  "date": "2025-06-10T00:00:00.000Z",
+  "totalAmount": 350,
+  "type": "EXPENSE"
+}
+
+### Listar transações
+GET {{baseUrl}}/transactions
+Authorization: Bearer {{authToken}}
+
+### Listar transações com filtros
+GET {{baseUrl}}/transactions?categoryId=id_da_categoria&type=EXPENSE
+Authorization: Bearer {{authToken}}
+
+### Buscar transação por ID
+GET {{baseUrl}}/transactions/id_da_transacao
+Authorization: Bearer {{authToken}}
+
+### Atualizar transação
+PATCH {{baseUrl}}/transactions/id_da_transacao
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Novo nome",
+  "description": "Nova descrição",
+  "totalAmount": 550,
+  "isPaid": true
+}
+
+### Excluir transação
+DELETE {{baseUrl}}/transactions/id_da_transacao
+Authorization: Bearer {{authToken}}
