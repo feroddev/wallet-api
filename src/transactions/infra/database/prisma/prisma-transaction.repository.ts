@@ -9,6 +9,12 @@ import { UpdateTransactionDto } from '../../http/dto/update-transaction.dto'
 export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async create(data: Partial<Transaction>): Promise<Transaction> {
+    return this.prisma.transaction.create({
+      data: data as any
+    })
+  }
+
   async createWithTransaction(
     userId: string,
     data: CreateTransactionDto,

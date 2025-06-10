@@ -55,6 +55,8 @@ model User {
   UserPlan       UserPlan[]
   PendingPayment PendingPayment[]
   Invoice        Invoice[]
+  Goal           Goal[]
+  BillToPay      BillToPay[]
 
   @@map("users")
 }
@@ -167,6 +169,39 @@ model Invoice {
 
   @@unique([creditCardId, month, year])
   @@map("invoices")
+}
+
+model BillToPay {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  name        String
+  description String?
+  amount      Decimal   @db.Money
+  dueDate     DateTime  @map("due_date")
+  isPaid      Boolean   @default(false) @map("is_paid")
+  paidAt      DateTime? @map("paid_at")
+  isRecurring Boolean   @default(false) @map("is_recurring")
+  recurrenceDay Int?    @map("recurrence_day")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bills_to_pay")
+}
+
+model Goal {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  name        String
+  description String?
+  targetValue Decimal   @db.Money @map("target_value")
+  savedValue  Decimal   @default(0) @db.Money @map("saved_value")
+  deadline    DateTime  @map("deadline")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
 }
 
 model PendingPayment {

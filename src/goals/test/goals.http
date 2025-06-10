@@ -1,0 +1,43 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Criar nova meta
+POST {{baseUrl}}/goals
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Viagem para Europa",
+  "description": "Economizar para viagem de férias",
+  "targetValue": 15000,
+  "deadline": "2026-01-01T00:00:00.000Z"
+}
+
+### Listar metas com progresso
+GET {{baseUrl}}/goals
+Authorization: Bearer {{authToken}}
+
+### Atualizar meta
+PATCH {{baseUrl}}/goals/id_da_meta
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Viagem para Europa e Ásia",
+  "targetValue": 20000,
+  "deadline": "2026-06-01T00:00:00.000Z"
+}
+
+### Atualizar progresso da meta manualmente
+PATCH {{baseUrl}}/goals/id_da_meta/progress
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "amount": 500
+}
+
+### Excluir meta
+DELETE {{baseUrl}}/goals/id_da_meta
+Authorization: Bearer {{authToken}}

@@ -10,6 +10,8 @@ export abstract class TransactionRepository {
     transaction: Prisma.TransactionClient
   ): Promise<Transaction>
 
+  abstract create(data: Partial<Transaction>): Promise<Transaction>
+
   abstract findMany(userId: string, payload: GetTransactionsDto): Promise<any>
 
   abstract find(data: Partial<Transaction>): Promise<any>
