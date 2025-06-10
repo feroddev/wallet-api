@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module'
 import { BillsModule } from './bills/bills.module'
 import { BudgetsModule } from './budgets/budgets.module'
 import { CreditCardModule } from './credit-card/credit-card.module'
+import { DashboardModule } from './dashboard/dashboard.module'
 import { GoalsModule } from './goals/goals.module'
 import { InvoicesModule } from './invoices/invoices.module'
 import { PrismaModule } from './prisma/prisma.module'
@@ -26,6 +27,7 @@ import { UserModule } from './user/user.module'
     BillsModule,
     BudgetsModule,
     SubscriptionPlansModule,
+    DashboardModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true

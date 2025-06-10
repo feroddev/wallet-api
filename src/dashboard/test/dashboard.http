@@ -1,0 +1,7 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Obter dados do painel financeiro
+GET {{baseUrl}}/dashboard
+Authorization: Bearer {{authToken}}
