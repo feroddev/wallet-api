@@ -5,10 +5,12 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { BillsModule } from './bills/bills.module'
+import { BudgetsModule } from './budgets/budgets.module'
 import { CreditCardModule } from './credit-card/credit-card.module'
 import { GoalsModule } from './goals/goals.module'
 import { InvoicesModule } from './invoices/invoices.module'
 import { PrismaModule } from './prisma/prisma.module'
+import { SubscriptionPlansModule } from './subscription-plans/subscription-plans.module'
 import { TransactionsModule } from './transactions/transactions.module'
 import { UserModule } from './user/user.module'
 
@@ -22,6 +24,8 @@ import { UserModule } from './user/user.module'
     InvoicesModule,
     GoalsModule,
     BillsModule,
+    BudgetsModule,
+    SubscriptionPlansModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true

@@ -57,6 +57,8 @@ model User {
   Invoice        Invoice[]
   Goal           Goal[]
   BillToPay      BillToPay[]
+  Budget         Budget[]
+  SubscriptionPlan SubscriptionPlan[]
 
   @@map("users")
 }
@@ -169,6 +171,34 @@ model Invoice {
 
   @@unique([creditCardId, month, year])
   @@map("invoices")
+}
+
+model Budget {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  category    String
+  limit       Decimal   @db.Money
+  month       Int
+  year        Int
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, month, year])
+  @@map("budgets")
+}
+
+model SubscriptionPlan {
+  id          String    @id @default(uuid())
+  name        String
+  price       Decimal   @db.Money
+  features    String[]
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  users       User[]    
+
+  @@map("subscription_plans")
 }
 
 model BillToPay {

@@ -1,0 +1,18 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Listar planos disponíveis
+GET {{baseUrl}}/plans
+
+### Listar apenas planos ativos
+GET {{baseUrl}}/plans?isActive=true
+
+### Atualizar plano do usuário
+PATCH {{baseUrl}}/plans/:id
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "planId": "id_do_plano"
+}

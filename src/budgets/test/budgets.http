@@ -1,0 +1,36 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Criar novo orçamento por categoria
+POST {{baseUrl}}/budgets
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "category": "Alimentação",
+  "limit": 800,
+  "month": 6,
+  "year": 2025
+}
+
+### Listar orçamentos
+GET {{baseUrl}}/budgets
+Authorization: Bearer {{authToken}}
+
+### Listar orçamentos com filtros
+GET {{baseUrl}}/budgets?month=6&year=2025&category=Alimentação
+Authorization: Bearer {{authToken}}
+
+### Atualizar orçamento
+PATCH {{baseUrl}}/budgets/id_do_orcamento
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "limit": 1000
+}
+
+### Excluir orçamento
+DELETE {{baseUrl}}/budgets/id_do_orcamento
+Authorization: Bearer {{authToken}}
