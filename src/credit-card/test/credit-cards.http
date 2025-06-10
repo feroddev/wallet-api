@@ -1,0 +1,38 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Criar novo cartão de crédito
+POST {{baseUrl}}/credit-card
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "cardName": "Nubank",
+  "lastDigits": 1234,
+  "limit": 5000,
+  "closingDay": 10,
+  "dueDay": 20
+}
+
+### Listar cartões de crédito
+GET {{baseUrl}}/credit-card
+Authorization: Bearer {{authToken}}
+
+### Buscar cartão de crédito específico
+GET {{baseUrl}}/credit-card/id_do_cartao
+Authorization: Bearer {{authToken}}
+
+### Atualizar cartão de crédito
+PUT {{baseUrl}}/credit-card/id_do_cartao
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "cardName": "Nubank Platinum",
+  "limit": 8000
+}
+
+### Excluir cartão de crédito
+DELETE {{baseUrl}}/credit-card/id_do_cartao
+Authorization: Bearer {{authToken}}

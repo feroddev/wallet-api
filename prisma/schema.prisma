@@ -54,6 +54,7 @@ model User {
   Transactions   Transaction[]
   UserPlan       UserPlan[]
   PendingPayment PendingPayment[]
+  Invoice        Invoice[]
 
   @@map("users")
 }
@@ -77,6 +78,7 @@ model Transaction {
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   category      Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   creditCard    CreditCard?     @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  invoice       Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
@@ -116,6 +118,7 @@ model CreditCard {
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   SplitOrRecurrence CreditCardExpense[]
   Transaction       Transaction[]
+  Invoice           Invoice[]
 
   @@map("credit_cards")
 }
@@ -143,6 +146,27 @@ model Category {
   CreditCardExpense CreditCardExpense[]
 
   @@map("categories")
+}
+
+model Invoice {
+  id           String        @id @default(uuid())
+  userId       String        @map("user_id")
+  creditCardId String        @map("credit_card_id")
+  month        Int
+  year         Int
+  totalAmount  Decimal       @db.Money @map("total_amount")
+  isPaid       Boolean       @default(false) @map("is_paid")
+  paidAt       DateTime?     @map("paid_at")
+  dueDate      DateTime      @map("due_date")
+  closingDate  DateTime      @map("closing_date")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditCard   CreditCard    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([creditCardId, month, year])
+  @@map("invoices")
 }
 
 model PendingPayment {

@@ -1,0 +1,26 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@authToken = seu_token_jwt_aqui
+
+### Gerar fatura para cartão de crédito
+POST {{baseUrl}}/invoices/generate
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "creditCardId": "id_do_cartao",
+  "month": 6,
+  "year": 2025
+}
+
+### Listar faturas
+GET {{baseUrl}}/invoices
+Authorization: Bearer {{authToken}}
+
+### Listar faturas com filtros
+GET {{baseUrl}}/invoices?month=6&year=2025&creditCardId=id_do_cartao
+Authorization: Bearer {{authToken}}
+
+### Marcar fatura como paga
+PATCH {{baseUrl}}/invoices/id_da_fatura/pay
+Authorization: Bearer {{authToken}}
