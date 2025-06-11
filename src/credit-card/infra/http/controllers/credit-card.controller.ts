@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -11,7 +12,8 @@ import { CreateCreditCardDto } from '../dto/create-credit-card.dto'
 import { UpdateCreditCardDto } from '../dto/update-credit-card.dto'
 
 @Auth()
-@Controller('/credit-card')
+@ApiTags('Cartões de Crédito')
+@Controller('/credit-cards')
 export class CreditCardController {
   constructor(
     private readonly getCreditCardUseCase: GetCreditCardUseCase,
@@ -22,11 +24,17 @@ export class CreditCardController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Listar todos os cartões de crédito do usuário' })
+  @ApiResponse({ status: 200, description: 'Lista de cartões de crédito' })
   async getCreditCard(@Jwt() { userId }: JwtPayload) {
     return this.getCreditCardUseCase.execute(userId)
   }
 
   @Post()
+  @ApiOperation({ summary: 'Criar um novo cartão de crédito' })
+  @ApiBody({ type: CreateCreditCardDto })
+  @ApiResponse({ status: 201, description: 'Cartão de crédito criado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async createCreditCard(
     @Jwt() { userId }: JwtPayload,
     @Body() data: CreateCreditCardDto
@@ -34,27 +42,40 @@ export class CreditCardController {
     return this.createCreditCardUseCase.execute(userId, data)
   }
 
-  @Get('/:creditCardId')
+  @Get('/:id')
+  @ApiOperation({ summary: 'Buscar detalhes de um cartão de crédito' })
+  @ApiParam({ name: 'id', description: 'ID do cartão de crédito' })
+  @ApiResponse({ status: 200, description: 'Detalhes do cartão de crédito' })
+  @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async findCreditCard(
     @Jwt() { userId }: JwtPayload,
-    @Param('creditCardId') creditCardId: string
+    @Param('id') creditCardId: string
   ) {
     return this.findCreditCardUseCase.execute(creditCardId, userId)
   }
 
-  @Put('/:creditCardId')
+  @Put('/:id')
+  @ApiOperation({ summary: 'Atualizar dados de um cartão de crédito' })
+  @ApiParam({ name: 'id', description: 'ID do cartão de crédito' })
+  @ApiBody({ type: UpdateCreditCardDto })
+  @ApiResponse({ status: 200, description: 'Cartão de crédito atualizado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async updateCreditCard(
     @Jwt() { userId }: JwtPayload,
     @Body() data: UpdateCreditCardDto,
-    @Param('creditCardId') creditCardId: string
+    @Param('id') creditCardId: string
   ) {
     return this.updateCreditCardUseCase.execute(userId, creditCardId, data)
   }
 
-  @Delete('/:creditCardId')
+  @Delete('/:id')
+  @ApiOperation({ summary: 'Excluir um cartão de crédito' })
+  @ApiParam({ name: 'id', description: 'ID do cartão de crédito' })
+  @ApiResponse({ status: 200, description: 'Cartão de crédito excluído com sucesso' })
+  @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async deleteCreditCard(
     @Jwt() { userId }: JwtPayload,
-    @Param('creditCardId') creditCardId: string
+    @Param('id') creditCardId: string
   ) {
     return this.deleteCreditCardUseCase.execute(userId, creditCardId)
   }
