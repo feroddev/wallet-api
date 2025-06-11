@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common'
-import { Invoice } from '@prisma/client'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { Invoice, PaymentMethod } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InvoiceRepository } from '../../../repositories/invoice.repository'
 
@@ -186,13 +186,65 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     return this.findById(invoice.id)
   }
 
-  async markAsPaid(id: string): Promise<Invoice> {
-    return this.prisma.invoice.update({
-      where: { id },
-      data: {
-        isPaid: true,
-        paidAt: new Date()
+  async markAsPaid(id: string, paymentMethod: PaymentMethod, paidAt: Date): Promise<Invoice> {
+    return this.prisma.$transaction(async (prisma) => {
+      const invoice = await prisma.invoice.update({
+        where: { id },
+        data: {
+          isPaid: true,
+          paidAt
+        },
+        include: {
+          transactions: true
+        }
+      })
+      
+      if (invoice.transactions.length > 0) {
+        await Promise.all(
+          invoice.transactions.map((transaction) =>
+            prisma.transaction.update({
+              where: { id: transaction.id },
+              data: { isPaid: true }
+            })
+          )
+        )
       }
+      
+      const faturaCategory = await prisma.category.findFirst({
+        where: {
+          name: 'Fatura do Cartão',
+          type: 'EXPENSE'
+        }
+      })
+      
+      if (!faturaCategory) {
+        throw new NotFoundException('Categoria "Fatura do Cartão" não encontrada')
+      }
+
+      const creditCard = await prisma.creditCard.findUnique({
+        where: { id: invoice.creditCardId }
+      })
+      
+      if (!creditCard) {
+        throw new NotFoundException('Cartão de crédito não encontrado')
+      }
+      
+      await prisma.transaction.create({
+        data: {
+          userId: invoice.userId,
+          name: `Pagamento de fatura do cartão ${creditCard.cardName}`,
+          description: `Pagamento do mês ${invoice.month}/${invoice.year}`,
+          type: 'EXPENSE',
+          paymentMethod,
+          date: paidAt,
+          totalAmount: invoice.totalAmount,
+          isPaid: true,
+          categoryId: faturaCategory.id,
+          creditCardId: creditCard.id
+        }
+      })
+      
+      return invoice
     })
   }
 }

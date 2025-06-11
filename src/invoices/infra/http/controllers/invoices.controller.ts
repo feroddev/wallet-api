@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -7,8 +8,10 @@ import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
 import { PayInvoiceUseCase } from '../../../use-case/pay-invoice.use-case'
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto'
 import { GetInvoicesDto } from '../dto/get-invoices.dto'
+import { PayInvoiceDto } from '../dto/pay-invoice.dto'
 
 @Auth()
+@ApiTags('Faturas')
 @Controller('invoices')
 export class InvoicesController {
   constructor(
@@ -55,14 +58,20 @@ export class InvoicesController {
     }
   }
 
-  @Patch(':id/pay')
+  @Post(':id/pay')
+  @ApiOperation({ summary: 'Pagar fatura de cartão de crédito' })
+  @ApiParam({ name: 'id', description: 'ID da fatura' })
+  @ApiResponse({ status: 200, description: 'Fatura paga com sucesso' })
   async payInvoice(
     @Param('id') id: string,
+    @Body() payInvoiceDto: PayInvoiceDto,
     @Jwt() { userId }: JwtPayload
   ) {
     const invoice = await this.payInvoiceUseCase.execute({
       id,
-      userId
+      userId,
+      paymentMethod: payInvoiceDto.paymentMethod,
+      paidAt: payInvoiceDto.paidAt
     })
 
     return {
