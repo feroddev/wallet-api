@@ -24,9 +24,14 @@ import { GetBillsUseCase } from './use-case/get-bills.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
-import { PaidPendingPaymentUseCase } from './use-case/paid-pending-payment.use-case'
 import { PayCreditCardUseCase } from './use-case/pay-credit-card.use-case'
 import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case'
+import { CreatePendingPaymentUseCase } from './use-case/create-pending-payment.use-case'
+import { GetPendingPaymentsUseCase } from './use-case/get-pending-payments.use-case'
+import { FindPendingPaymentUseCase } from './use-case/find-pending-payment.use-case'
+import { UpdatePendingPaymentUseCase } from './use-case/update-pending-payment.use-case'
+import { DeletePendingPaymentUseCase } from './use-case/delete-pending-payment.use-case'
+import { PayPendingPaymentUseCase } from './use-case/pay-pending-payment.use-case'
 
 @Module({
   controllers: [
@@ -45,10 +50,15 @@ import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case
     DeleteTransactionUseCase,
     CreateRecurringTransactionsUseCase,
     RecurringTransactionsCron,
-    PaidPendingPaymentUseCase,
     PayCreditCardUseCase,
     GetInvoicesUseCase,
     GetBillsUseCase,
+    CreatePendingPaymentUseCase,
+    GetPendingPaymentsUseCase,
+    FindPendingPaymentUseCase,
+    UpdatePendingPaymentUseCase,
+    DeletePendingPaymentUseCase,
+    PayPendingPaymentUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
