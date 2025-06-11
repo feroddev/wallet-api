@@ -1,53 +1,54 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator'
+import { IsDateString, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator'
 
-export class CreateGoalDto {
+export class UpdateGoalDto {
   @ApiProperty({
-    description: 'Nome da meta financeira',
-    example: 'Viagem para Europa'
+    description: 'Nome da meta',
+    example: 'Reserva de Emergência',
+    required: false
   })
-  @IsNotEmpty()
   @IsString()
-  name: string
+  @IsOptional()
+  name?: string
 
   @ApiProperty({
     description: 'Descrição da meta',
-    example: 'Viagem para conhecer Itália e França',
+    example: 'Guardar dinheiro para imprevistos',
     required: false
   })
-  @IsOptional()
   @IsString()
+  @IsOptional()
   description?: string
 
   @ApiProperty({
     description: 'Valor alvo da meta',
-    example: 15000
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  @Min(0.01)
-  @Transform(({ value }) => Number(value))
-  targetValue: number
-
-  @ApiProperty({
-    description: 'Valor já economizado',
     example: 5000,
     required: false
   })
-  @IsOptional()
   @IsNumber()
-  @Min(0)
+  @IsPositive()
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  targetValue?: number
+
+  @ApiProperty({
+    description: 'Valor já economizado',
+    example: 2500,
+    required: false
+  })
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
   @Transform(({ value }) => Number(value))
   savedValue?: number
 
   @ApiProperty({
     description: 'Data limite para atingir a meta',
-    example: '2026-12-31'
+    example: '2025-12-31T00:00:00.000Z',
+    required: false
   })
-  @IsNotEmpty()
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  deadline: Date
+  @IsDateString()
+  @IsOptional()
+  deadline?: Date
 }
