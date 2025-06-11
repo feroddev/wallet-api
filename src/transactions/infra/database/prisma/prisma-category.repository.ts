@@ -23,6 +23,10 @@ export class PrismaCategoryRepository implements CategoryRepository {
       where: data
     })
   }
+  
+  async findAll(): Promise<Category[]> {
+    return this.prisma.category.findMany()
+  }
 
   async update(id: string, data: Partial<Category>): Promise<Category> {
     return this.prisma.category.update({

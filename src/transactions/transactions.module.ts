@@ -21,6 +21,7 @@ import { CreateTransactionsUseCase } from './use-case/create-transactions.use-ca
 import { DeleteTransactionUseCase } from './use-case/delete-transaction.use-case'
 import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
 import { GetBillsUseCase } from './use-case/get-bills.use-case'
+import { GetAllCategoriesUseCase } from './use-case/get-all-categories.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetInvoicesUseCase } from './use-case/get-invoices.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
@@ -44,6 +45,7 @@ import { PayPendingPaymentUseCase } from './use-case/pay-pending-payment.use-cas
     PrismaService,
     CreateTransactionsUseCase,
     GetCategoriesUseCase,
+    GetAllCategoriesUseCase,
     GetTransactionsUseCase,
     FindTransactionUseCase,
     UpdateTransactionUseCase,
