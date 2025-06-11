@@ -1,45 +1,48 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsInt, IsNotEmpty, IsNumber, IsPositive, IsString, Max, Min } from 'class-validator'
+import { IsInt, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator'
 
-export class CreateBudgetDto {
+export class UpdateBudgetDto {
   @ApiProperty({
     description: 'Nome da categoria',
-    example: 'Alimentação'
+    example: 'Alimentação',
+    required: false
   })
-  @IsNotEmpty()
   @IsString()
-  category: string
+  @IsOptional()
+  category?: string
 
   @ApiProperty({
     description: 'Limite do orçamento',
-    example: 800
+    example: 800,
+    required: false
   })
-  @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  @Min(0.01)
+  @IsOptional()
   @Transform(({ value }) => Number(value))
-  limit: number
+  limit?: number
 
   @ApiProperty({
     description: 'Mês do orçamento (1-12)',
-    example: 6
+    example: 6,
+    required: false
   })
-  @IsNotEmpty()
   @IsInt()
   @Min(1)
   @Max(12)
+  @IsOptional()
   @Transform(({ value }) => Number(value))
-  month: number
+  month?: number
 
   @ApiProperty({
     description: 'Ano do orçamento',
-    example: 2025
+    example: 2025,
+    required: false
   })
-  @IsNotEmpty()
   @IsInt()
   @Min(2000)
+  @IsOptional()
   @Transform(({ value }) => Number(value))
-  year: number
+  year?: number
 }
