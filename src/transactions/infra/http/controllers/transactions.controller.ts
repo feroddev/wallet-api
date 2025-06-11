@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -10,8 +11,10 @@ import { UpdateTransactionUseCase } from '../../../use-case/update-transaction.u
 import { CreateTransactionDto } from '../dto/create-transaction.dto'
 import { GetTransactionsDto } from '../dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../dto/update-transaction.dto'
+import { TransactionType } from '../dto/enum'
 
 @Auth()
+@ApiTags('Transações')
 @Controller('/transactions')
 export class TransactionsController {
   constructor(
@@ -23,6 +26,10 @@ export class TransactionsController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Criar uma nova transação' })
+  @ApiBody({ type: CreateTransactionDto })
+  @ApiResponse({ status: 201, description: 'Transação criada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async createTransaction(
     @Jwt() { userId }: JwtPayload,
     @Body() body: CreateTransactionDto
@@ -31,6 +38,12 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar transações com filtros' })
+  @ApiQuery({ name: 'startDate', required: false, type: Date })
+  @ApiQuery({ name: 'endDate', required: false, type: Date })
+  @ApiQuery({ name: 'type', required: false, enum: TransactionType })
+  @ApiQuery({ name: 'categoryId', required: false })
+  @ApiResponse({ status: 200, description: 'Lista de transações' })
   async getTransactions(
     @Jwt() { userId }: JwtPayload,
     @Query() query: GetTransactionsDto
@@ -39,11 +52,20 @@ export class TransactionsController {
   }
 
   @Get('/:id')
+  @ApiOperation({ summary: 'Buscar uma transação pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID da transação' })
+  @ApiResponse({ status: 200, description: 'Transação encontrada' })
+  @ApiResponse({ status: 404, description: 'Transação não encontrada' })
   async getTransaction(@Jwt() { userId }: JwtPayload, @Param('id') id: string) {
     return this.findTransactionUseCase.execute(id, userId)
   }
 
   @Patch('/:id')
+  @ApiOperation({ summary: 'Atualizar uma transação' })
+  @ApiParam({ name: 'id', description: 'ID da transação' })
+  @ApiBody({ type: UpdateTransactionDto })
+  @ApiResponse({ status: 200, description: 'Transação atualizada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Transação não encontrada' })
   async updateTransaction(
     @Jwt() { userId }: JwtPayload,
     @Param('id') id: string,
@@ -53,6 +75,10 @@ export class TransactionsController {
   }
 
   @Delete('/:id')
+  @ApiOperation({ summary: 'Excluir uma transação' })
+  @ApiParam({ name: 'id', description: 'ID da transação' })
+  @ApiResponse({ status: 200, description: 'Transação excluída com sucesso' })
+  @ApiResponse({ status: 404, description: 'Transação não encontrada' })
   async deleteTransaction(
     @Jwt() { userId }: JwtPayload,
     @Param('id') id: string
