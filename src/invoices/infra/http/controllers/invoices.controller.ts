@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -21,6 +21,11 @@ export class InvoicesController {
   ) {}
 
   @Post('generate')
+  @ApiOperation({ summary: 'Gerar fatura de cartão de crédito' })
+  @ApiBody({ type: GenerateInvoiceDto })
+  @ApiResponse({ status: 201, description: 'Fatura gerada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async generate(
     @Body() body: GenerateInvoiceDto,
     @Jwt() { userId }: JwtPayload
@@ -40,6 +45,11 @@ export class InvoicesController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar faturas de cartões de crédito' })
+  @ApiQuery({ name: 'month', required: false, type: Number, description: 'Mês da fatura (1-12)' })
+  @ApiQuery({ name: 'year', required: false, type: Number, description: 'Ano da fatura' })
+  @ApiQuery({ name: 'creditCardId', required: false, description: 'ID do cartão de crédito' })
+  @ApiResponse({ status: 200, description: 'Lista de faturas' })
   async getInvoices(
     @Query() query: GetInvoicesDto,
     @Jwt() { userId }: JwtPayload

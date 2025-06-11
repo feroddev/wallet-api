@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -12,6 +13,7 @@ import { GetBillsDto } from '../dto/get-bills.dto'
 import { UpdateBillDto } from '../dto/update-bill.dto'
 
 @Auth()
+@ApiTags('Contas')
 @Controller('bills')
 export class BillsController {
   constructor(
@@ -23,6 +25,10 @@ export class BillsController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Criar uma nova conta' })
+  @ApiBody({ type: CreateBillDto })
+  @ApiResponse({ status: 201, description: 'Conta criada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async create(
     @Body() body: CreateBillDto,
     @Jwt() { userId }: JwtPayload
@@ -45,6 +51,12 @@ export class BillsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar contas com filtros' })
+  @ApiQuery({ name: 'isPaid', required: false, type: Boolean })
+  @ApiQuery({ name: 'isRecurring', required: false, type: Boolean })
+  @ApiQuery({ name: 'dueDateStart', required: false, type: Date })
+  @ApiQuery({ name: 'dueDateEnd', required: false, type: Date })
+  @ApiResponse({ status: 200, description: 'Lista de contas' })
   async getBills(
     @Query() query: GetBillsDto,
     @Jwt() { userId }: JwtPayload
@@ -65,6 +77,11 @@ export class BillsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar uma conta' })
+  @ApiParam({ name: 'id', description: 'ID da conta' })
+  @ApiBody({ type: UpdateBillDto })
+  @ApiResponse({ status: 200, description: 'Conta atualizada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Conta não encontrada' })
   async update(
     @Param('id') id: string,
     @Body() body: UpdateBillDto,
@@ -89,6 +106,10 @@ export class BillsController {
   }
 
   @Patch(':id/pay')
+  @ApiOperation({ summary: 'Marcar uma conta como paga' })
+  @ApiParam({ name: 'id', description: 'ID da conta' })
+  @ApiResponse({ status: 200, description: 'Conta marcada como paga com sucesso' })
+  @ApiResponse({ status: 404, description: 'Conta não encontrada' })
   async pay(
     @Param('id') id: string,
     @Jwt() { userId }: JwtPayload
@@ -104,6 +125,10 @@ export class BillsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Excluir uma conta' })
+  @ApiParam({ name: 'id', description: 'ID da conta' })
+  @ApiResponse({ status: 200, description: 'Conta excluída com sucesso' })
+  @ApiResponse({ status: 404, description: 'Conta não encontrada' })
   async delete(
     @Param('id') id: string,
     @Jwt() { userId }: JwtPayload
