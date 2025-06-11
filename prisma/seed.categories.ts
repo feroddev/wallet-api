@@ -34,14 +34,13 @@ async function main() {
     })
   }
 
-  // CRIAR investimentos possiveis como CDI, Poupança, AÇÕES, FUNDO IMOBILIARIO, etc
   const investments = [
-    "Tesouro Direto",
-    "CDB",
-    "Fundo Imobiliário (FII)",
-    "Ações",
-    "Criptomoedas",
-    "Outros"
+    'Tesouro Direto',
+    'CDB',
+    'Fundo Imobiliário (FII)',
+    'Ações',
+    'Criptomoedas',
+    'Outros'
   ]
 
   for (const investment of investments) {
