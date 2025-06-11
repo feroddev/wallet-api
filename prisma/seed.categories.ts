@@ -34,6 +34,22 @@ async function main() {
     })
   }
 
+  // CRIAR investimentos possiveis como CDI, Poupança, AÇÕES, FUNDO IMOBILIARIO, etc
+  const investments = [
+    "Tesouro Direto",
+    "CDB",
+    "Fundo Imobiliário (FII)",
+    "Ações",
+    "Criptomoedas",
+    "Outros"
+  ]
+
+  for (const investment of investments) {
+    await prisma.category.create({
+      data: { name: investment, type: 'INVESTMENT' }
+    })
+  }
+
   console.log('Categorias criadas com sucesso!')
 }
 
