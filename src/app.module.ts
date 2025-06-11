@@ -11,7 +11,6 @@ import { DashboardModule } from './dashboard/dashboard.module'
 import { GoalsModule } from './goals/goals.module'
 import { InvoicesModule } from './invoices/invoices.module'
 import { PrismaModule } from './prisma/prisma.module'
-import { SubscriptionPlansModule } from './subscription-plans/subscription-plans.module'
 import { TransactionsModule } from './transactions/transactions.module'
 import { UserModule } from './user/user.module'
 
@@ -26,7 +25,6 @@ import { UserModule } from './user/user.module'
     GoalsModule,
     BillsModule,
     BudgetsModule,
-    SubscriptionPlansModule,
     DashboardModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({

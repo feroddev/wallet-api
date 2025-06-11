@@ -19,7 +19,6 @@ O sistema utiliza PostgreSQL com os seguintes modelos principais:
 
 - **User**: Armazena informações dos usuários e suas preferências
 - **UserPlan**: Histórico de planos utilizados pelo usuário
-- **SubscriptionPlan**: Planos de assinatura disponíveis no sistema
 
 ### Finanças
 
