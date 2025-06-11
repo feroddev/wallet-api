@@ -25,11 +25,15 @@ export class CreateTransactionsUseCase {
 
     return this.prisma.$transaction(async (transaction) => {
       if (data.paymentMethod === PaymentMethod.CREDIT_CARD) {
-        return this.createCreditCardExpense(data, transaction)
+        return this.createCreditCardExpense(data, transaction, userId)
       }
 
       if (data.paymentMethod === PaymentMethod.BANK_SLIP) {
         return this.createBankSlipExpense(data, transaction, userId)
+      }
+      
+      if (data.isRecurring) {
+        return this.createRecurringTransaction(data, transaction, userId)
       }
 
       const transactionCreated =
@@ -71,9 +75,43 @@ export class CreateTransactionsUseCase {
     )
   }
 
+  private async createRecurringTransaction(
+    data: CreateTransactionDto,
+    transaction: Prisma.TransactionClient,
+    userId: string
+  ) {
+    const recurrenceCount = 12 // Número de recorrências a serem criadas
+    const transactions = []
+    
+    for (let i = 0; i < recurrenceCount; i++) {
+      const transactionDate = new Date(data.date)
+      transactionDate.setMonth(transactionDate.getUTCMonth() + i)
+      
+      const transactionData = {
+        ...data,
+        date: transactionDate.toISOString()
+      }
+      
+      const createdTransaction = await this.transactionsRepository.createWithTransaction(
+        userId,
+        transactionData,
+        transaction
+      )
+      
+      transactions.push(createdTransaction)
+    }
+    
+    return {
+      message: 'Transações recorrentes criadas com sucesso',
+      count: transactions.length,
+      firstTransaction: transactions[0]
+    }
+  }
+
   private async createCreditCardExpense(
     data: CreateTransactionDto,
-    transaction: Prisma.TransactionClient
+    transaction: Prisma.TransactionClient,
+    userId: string
   ) {
     const creditCard = await this.creditCardRepository.find({
       id: data.creditCardId
@@ -139,6 +177,21 @@ export class CreateTransactionsUseCase {
       throw new BadRequestException(
         'Precisa informar o cartão de crédito para pagamento com cartão de crédito'
       )
+    }
+    
+    if (
+      data.paymentMethod === PaymentMethod.CREDIT_CARD &&
+      (!data.totalInstallments || data.totalInstallments < 1)
+    ) {
+      data.totalInstallments = 1
+    }
+    
+    if (data.isPaid === undefined) {
+      data.isPaid = true
+    }
+    
+    if (data.isRecurring === undefined) {
+      data.isRecurring = false
     }
   }
 }

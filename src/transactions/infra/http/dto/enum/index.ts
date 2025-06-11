@@ -21,5 +21,6 @@ export enum PaymentStatus {
 
 export enum TransactionType {
   EXPENSE = 'EXPENSE',
-  INCOME = 'INCOME'
+  INCOME = 'INCOME',
+  INVESTMENT = 'INVESTMENT'
 }
