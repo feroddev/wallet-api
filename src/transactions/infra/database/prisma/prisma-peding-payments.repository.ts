@@ -5,6 +5,9 @@ import { GetBillsDto } from '../../../../credit-card/infra/http/dto/get-bills.dt
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { PendingPaymentsRepository } from '../../../repositories/pending-payments.repository'
 import { CreatePendingPaymentDto } from '../../http/dto/create-pending-payment.dto'
+import { GetPendingPaymentsDto } from '../../http/dto/get-pending-payments.dto'
+import { PayPendingPaymentDto } from '../../http/dto/pay-pending-payment.dto'
+import { UpdatePendingPaymentDto } from '../../http/dto/update-pending-payment.dto'
 import { PaymentStatus, TransactionType } from '../../http/dto/enum'
 
 @Injectable()
@@ -17,8 +20,34 @@ export class PrismaPendingPaymentsRepository
     data: CreatePendingPaymentDto[],
     transaction: Prisma.TransactionClient
   ) {
+    const formattedData = data.map(item => ({
+      userId: item['userId'],
+      name: item.name,
+      description: item.description,
+      categoryId: item.categoryId,
+      totalAmount: item.totalAmount,
+      dueDate: new Date(item.dueDate),
+      status: item.paymentStatus || PaymentStatus.PENDING,
+      paymentMethod: item.paymentMethod
+    }))
+    
     return transaction.pendingPayment.createMany({
-      data
+      data: formattedData
+    })
+  }
+
+  async create(userId: string, data: CreatePendingPaymentDto) {
+    return this.prisma.pendingPayment.create({
+      data: {
+        userId,
+        name: data.name,
+        description: data.description,
+        categoryId: data.categoryId,
+        totalAmount: data.totalAmount,
+        dueDate: new Date(data.dueDate),
+        status: data.paymentStatus || PaymentStatus.PENDING,
+        paymentMethod: data.paymentMethod
+      }
     })
   }
 
@@ -70,46 +99,154 @@ export class PrismaPendingPaymentsRepository
     }
   }
 
-  async payPendingPayment(id: string, paidAt: Date): Promise<any> {
-    const pendingPayments = await this.prisma.pendingPayment.findFirst({
-      where: {
-        id
+  async findAll(userId: string, filters: GetPendingPaymentsDto) {
+    const { status, startDate, endDate, categoryId } = filters
+    
+    const where: Prisma.PendingPaymentWhereInput = { userId }
+    
+    if (status) {
+      where.status = status
+    }
+    
+    if (startDate || endDate) {
+      where.dueDate = {}
+      
+      if (startDate) {
+        where.dueDate.gte = new Date(startDate)
+      }
+      
+      if (endDate) {
+        where.dueDate.lte = new Date(endDate)
+      }
+    }
+    
+    if (categoryId) {
+      where.categoryId = categoryId
+    }
+    
+    return this.prisma.pendingPayment.findMany({
+      where,
+      include: {
+        category: {
+          select: {
+            name: true,
+            type: true
+          }
+        }
+      },
+      orderBy: {
+        dueDate: 'asc'
       }
     })
-
-    if (!pendingPayments) {
+  }
+  
+  async findById(id: string, userId: string) {
+    const pendingPayment = await this.prisma.pendingPayment.findFirst({
+      where: {
+        id,
+        userId
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+            type: true
+          }
+        }
+      }
+    })
+    
+    if (!pendingPayment) {
       throw new NotFoundException(errors.PENDING_PAYMENT_NOT_FOUND)
     }
-
-    await this.prisma.pendingPayment.update({
+    
+    return pendingPayment
+  }
+  
+  async update(id: string, userId: string, data: UpdatePendingPaymentDto) {
+    const pendingPayment = await this.prisma.pendingPayment.findFirst({
       where: {
-        id
-      },
-      data: {
-        status: PaymentStatus.PAID,
-        paidAt
+        id,
+        userId
       }
     })
-
-    const user = await this.prisma.user.findFirst({
+    
+    if (!pendingPayment) {
+      throw new NotFoundException(errors.PENDING_PAYMENT_NOT_FOUND)
+    }
+    
+    return this.prisma.pendingPayment.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description: data.description,
+        categoryId: data.categoryId,
+        totalAmount: data.totalAmount,
+        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        status: data.paymentStatus,
+        paymentMethod: data.paymentMethod
+      }
+    })
+  }
+  
+  async delete(id: string, userId: string) {
+    const pendingPayment = await this.prisma.pendingPayment.findFirst({
       where: {
-        id: pendingPayments.userId
+        id,
+        userId
+      }
+    })
+    
+    if (!pendingPayment) {
+      throw new NotFoundException(errors.PENDING_PAYMENT_NOT_FOUND)
+    }
+    
+    return this.prisma.pendingPayment.delete({
+      where: { id }
+    })
+  }
+
+  async payPendingPayment(id: string, userId: string, data: PayPendingPaymentDto): Promise<any> {
+    const { paidAt, paymentMethod } = data
+    const paidAtDate = new Date(paidAt)
+    
+    const pendingPayment = await this.prisma.pendingPayment.findFirst({
+      where: {
+        id,
+        userId
       }
     })
 
-    await this.prisma.transaction.create({
-      data: {
-        date: paidAt,
-        name: pendingPayments.name,
-        paymentMethod: pendingPayments.paymentMethod,
-        totalAmount: pendingPayments.totalAmount,
-        type: TransactionType.EXPENSE,
-        categoryId: pendingPayments.categoryId,
-        description: pendingPayments.description,
-        userId: pendingPayments.userId
-      }
+    if (!pendingPayment) {
+      throw new NotFoundException(errors.PENDING_PAYMENT_NOT_FOUND)
+    }
+    
+    return this.prisma.$transaction(async (prisma) => {
+      const transaction = await prisma.transaction.create({
+        data: {
+          date: paidAtDate,
+          name: pendingPayment.name,
+          paymentMethod,
+          totalAmount: pendingPayment.totalAmount,
+          type: TransactionType.EXPENSE,
+          categoryId: pendingPayment.categoryId,
+          description: pendingPayment.description,
+          userId,
+          isPaid: true
+        }
+      })
+      
+      await prisma.pendingPayment.update({
+        where: { id },
+        data: {
+          status: PaymentStatus.PAID,
+          paidAt: paidAtDate,
+          paymentMethod,
+          transactionId: transaction.id
+        }
+      })
+      
+      return { message: 'Pagamento realizado com sucesso', transaction }
     })
-
-    return { message: 'Payment made successfully' }
   }
 }

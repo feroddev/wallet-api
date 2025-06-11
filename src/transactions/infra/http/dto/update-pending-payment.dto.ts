@@ -9,13 +9,15 @@ import {
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class CreatePendingPaymentDto {
+export class UpdatePendingPaymentDto {
   @ApiProperty({
     description: 'Nome do pagamento pendente',
-    example: 'Conta de Luz'
+    example: 'Conta de Luz',
+    required: false
   })
+  @IsOptional()
   @IsString()
-  name: string
+  name?: string
 
   @ApiProperty({
     description: 'Descrição do pagamento pendente',
@@ -28,22 +30,25 @@ export class CreatePendingPaymentDto {
 
   @ApiProperty({
     description: 'Data de vencimento',
-    example: '2025-06-15T00:00:00.000Z'
+    example: '2025-06-15T00:00:00.000Z',
+    required: false
   })
+  @IsOptional()
   @IsDateString()
-  dueDate: string
+  dueDate?: string
 
   @ApiProperty({
     description: 'Valor total',
-    example: 230.90
+    example: 230.90,
+    required: false
   })
+  @IsOptional()
   @IsNumber()
-  totalAmount: number
+  totalAmount?: number
 
   @ApiProperty({
     description: 'Status do pagamento',
     enum: PaymentStatus,
-    default: 'PENDING',
     required: false
   })
   @IsOptional()
@@ -62,9 +67,11 @@ export class CreatePendingPaymentDto {
 
   @ApiProperty({
     description: 'ID da categoria',
-    example: 'uuid-categoria'
+    example: 'uuid-categoria',
+    required: false
   })
+  @IsOptional()
   @IsString()
   @IsUUID()
-  categoryId: string
+  categoryId?: string
 }
