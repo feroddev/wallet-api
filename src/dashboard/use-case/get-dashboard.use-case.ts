@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
-import { endOfMonth, startOfMonth, addMonths } from 'date-fns'
+import { endOfMonth, startOfMonth, addDays, addMonths } from 'date-fns'
 import { Decimal } from '@prisma/client/runtime/library'
 
 interface GetDashboardRequest {
@@ -100,17 +100,40 @@ export class GetDashboardUseCase {
     
     const investments = Number(investmentsResult._sum.totalAmount || 0)
 
-    const balanceResult = await this.prisma.transaction.aggregate({
+    const incomeTotal = await this.prisma.transaction.aggregate({
       where: {
         userId,
-        isPaid: true,
+        type: 'INCOME',
+        isPaid: true
       },
       _sum: {
         totalAmount: true
       }
     })
 
-    const balance = Number(balanceResult._sum.totalAmount || 0)
+    const expenseTotal = await this.prisma.transaction.aggregate({
+      where: {
+        userId,
+        type: 'EXPENSE',
+        isPaid: true
+      },
+      _sum: {
+        totalAmount: true
+      }
+    })
+
+    const investmentTotal = await this.prisma.transaction.aggregate({
+      where: {
+        userId,
+        type: 'INVESTMENT',
+        isPaid: true
+      },
+      _sum: {
+        totalAmount: true
+      }
+    })
+
+    const balance = Number(incomeTotal._sum.totalAmount || 0) - Number(expenseTotal._sum.totalAmount || 0) - Number(investmentTotal._sum.totalAmount || 0)
 
     return {
       monthlyIncome,
@@ -151,8 +174,8 @@ export class GetDashboardUseCase {
     return transactions.map(transaction => ({
       id: transaction.id,
       amount: Number(transaction.totalAmount),
-      date: transaction.date,
-      description: transaction.description,
+      date: transaction.date.toISOString(),
+      description: transaction.description || '',
       category: transaction.category.name,
       type: transaction.type
     }))
@@ -165,7 +188,6 @@ export class GetDashboardUseCase {
         month,
         year
       },
-
     })
 
     const budgetsWithSpent = await Promise.all(
@@ -201,11 +223,13 @@ export class GetDashboardUseCase {
     const transactions = await this.prisma.transaction.findMany({
       where: {
         userId,
-        categoryId: category,
         type: 'EXPENSE',
         date: {
           gte: startDate,
           lte: endDate
+        },
+        category: {
+          name: category
         }
       },
       select: {
@@ -213,13 +237,16 @@ export class GetDashboardUseCase {
       }
     })
 
-    return transactions.reduce((sum, transaction) => {
-      return sum + Number(transaction.totalAmount)
+    // Retornar valor positivo para o gasto
+    return transactions.reduce((total, transaction) => {
+      return total + Number(transaction.totalAmount)
     }, 0)
   }
 
   private async getExpensesByCategory(userId: string, startMonth: Date, endMonth: Date) {
-    const expenses = await this.prisma.transaction.findMany({
+    // Usar a API do Prisma em vez de SQL raw para evitar problemas com nomes de tabelas
+    const transactions = await this.prisma.transaction.groupBy({
+      by: ['categoryId'],
       where: {
         userId,
         type: 'EXPENSE',
@@ -229,57 +256,50 @@ export class GetDashboardUseCase {
           lte: endMonth
         }
       },
+      _sum: {
+        totalAmount: true
+      }
+    })
+    
+    // Buscar os nomes das categorias
+    const categoryIds = transactions.map(t => t.categoryId)
+    const categories = await this.prisma.category.findMany({
+      where: {
+        id: { in: categoryIds }
+      },
       select: {
-        totalAmount: true,
-        category: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
+        id: true,
+        name: true
       }
     })
-
-    const expensesByCategory = {}
-    let totalExpenses = 0
     
-    expenses.forEach(expense => {
-      const categoryId = expense.category.id
-      const amount = Number(expense.totalAmount)
-      totalExpenses += amount
-      
-      if (!expensesByCategory[categoryId]) {
-        expensesByCategory[categoryId] = {
-          category: expense.category.name,
-          amount: 0,
-          color: this.getRandomColor(expense.category.name)
-        }
+    // Mapear os resultados
+    const expensesByCategory = transactions.map(t => {
+      const category = categories.find(c => c.id === t.categoryId)
+      return {
+        category: category?.name || 'Sem categoria',
+        amount: Number(t._sum.totalAmount || 0)
       }
-      
-      expensesByCategory[categoryId].amount += amount
-    })
+    }).sort((a, b) => b.amount - a.amount)
 
-    // Calcular percentuais
-    const result = Object.values(expensesByCategory).map((category: any) => ({
-      category: category.category,
-      amount: category.amount,
-      color: category.color,
-      percentage: totalExpenses > 0 ? (category.amount / totalExpenses) * 100 : 0
-    }))
+    // Calcular o total de despesas
+    const totalExpenses = (expensesByCategory as any[]).reduce(
+      (sum, item) => sum + Number(item.amount),
+      0
+    )
 
-    // Ordenar por valor (do maior para o menor)
-    return result.sort((a, b) => b.amount - a.amount)
-  }
-
-  private getRandomColor(seed: string): string {
+    // Adicionar percentual e cor para cada categoria
     const colors = [
-      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-      '#FF9F40', '#8AC249', '#EA5F89', '#00D8B6', '#FFB88C'
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA5A5', '#A5FFD6',
+      '#FFC154', '#47B39C', '#EC6B56', '#FFC154', '#47B39C'
     ]
-    
-    const index = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length
-    
-    return colors[index]
+
+    return (expensesByCategory as any[]).map((item, index) => ({
+      category: item.category,
+      amount: Number(item.amount),
+      percentage: totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0,
+      color: colors[index % colors.length]
+    }))
   }
 
   private async getNextCreditCardInvoice(userId: string) {
@@ -319,7 +339,7 @@ export class GetDashboardUseCase {
       return {
         id: invoice.id,
         cardName: invoice.creditCard.cardName,
-        dueDate: invoice.dueDate,
+        dueDate: invoice.dueDate.toISOString(),
         totalAmount: Number(invoice.totalAmount),
         isPaid: invoice.isPaid
       }
@@ -351,8 +371,9 @@ export class GetDashboardUseCase {
       title: goal.name,
       targetAmount: Number(goal.targetValue),
       currentAmount: Number(goal.savedValue),
-      deadline: goal.deadline,
+      deadline: goal.deadline.toISOString(),
       icon: '🎯' // Emoji padrão para meta
     }))
   }
+
 }

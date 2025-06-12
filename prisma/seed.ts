@@ -190,7 +190,7 @@ async function createTransactions(categories, creditCards, invoices) {
         description: `Descrição da despesa ${i + 1}`,
         paymentMethod: i % 2 === 0 ? PaymentMethod.CREDIT_CARD : PaymentMethod.DEBIT_CARD,
         date,
-        totalAmount: -(100 + i * 50),
+        totalAmount: 100 + i * 50,
         isPaid: true,
         isRecurring: i % 3 === 0,
         creditCardId: i % 2 === 0 ? creditCards[i % creditCards.length].id : null
@@ -237,7 +237,7 @@ async function createTransactions(categories, creditCards, invoices) {
         description: `Descrição do investimento ${i + 1}`,
         paymentMethod: PaymentMethod.BANK_TRANSFER,
         date,
-        totalAmount: -(500 + i * 250),
+        totalAmount: 500 + i * 250,
         isPaid: true,
         isRecurring: false
       }
