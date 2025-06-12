@@ -42,7 +42,6 @@ import { PayPendingPaymentUseCase } from './use-case/pay-pending-payment.use-cas
     PendingPaymentController
   ],
   providers: [
-    PrismaService,
     CreateTransactionsUseCase,
     GetCategoriesUseCase,
     GetAllCategoriesUseCase,

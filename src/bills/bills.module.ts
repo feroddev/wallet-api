@@ -17,7 +17,6 @@ import { PrismaTransactionRepository } from '../transactions/infra/database/pris
   imports: [AuthModule, TransactionsModule],
   controllers: [BillsController],
   providers: [
-    PrismaService,
     CreateBillUseCase,
     GetBillsUseCase,
     UpdateBillUseCase,

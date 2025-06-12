@@ -15,7 +15,6 @@ import { UpdateCreditCardUseCase } from './use-case/update-credit-card.use-case'
 @Module({
   controllers: [CreditCardController],
   providers: [
-    PrismaService,
     GetCreditCardUseCase,
     CreateCreditCardUseCase,
     DeleteCreditCardUseCase,

@@ -13,7 +13,6 @@ import { UpdateBudgetUseCase } from './use-case/update-budget.use-case'
   imports: [AuthModule],
   controllers: [BudgetsController],
   providers: [
-    PrismaService,
     CreateBudgetUseCase,
     GetBudgetsUseCase,
     UpdateBudgetUseCase,

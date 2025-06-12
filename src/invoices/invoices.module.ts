@@ -12,7 +12,6 @@ import { PayInvoiceUseCase } from './use-case/pay-invoice.use-case'
   imports: [AuthModule],
   controllers: [InvoicesController],
   providers: [
-    PrismaService,
     GenerateInvoiceUseCase,
     GetInvoicesUseCase,
     PayInvoiceUseCase,

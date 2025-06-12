@@ -14,7 +14,6 @@ import { UpdateProgressUseCase } from './use-case/update-progress.use-case'
   imports: [AuthModule],
   controllers: [GoalsController],
   providers: [
-    PrismaService,
     CreateGoalUseCase,
     GetGoalsUseCase,
     UpdateGoalUseCase,

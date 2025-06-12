@@ -31,7 +31,7 @@ export class GetDashboardUseCase {
     const expensesByCategory = await this.getExpensesByCategory(userId, startMonth, endMonth)
 
     // Obter próxima fatura de cartão de crédito
-    const nextCreditCardInvoice = await this.getNextCreditCardInvoice(userId)
+    const nextCreditCardInvoice = await this.getNextCreditCardInvoice(userId, startMonth, endMonth)
 
     // Obter metas financeiras
     const financialGoals = await this.getFinancialGoals(userId)
@@ -302,7 +302,7 @@ export class GetDashboardUseCase {
     }))
   }
 
-  private async getNextCreditCardInvoice(userId: string) {
+  private async getNextCreditCardInvoice(userId: string, startMonth: Date, endMonth: Date) {
     // Buscar todos os cartões do usuário
     const creditCards = await this.prisma.creditCard.findMany({
       where: {
@@ -314,7 +314,6 @@ export class GetDashboardUseCase {
       return null
     }
 
-    // Para cada cartão, buscar a próxima fatura
     const invoicesPromises = creditCards.map(async (card) => {
       const now = new Date()
 
@@ -323,7 +322,8 @@ export class GetDashboardUseCase {
         where: {
           creditCardId: card.id,
           dueDate: {
-            gte: now
+            gte: startMonth,
+            lte: endMonth
           }
         },
         orderBy: {
@@ -348,12 +348,11 @@ export class GetDashboardUseCase {
     const invoices = await Promise.all(invoicesPromises)
     const validInvoices = invoices.filter(invoice => invoice !== null)
 
-    // Ordenar por data de vencimento e retornar a mais próxima
     if (validInvoices.length === 0) return null
 
     return validInvoices.sort((a, b) => 
       new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    )[0]
+    )
   }
 
   private async getFinancialGoals(userId: string) {

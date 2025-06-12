@@ -10,7 +10,7 @@ import { GetBudgetsUseCase } from './use-case/get-budgets.use-case'
 import { UpdateBudgetUseCase } from './use-case/update-budget.use-case'
 
 @Module({
-  imports: [PrismaModule],
+  imports: [],
   controllers: [BudgetController],
   providers: [
     {

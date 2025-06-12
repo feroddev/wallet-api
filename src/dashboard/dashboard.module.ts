@@ -8,7 +8,6 @@ import { GetDashboardUseCase } from './use-case/get-dashboard.use-case'
   imports: [AuthModule],
   controllers: [DashboardController],
   providers: [
-    PrismaService,
     GetDashboardUseCase
   ]
 })

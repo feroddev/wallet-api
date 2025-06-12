@@ -10,7 +10,7 @@ import { GetGoalsUseCase } from './use-case/get-goals.use-case'
 import { UpdateGoalUseCase } from './use-case/update-goal.use-case'
 
 @Module({
-  imports: [PrismaModule],
+  imports: [],
   controllers: [GoalController],
   providers: [
     {

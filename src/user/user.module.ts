@@ -12,7 +12,6 @@ import { UpdateUserUseCase } from './use-cases/update-user.use-case'
   controllers: [UserController],
   imports: [AuthModule, ConfigModule.forRoot()],
   providers: [
-    PrismaService,
     GetUserUseCase,
     UpdateUserUseCase,
     {
