@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
-import { endOfMonth, startOfMonth, addDays, addMonths } from 'date-fns'
-import { Decimal } from '@prisma/client/runtime/library'
+import { endOfMonth, startOfMonth } from 'date-fns'
 
 interface GetDashboardRequest {
   userId: string
@@ -18,22 +17,16 @@ export class GetDashboardUseCase {
     const startMonth = startOfMonth(now)
     const endMonth = endOfMonth(now)
 
-    // Obter resumo financeiro
     const financialSummary = await this.getFinancialSummary(userId, startMonth, endMonth)
     
-    // Obter transações recentes
     const recentTransactions = await this.getRecentTransactions(userId, startMonth, endMonth)
     
-    // Obter orçamentos
     const budgets = await this.getBudgets(userId, now.getMonth() + 1, now.getFullYear())
     
-    // Obter despesas por categoria
     const expensesByCategory = await this.getExpensesByCategory(userId, startMonth, endMonth)
 
-    // Obter próxima fatura de cartão de crédito
     const nextCreditCardInvoice = await this.getNextCreditCardInvoice(userId, startMonth, endMonth)
 
-    // Obter metas financeiras
     const financialGoals = await this.getFinancialGoals(userId)
 
     return {
@@ -47,7 +40,6 @@ export class GetDashboardUseCase {
   }
 
   private async getFinancialSummary(userId: string, startMonth: Date, endMonth: Date) {
-    // Obter receitas do mês
     const incomeResult = await this.prisma.transaction.aggregate({
       where: {
         userId,
@@ -237,14 +229,12 @@ export class GetDashboardUseCase {
       }
     })
 
-    // Retornar valor positivo para o gasto
     return transactions.reduce((total, transaction) => {
       return total + Number(transaction.totalAmount)
     }, 0)
   }
 
   private async getExpensesByCategory(userId: string, startMonth: Date, endMonth: Date) {
-    // Usar a API do Prisma em vez de SQL raw para evitar problemas com nomes de tabelas
     const transactions = await this.prisma.transaction.groupBy({
       by: ['categoryId'],
       where: {
@@ -312,12 +302,9 @@ export class GetDashboardUseCase {
 
     if (creditCards.length === 0) {
       return null
-    }
+    }    
 
     const invoicesPromises = creditCards.map(async (card) => {
-      const now = new Date()
-
-      // Buscar a fatura atual ou próxima
       const invoice = await this.prisma.invoice.findFirst({
         where: {
           creditCardId: card.id,
@@ -334,7 +321,7 @@ export class GetDashboardUseCase {
         }
       })
 
-      if (!invoice) return null
+      if (!invoice) return null     
 
       return {
         id: invoice.id,
@@ -346,13 +333,14 @@ export class GetDashboardUseCase {
     })
 
     const invoices = await Promise.all(invoicesPromises)
+
     const validInvoices = invoices.filter(invoice => invoice !== null)
 
     if (validInvoices.length === 0) return null
 
     return validInvoices.sort((a, b) => 
       new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    )
+    ).slice(0, 2)
   }
 
   private async getFinancialGoals(userId: string) {
