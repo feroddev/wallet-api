@@ -23,6 +23,4 @@ export abstract class TransactionRepository {
   abstract update(id: string, userId: string, data: UpdateTransactionDto): Promise<Transaction>
   
   abstract delete(id: string, userId: string): Promise<Transaction>
-  
-  abstract createRecurringTransactions(): Promise<void>
-}
+  }

@@ -121,45 +121,4 @@ export class PrismaTransactionRepository implements TransactionRepository {
       where: { id }
     })
   }
-
-  async createRecurringTransactions(): Promise<void> {
-    const today = new Date()
-    const currentMonth = today.getMonth()
-    const currentYear = today.getFullYear()
-    
-    const firstDayLastMonth = new Date(currentYear, currentMonth - 1, 1)
-    const lastDayLastMonth = new Date(currentYear, currentMonth, 0)
-
-    const recurringTransactions = await this.prisma.transaction.findMany({
-      where: {
-        isRecurring: true,
-        date: {
-          gte: firstDayLastMonth,
-          lte: lastDayLastMonth
-        }
-      }
-    })
-
-    for (const transaction of recurringTransactions) {
-      const newDate = new Date(transaction.date)
-      newDate.setMonth(newDate.getMonth() + 1)
-
-      await this.prisma.transaction.create({
-        data: {
-          name: transaction.name,
-          description: transaction.description,
-          type: transaction.type,
-          categoryId: transaction.categoryId,
-          totalAmount: transaction.totalAmount,
-          paymentMethod: transaction.paymentMethod,
-          date: newDate,
-          userId: transaction.userId,
-          isRecurring: true,
-          isPaid: false,
-          creditCardId: transaction.creditCardId,
-          invoiceId: transaction.invoiceId
-        }
-      })
-    }
-  }
 }

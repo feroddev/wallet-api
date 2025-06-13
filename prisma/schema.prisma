@@ -91,41 +91,19 @@ model Transaction {
   @@map("transactions")
 }
 
-model CreditCardExpense {
-  id                String        @id @default(uuid())
-  name              String
-  description       String?
-  creditCardId      String        @map("credit_card_id")
-  categoryId        String        @map("category_id")
-  installmentNumber Int           @map("installment_number")
-  amount            Decimal       @db.Money
-  totalInstallments Int           @map("total_installments")
-  dueDate           DateTime      @map("due_date")
-  date              DateTime      @map("date")
-  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
-  paidAt            DateTime?     @map("paid_at")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-  creditCard        CreditCard    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
-  category          Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@map("credit_card_expenses")
-}
-
 model CreditCard {
-  id                String              @id @default(uuid())
-  userId            String              @map("user_id")
-  cardName          String              @map("card_name")
-  lastDigits        Int?                @map("last_digits")
-  limit             Decimal             @db.Money
-  closingDay        Int                 @map("closing_day")
-  dueDay            Int                 @map("due_day")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  SplitOrRecurrence CreditCardExpense[]
-  Transaction       Transaction[]
-  Invoice           Invoice[]
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  cardName    String        @map("card_name")
+  lastDigits  Int?          @map("last_digits")
+  limit       Decimal       @db.Money
+  closingDay  Int           @map("closing_day")
+  dueDay      Int           @map("due_day")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Transaction Transaction[]
+  Invoice     Invoice[]
 
   @@map("credit_cards")
 }
@@ -144,12 +122,11 @@ model UserPlan {
 }
 
 model Category {
-  id                String              @id @default(uuid())
-  name              String
-  type              CategoryType
-  createdAt         DateTime            @default(now()) @map("created_at")
-  transactions      Transaction[]
-  CreditCardExpense CreditCardExpense[]
+  id           String        @id @default(uuid())
+  name         String
+  type         CategoryType
+  createdAt    DateTime      @default(now()) @map("created_at")
+  transactions Transaction[]
 
   @@map("categories")
 }

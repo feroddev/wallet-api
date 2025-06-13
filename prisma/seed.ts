@@ -1,4 +1,4 @@
-import { PrismaClient, CategoryType, PaymentMethod, TransactionType, Plan, PaymentStatus, Category } from '@prisma/client'
+import { PrismaClient, CategoryType, PaymentMethod, TransactionType, Plan, Category } from '@prisma/client'
 import { addDays, addMonths, subDays, subMonths } from 'date-fns'
 
 const prisma = new PrismaClient()
@@ -23,9 +23,6 @@ async function main() {
   // Criar planos do usuário
   await createUserPlans()
 
-  // Criar pagamentos pendentes
-  await createPendingPayments(categories, transactions)
-
   // Criar orçamentos
   await createBudgets(categories)
 
@@ -40,10 +37,8 @@ async function main() {
 
 async function cleanDatabase() {
   // Limpar dados existentes para o usuário específico
-  await prisma.pendingPayment.deleteMany({ where: { userId } })
   await prisma.transaction.deleteMany({ where: { userId } })
   await prisma.invoice.deleteMany({ where: { userId } })
-  await prisma.creditCardExpense.deleteMany({ where: { creditCard: { userId } } })
   await prisma.creditCard.deleteMany({ where: { userId } })
   await prisma.userPlan.deleteMany({ where: { userId } })
   await prisma.budget.deleteMany({ where: { userId } })
@@ -223,7 +218,6 @@ async function createTransactions(categories, creditCards, invoices) {
     transactions.push(transaction)
   }
 
-  // Criar transações de investimentos
   for (let i = 0; i < 3; i++) {
     const date = subDays(now, i * 15)
     const category = investmentCategories[i % investmentCategories.length]
@@ -244,28 +238,6 @@ async function createTransactions(categories, creditCards, invoices) {
     })
     
     transactions.push(transaction)
-  }
-
-  // Criar despesas de cartão de crédito
-  for (const card of creditCards) {
-    for (let i = 0; i < 3; i++) {
-      const category = expenseCategories[i % expenseCategories.length]
-      
-      await prisma.creditCardExpense.create({
-        data: {
-          name: `Compra parcelada ${i + 1}`,
-          description: `Descrição da compra parcelada ${i + 1}`,
-          creditCardId: card.id,
-          categoryId: category.id,
-          installmentNumber: 1,
-          amount: 200 + i * 100,
-          totalInstallments: 3,
-          dueDate: addDays(now, 15 + i * 5),
-          date: subDays(now, 5 + i),
-          paymentStatus: PaymentStatus.PENDING
-        }
-      })
-    }
   }
 
   return transactions
@@ -289,39 +261,6 @@ async function createUserPlans() {
       plan: Plan.BASIC,
       startDate: subMonths(new Date(), 13),
       endDate: subMonths(new Date(), 1)
-    }
-  })
-}
-
-async function createPendingPayments(categories, transactions) {
-  const expenseCategories = categories.filter(c => c.type === CategoryType.EXPENSE)
-  const now = new Date()
-
-  // Pagamento pendente sem transação associada
-  await prisma.pendingPayment.create({
-    data: {
-      userId,
-      name: 'Conta de luz',
-      description: 'Fatura mensal de energia',
-      categoryId: expenseCategories[0].id,
-      totalAmount: 150,
-      dueDate: addDays(now, 10),
-      status: PaymentStatus.PENDING
-    }
-  })
-
-  // Pagamento pendente com transação associada
-  await prisma.pendingPayment.create({
-    data: {
-      userId,
-      name: 'Conta de água',
-      description: 'Fatura mensal de água',
-      categoryId: expenseCategories[1].id,
-      totalAmount: 80,
-      dueDate: addDays(now, 15),
-      status: PaymentStatus.PAID,
-      paidAt: subDays(now, 2),
-      transactionId: transactions[0].id
     }
   })
 }
