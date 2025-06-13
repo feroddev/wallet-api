@@ -75,7 +75,7 @@ model Transaction {
   paymentMethod  PaymentMethod    @map("payment_method")
   date           DateTime         @map("date")
   totalAmount    Decimal          @db.Money
-  isPaid         Boolean          @default(true) @map("is_paid")
+  isPaid         Boolean          @default(false) @map("is_paid")
   isRecurring    Boolean          @default(false) @map("is_recurring")
   creditCardId   String?          @map("credit_card_id")
   invoiceId      String?          @map("invoice_id")
