@@ -1,14 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { PaymentStatus, Prisma } from '@prisma/client'
 import { CreditCardRepository } from '../../credit-card/repositories/credit-card.repository'
 import { PrismaService } from '../../prisma/prisma.service'
 import { CreditCardExpenseDto } from '../infra/http/dto/create-credit-card-expense.dto'
 import { CreatePendingPaymentDto } from '../infra/http/dto/create-pending-payment.dto'
 import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
-import { PaymentMethod } from '../infra/http/dto/enum'
+import { PaymentMethod, TransactionType } from '../infra/http/dto/enum'
 import { CreditCardExpenseRepository } from '../repositories/credit-card-expense.repository'
 import { PendingPaymentsRepository } from '../repositories/pending-payments.repository'
 import { TransactionRepository } from '../repositories/transaction.repository'
+import { InvoiceRepository } from '../../invoices/repositories/invoice.repository'
 
 @Injectable()
 export class CreateTransactionsUseCase {
@@ -16,8 +17,7 @@ export class CreateTransactionsUseCase {
     private readonly prisma: PrismaService,
     private readonly transactionsRepository: TransactionRepository,
     private readonly creditCardRepository: CreditCardRepository,
-    private readonly creditCardExpenseRepository: CreditCardExpenseRepository,
-    private readonly pendingPaymentsRepository: PendingPaymentsRepository
+    private readonly invoiceRepository: InvoiceRepository
   ) {}
 
   async execute(userId: string, data: CreateTransactionDto) {
@@ -32,16 +32,12 @@ export class CreateTransactionsUseCase {
         return this.createBankSlipExpense(data, transaction, userId)
       }
       
-      if (data.isRecurring) {
-        return this.createRecurringTransaction(data, transaction, userId)
-      }
-
       const transactionCreated =
-        await this.transactionsRepository.createWithTransaction(
+        await this.transactionsRepository.createWithTransaction({
           userId,
           data,
           transaction
-        )
+        })
 
       return transactionCreated
     })
@@ -52,59 +48,15 @@ export class CreateTransactionsUseCase {
     transaction: Prisma.TransactionClient,
     userId: string
   ) {
-    const payload: CreatePendingPaymentDto[] = Array.from({
-      length: data.isRecurring ? 24 : 1
-    }).map((_, index) => {
-      const installmentDate = new Date(data.date)
-      installmentDate.setMonth(installmentDate.getUTCMonth() + index)
-
-      return {
-        userId,
-        name: data.name,
-        description: data.description,
-        totalAmount: data.totalAmount,
-        dueDate: installmentDate.toISOString(),
-        categoryId: data.categoryId,
-        paymentMethod: 'BANK_SLIP'
-      }
+    const bankSlip = await this.transactionsRepository.createWithTransaction({
+      userId,
+      data,
+      transaction
     })
 
-    return this.pendingPaymentsRepository.createWithTransaction(
-      payload,
-      transaction
-    )
-  }
-
-  private async createRecurringTransaction(
-    data: CreateTransactionDto,
-    transaction: Prisma.TransactionClient,
-    userId: string
-  ) {
-    const recurrenceCount = 12 // Número de recorrências a serem criadas
-    const transactions = []
-    
-    for (let i = 0; i < recurrenceCount; i++) {
-      const transactionDate = new Date(data.date)
-      transactionDate.setMonth(transactionDate.getUTCMonth() + i)
-      
-      const transactionData = {
-        ...data,
-        date: transactionDate.toISOString()
-      }
-      
-      const createdTransaction = await this.transactionsRepository.createWithTransaction(
-        userId,
-        transactionData,
-        transaction
-      )
-      
-      transactions.push(createdTransaction)
-    }
-    
     return {
-      message: 'Transações recorrentes criadas com sucesso',
-      count: transactions.length,
-      firstTransaction: transactions[0]
+      message: 'Pagamento pendente criado com sucesso',
+      bankSlip
     }
   }
 
@@ -121,52 +73,83 @@ export class CreateTransactionsUseCase {
       throw new BadRequestException('Cartão de crédito não encontrado')
     }
 
-    const transactionDate = new Date(data.date)
-    const firstInstallmentDate = new Date(
-      transactionDate.getUTCFullYear(),
-      transactionDate.getUTCMonth(),
-      creditCard.dueDay
-    )
+    const purchaseDate = new Date(data.date)
+    const installments = data.totalInstallments || 1
+    const installmentAmount = data.totalAmount / installments
+    const transactions = []
 
-    if (
-      transactionDate.getUTCDate() >= creditCard.closingDay ||
-      creditCard.closingDay > creditCard.dueDay
-    ) {
-      const isTwoMonths =
-        creditCard.closingDay > creditCard.dueDay &&
-        transactionDate.getUTCDate() >= creditCard.closingDay &&
-        transactionDate.getUTCDate() < 32
+    for (let i = 0; i < installments; i++) {
+      const invoiceDate = this.calculateInvoiceDate(purchaseDate, creditCard.closingDay, creditCard.dueDay, i)
+      const invoiceMonth = invoiceDate.getMonth() + 1
+      const invoiceYear = invoiceDate.getFullYear()
 
-      firstInstallmentDate.setMonth(
-        firstInstallmentDate.getUTCMonth() + (isTwoMonths ? 2 : 1)
+      let invoice = await this.invoiceRepository.findByCreditCardIdAndMonth(
+        creditCard.id,
+        invoiceMonth,
+        invoiceYear
       )
+
+      if (!invoice) {
+        invoice = await this.invoiceRepository.generateInvoice(
+          creditCard.id,
+          invoiceMonth,
+          invoiceYear
+        )
+      }
+
+      const transactionData = {
+        userId,
+        name: installments > 1 ? `${data.name} (${i+1}/${installments})` : data.name,
+        description: data.description,
+        totalAmount: installmentAmount,
+        date: data.date,
+        type: data.type,
+        categoryId: data.categoryId,
+        paymentMethod: PaymentMethod.CREDIT_CARD,
+        isPaid: false, 
+        creditCardId: creditCard.id,
+        invoiceId: invoice.id,
+        installmentIndex: i + 1,
+        totalInstallments: installments
+      }
+
+      const createdTransaction = await this.transactionsRepository.createWithTransaction({
+        userId,
+        data: transactionData,
+        transaction
+      })
+
+      transactions.push(createdTransaction)
     }
 
-    const payload: CreditCardExpenseDto[] = Array.from({
-      length: data.totalInstallments
-    }).map((_, index) => {
-      const installmentDate = new Date(firstInstallmentDate)
-      installmentDate.setMonth(installmentDate.getUTCMonth() + index)
+    return {
+      message: installments > 1 ? 'Compra parcelada criada com sucesso' : 'Compra com cartão de crédito criada com sucesso',
+      count: transactions.length,
+      transactions
+    }
+  }
 
-      return {
-        name: data.name,
-        description: data.description,
-        amount: data.totalAmount / data.totalInstallments,
-        installmentNumber: index + 1,
-        totalInstallments: data.totalInstallments,
-        dueDate: installmentDate.toISOString(),
-        creditCardId: creditCard.id,
-        categoryId: data.categoryId,
-        date: data.date
-      }
-    })
-
-    await this.creditCardExpenseRepository.createWithTransaction(
-      payload,
-      transaction
-    )
-
-    return { message: 'Credit card expense created' }
+  private calculateInvoiceDate(purchaseDate: Date, closingDay: number, dueDay: number, installmentOffset = 0): Date {
+    const purchaseDay = purchaseDate.getDate()
+    const purchaseMonth = purchaseDate.getMonth()
+    const purchaseYear = purchaseDate.getFullYear()
+    
+    let invoiceMonth = purchaseMonth
+    let invoiceYear = purchaseYear
+    
+    if (purchaseDay > closingDay) {
+      invoiceMonth += 1
+    }
+    
+    invoiceMonth += installmentOffset
+    
+    while (invoiceMonth > 11) {
+      invoiceMonth -= 12
+      invoiceYear += 1
+    }
+    
+    const invoiceDate = new Date(invoiceYear, invoiceMonth, dueDay)
+    return invoiceDate
   }
 
   private validateTransactionData(data: CreateTransactionDto) {
@@ -184,14 +167,6 @@ export class CreateTransactionsUseCase {
       (!data.totalInstallments || data.totalInstallments < 1)
     ) {
       data.totalInstallments = 1
-    }
-    
-    if (data.isPaid === undefined) {
-      data.isPaid = true
-    }
-    
-    if (data.isRecurring === undefined) {
-      data.isRecurring = false
     }
   }
 }

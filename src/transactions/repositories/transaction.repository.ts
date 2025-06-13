@@ -4,11 +4,15 @@ import { GetTransactionsDto } from '../infra/http/dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../infra/http/dto/update-transaction.dto'
 
 export abstract class TransactionRepository {
-  abstract createWithTransaction(
+  abstract createWithTransaction({
+    userId,
+    data,
+    transaction
+  }: {
     userId: string,
     data: CreateTransactionDto,
     transaction: Prisma.TransactionClient
-  ): Promise<Transaction>
+  }): Promise<Transaction>
 
   abstract create(data: Partial<Transaction>): Promise<Transaction>
 

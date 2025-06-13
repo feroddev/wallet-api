@@ -15,11 +15,15 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async createWithTransaction(
+  async createWithTransaction({
+    userId,
+    data,
+    transaction
+  }: {
     userId: string,
     data: CreateTransactionDto,
     transaction: Prisma.TransactionClient
-  ): Promise<Transaction> {
+  }): Promise<Transaction> {
     const { totalInstallments, isRecurring, creditCardId, ...payload } = data
 
     return transaction.transaction.create({

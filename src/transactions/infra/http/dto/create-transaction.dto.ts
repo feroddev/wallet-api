@@ -37,7 +37,7 @@ export class CreateTransactionDto {
   })
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod
-
+  
   @ApiProperty({ 
     description: 'Indica se a transação é recorrente', 
     default: false,
