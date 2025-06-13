@@ -21,7 +21,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000', 'https://wallet-web-six.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
   })
-  
+
   const config = new DocumentBuilder()
     .setTitle('Wallet API')
     .setDescription('API para gerenciamento de finanças pessoais')
