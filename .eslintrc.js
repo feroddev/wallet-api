@@ -6,6 +6,7 @@ module.exports = {
 		"plugin:prettier/recommended"
 	],
 	"rules": {
-		"@typescript-eslint/naming-convention": ["off"]
+		"@typescript-eslint/naming-convention": ["off"],
+		"unused-imports/no-unused-imports": "error"
 	}
 }
