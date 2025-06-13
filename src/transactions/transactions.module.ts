@@ -33,6 +33,8 @@ import { FindPendingPaymentUseCase } from './use-case/find-pending-payment.use-c
 import { UpdatePendingPaymentUseCase } from './use-case/update-pending-payment.use-case'
 import { DeletePendingPaymentUseCase } from './use-case/delete-pending-payment.use-case'
 import { PayPendingPaymentUseCase } from './use-case/pay-pending-payment.use-case'
+import { InvoiceRepository } from '../invoices/repositories/invoice.repository'
+import { PrismaInvoiceRepository } from '../invoices/infra/database/prisma/prisma-invoice.repository'
 
 @Module({
   controllers: [
@@ -79,6 +81,10 @@ import { PayPendingPaymentUseCase } from './use-case/pay-pending-payment.use-cas
     {
       provide: PendingPaymentsRepository,
       useClass: PrismaPendingPaymentsRepository
+    },
+    {
+      provide: InvoiceRepository,
+      useClass: PrismaInvoiceRepository
     }
   ],
   imports: [AuthModule]
