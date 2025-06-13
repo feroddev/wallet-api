@@ -47,45 +47,45 @@ enum CategoryType {
 }
 
 model User {
-  id             String           @id @default(uuid())
-  name           String
-  email          String           @unique
-  password       String
-  plan           Plan             @default(FREE)
-  createdAt      DateTime         @default(now()) @map("created_at")
-  CreditCards    CreditCard[]
-  Transactions   Transaction[]
-  UserPlan       UserPlan[]
-  PendingPayment PendingPayment[]
-  Invoice        Invoice[]
-  Goal           Goal[]
-  BillToPay      BillToPay[]
-  Budget         Budget[]
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  plan         Plan          @default(FREE)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  CreditCards  CreditCard[]
+  Transactions Transaction[]
+  UserPlan     UserPlan[]
+  Invoice      Invoice[]
+  Goal         Goal[]
+  BillToPay    BillToPay[]
+  Budget       Budget[]
 
   @@map("users")
 }
 
 model Transaction {
-  id             String           @id @default(uuid())
-  userId         String           @map("user_id")
-  categoryId     String           @map("category_id")
-  name           String
-  type           TransactionType  @map("type")
-  description    String?
-  paymentMethod  PaymentMethod    @map("payment_method")
-  date           DateTime         @map("date")
-  totalAmount    Decimal          @db.Money
-  isPaid         Boolean          @default(false) @map("is_paid")
-  isRecurring    Boolean          @default(false) @map("is_recurring")
-  creditCardId   String?          @map("credit_card_id")
-  invoiceId      String?          @map("invoice_id")
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @updatedAt @map("updated_at")
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category       Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  creditCard     CreditCard?      @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
-  invoice        Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-  PendingPayment PendingPayment[]
+  id            String          @id @default(uuid())
+  userId        String          @map("user_id")
+  categoryId    String          @map("category_id")
+  name          String
+  type          TransactionType @map("type")
+  description   String?
+  paymentMethod PaymentMethod   @map("payment_method")
+  date          DateTime        @map("date")
+  totalAmount   Decimal         @db.Money
+  isPaid        Boolean         @default(false) @map("is_paid")
+  isRecurring   Boolean         @default(false) @map("is_recurring")
+  creditCardId  String?         @map("credit_card_id")
+  invoiceId     String?         @map("invoice_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  billToPayId   String?
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  creditCard    CreditCard?     @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  invoice       Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  BillToPay     BillToPay?      @relation(fields: [billToPayId], references: [id])
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
@@ -149,7 +149,6 @@ model Category {
   type              CategoryType
   createdAt         DateTime            @default(now()) @map("created_at")
   transactions      Transaction[]
-  PendingPayment    PendingPayment[]
   CreditCardExpense CreditCardExpense[]
 
   @@map("categories")
@@ -192,19 +191,20 @@ model Budget {
 }
 
 model BillToPay {
-  id            String    @id @default(uuid())
-  userId        String    @map("user_id")
+  id            String        @id @default(uuid())
+  userId        String        @map("user_id")
   name          String
   description   String?
-  amount        Decimal   @db.Money
-  dueDate       DateTime  @map("due_date")
-  isPaid        Boolean   @default(false) @map("is_paid")
-  paidAt        DateTime? @map("paid_at")
-  isRecurring   Boolean   @default(false) @map("is_recurring")
-  recurrenceDay Int?      @map("recurrence_day")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount        Decimal       @db.Money
+  dueDate       DateTime      @map("due_date")
+  isPaid        Boolean       @default(false) @map("is_paid")
+  paidAt        DateTime?     @map("paid_at")
+  isRecurring   Boolean       @default(false) @map("is_recurring")
+  recurrenceDay Int?          @map("recurrence_day")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
 
   @@map("bills_to_pay")
 }
@@ -222,25 +222,4 @@ model Goal {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("goals")
-}
-
-model PendingPayment {
-  id            String         @id @default(uuid())
-  userId        String         @map("user_id")
-  name          String
-  description   String?        @map("description")
-  categoryId    String         @map("category_id")
-  totalAmount   Decimal        @db.Money
-  dueDate       DateTime       @map("due_date")
-  status        PaymentStatus  @default(PENDING) @map("status")
-  paymentMethod PaymentMethod? @map("payment_method")
-  paidAt        DateTime?      @map("paid_at")
-  transactionId String?        @map("transaction_id")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  transaction   Transaction?   @relation(fields: [transactionId], references: [id], onDelete: SetNull)
-
-  @@map("pending_payments")
 }

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-import { PrismaModule } from '../prisma/prisma.module'
 import { GoalController } from './infra/http/controllers/goal.controller'
 import { PrismaGoalRepository } from './infra/database/prisma/prisma-goal.repository'
 import { GoalRepository } from './repositories/goal.repository'
