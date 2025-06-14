@@ -2,7 +2,7 @@ import { PrismaClient, CategoryType, PaymentMethod, TransactionType, Plan, Categ
 import { addDays, addMonths, subDays, subMonths } from 'date-fns'
 
 const prisma = new PrismaClient()
-const userId = '26c89b94-5161-4250-ac09-8bc185ba817a'
+const userId = 'd3e42b93-fdeb-45fc-8d1b-acb2e2191a97'
 
 async function main() {
   // Limpar dados existentes
@@ -18,7 +18,7 @@ async function main() {
   const invoices = await createInvoices(creditCards)
 
   // Criar transações
-  const transactions = await createTransactions(categories, creditCards, invoices)
+  await createTransactions(categories, creditCards, invoices)
 
   // Criar planos do usuário
   await createUserPlans()

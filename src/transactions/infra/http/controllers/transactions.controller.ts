@@ -5,6 +5,7 @@ import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
 import { CreateTransactionsUseCase } from '../../../use-case/create-transactions.use-case'
 import { DeleteTransactionUseCase } from '../../../use-case/delete-transaction.use-case'
+import { DeleteInstallmentsUseCase } from '../../../use-case/delete-installments.use-case'
 import { FindTransactionUseCase } from '../../../use-case/find-transaction.use-case'
 import { GetTransactionsUseCase } from '../../../use-case/get-transactions.use-case'
 import { UpdateTransactionUseCase } from '../../../use-case/update-transaction.use-case'
@@ -22,7 +23,8 @@ export class TransactionsController {
     private readonly getTransactionsUseCase: GetTransactionsUseCase,
     private readonly findTransactionUseCase: FindTransactionUseCase,
     private readonly updateTransactionUseCase: UpdateTransactionUseCase,
-    private readonly deleteTransactionUseCase: DeleteTransactionUseCase
+    private readonly deleteTransactionUseCase: DeleteTransactionUseCase,
+    private readonly deleteInstallmentsUseCase: DeleteInstallmentsUseCase
   ) {}
 
   @Post()
@@ -84,5 +86,17 @@ export class TransactionsController {
     @Param('id') id: string
   ) {
     return this.deleteTransactionUseCase.execute(id, userId)
+  }
+
+  @Delete('/:id/installments')
+  @ApiOperation({ summary: 'Cancelar uma compra parcelada excluindo todas as parcelas' })
+  @ApiParam({ name: 'id', description: 'ID de qualquer transação da compra parcelada' })
+  @ApiResponse({ status: 200, description: 'Compra parcelada cancelada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Transação não encontrada ou não é parte de uma compra parcelada' })
+  async deleteInstallments(
+    @Jwt() { userId }: JwtPayload,
+    @Param('id') id: string
+  ) {
+    return this.deleteInstallmentsUseCase.execute(userId, id)
   }
 }

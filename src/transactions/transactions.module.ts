@@ -9,6 +9,7 @@ import { TransactionsController } from './infra/http/controllers/transactions.co
 import { CategoryRepository } from './repositories/category.repository'
 import { CreateTransactionsUseCase } from './use-case/create-transactions.use-case'
 import { DeleteTransactionUseCase } from './use-case/delete-transaction.use-case'
+import { DeleteInstallmentsUseCase } from './use-case/delete-installments.use-case'
 import { FindTransactionUseCase } from './use-case/find-transaction.use-case'
 import { GetAllCategoriesUseCase } from './use-case/get-all-categories.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
@@ -17,6 +18,7 @@ import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case
 import { InvoiceRepository } from '../invoices/repositories/invoice.repository'
 import { PrismaInvoiceRepository } from '../invoices/infra/database/prisma/prisma-invoice.repository'
 import { TransactionRepository } from './repositories/transaction.repository'
+import { PrismaService } from '../prisma/prisma.service'
 
 @Module({
   controllers: [
@@ -31,6 +33,8 @@ import { TransactionRepository } from './repositories/transaction.repository'
     FindTransactionUseCase,
     UpdateTransactionUseCase,
     DeleteTransactionUseCase,
+    DeleteInstallmentsUseCase,
+    PrismaService,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository

@@ -20,7 +20,11 @@ export abstract class TransactionRepository {
 
   abstract find(data: Partial<Transaction>): Promise<any>
   
+  abstract findByPurchaseId(purchaseId: string, userId: string): Promise<Transaction[]>
+  
   abstract update(id: string, userId: string, data: UpdateTransactionDto): Promise<Transaction>
   
   abstract delete(id: string, userId: string): Promise<Transaction>
+  
+  abstract deleteAllInstallments(purchaseId: string, userId: string, transaction?: Prisma.TransactionClient): Promise<{ count: number }>
   }

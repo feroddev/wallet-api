@@ -19,11 +19,18 @@ export class CreateTransactionsUseCase {
   async execute(userId: string, data: CreateTransactionDto) {
     this.validateTransactionData(data)
 
-    return this.prisma.$transaction(async (transaction) => {
-      if (data.paymentMethod === PaymentMethod.CREDIT_CARD) {
-        return this.createCreditCardExpense(data, transaction, userId)
-      }
+    if (data.paymentMethod === PaymentMethod.CREDIT_CARD) {
+      return this.prisma.executeWithExtendedTimeout(async () => {
+        return this.prisma.$transaction(async (transaction) => {
+          return this.createCreditCardExpense(data, transaction, userId)
+        }, {
+          timeout: 60000, // 60 segundos para transações com cartão de crédito
+          maxWait: 20000  // 20 segundos de espera máxima
+        })
+      })
+    }
 
+    return this.prisma.$transaction(async (transaction) => {
       if (data.paymentMethod === PaymentMethod.BANK_SLIP) {
         return this.createBankSlipExpense(data, transaction, userId)
       }
@@ -61,9 +68,7 @@ export class CreateTransactionsUseCase {
     transaction: Prisma.TransactionClient,
     userId: string
   ) {
-    const creditCard = await this.creditCardRepository.find({
-      id: data.creditCardId
-    })
+    const creditCard = await this.creditCardRepository.find({ id: data.creditCardId })
 
     if (!creditCard) {
       throw new BadRequestException('Cartão de crédito não encontrado')
@@ -73,25 +78,52 @@ export class CreateTransactionsUseCase {
     const installments = data.totalInstallments || 1
     const installmentAmount = data.totalAmount / installments
     const transactions = []
+    
+    // Gerar um ID único para a compra parcelada
+    const purchaseId = data.purchaseId || `purchase-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 
+    // Pré-calcular todas as faturas necessárias para evitar consultas repetidas
+    const invoiceDates = [];
+    const invoiceCache = new Map();
+    
     for (let i = 0; i < installments; i++) {
       const invoiceDate = this.calculateInvoiceDate(purchaseDate, creditCard.closingDay, creditCard.dueDay, i)
       const invoiceMonth = invoiceDate.getMonth() + 1
       const invoiceYear = invoiceDate.getFullYear()
-
+      invoiceDates.push({ month: invoiceMonth, year: invoiceYear })
+    }
+    
+    // Buscar todas as faturas existentes de uma vez
+    const uniqueDates = [...new Set(invoiceDates.map(d => `${d.month}-${d.year}`))];
+    for (const dateKey of uniqueDates) {
+      const [month, year] = dateKey.split('-').map(Number);
       let invoice = await this.invoiceRepository.findByCreditCardIdAndMonth(
         creditCard.id,
-        invoiceMonth,
-        invoiceYear
+        month,
+        year
       )
 
       if (!invoice) {
         invoice = await this.invoiceRepository.generateInvoice(
           creditCard.id,
-          invoiceMonth,
-          invoiceYear
+          month,
+          year
         )
       }
+      
+      invoiceCache.set(dateKey, invoice);
+    }
+
+    // Criar todas as transações em lote e atualizar os valores das faturas
+    const transactionsData = [];
+    const invoiceUpdates = new Map();
+    
+    for (let i = 0; i < installments; i++) {
+      const invoiceDate = this.calculateInvoiceDate(purchaseDate, creditCard.closingDay, creditCard.dueDay, i)
+      const invoiceMonth = invoiceDate.getMonth() + 1
+      const invoiceYear = invoiceDate.getFullYear()
+      const dateKey = `${invoiceMonth}-${invoiceYear}`;
+      const invoice = invoiceCache.get(dateKey);
 
       const transactionData = {
         userId,
@@ -105,8 +137,9 @@ export class CreateTransactionsUseCase {
         isPaid: false, 
         creditCardId: creditCard.id,
         invoiceId: invoice.id,
-        installmentIndex: i + 1,
-        totalInstallments: installments
+        purchaseId: purchaseId,
+        totalInstallments: installments,
+        installmentNumber: i + 1
       }
 
       const createdTransaction = await this.transactionsRepository.createWithTransaction({
@@ -116,6 +149,25 @@ export class CreateTransactionsUseCase {
       })
 
       transactions.push(createdTransaction)
+      
+      // Registrar o valor para atualização da fatura
+      if (!invoiceUpdates.has(invoice.id)) {
+        invoiceUpdates.set(invoice.id, installmentAmount);
+      } else {
+        invoiceUpdates.set(invoice.id, invoiceUpdates.get(invoice.id) + installmentAmount);
+      }
+    }
+    
+    // Atualizar os valores totais das faturas
+    for (const [invoiceId, amountToAdd] of invoiceUpdates.entries()) {
+      await transaction.invoice.update({
+        where: { id: invoiceId },
+        data: {
+          totalAmount: {
+            increment: amountToAdd
+          }
+        }
+      });
     }
 
     return {

@@ -84,6 +84,24 @@ export class CreateTransactionDto {
   totalInstallments?: number
 
   @ApiProperty({ 
+    description: 'ID da compra para agrupar parcelas',
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  purchaseId?: string
+
+  @ApiProperty({ 
+    description: 'Número da parcela atual',
+    required: false,
+    minimum: 1
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  installmentNumber?: number
+
+  @ApiProperty({ 
     description: 'Data da transação',
     example: '2025-06-01' 
   })

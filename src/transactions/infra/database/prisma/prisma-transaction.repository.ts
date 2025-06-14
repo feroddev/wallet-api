@@ -24,14 +24,17 @@ export class PrismaTransactionRepository implements TransactionRepository {
     data: CreateTransactionDto,
     transaction: Prisma.TransactionClient
   }): Promise<Transaction> {
-    const { totalInstallments, isRecurring, creditCardId, ...payload } = data
+    const { totalInstallments, isRecurring, creditCardId, purchaseId, installmentNumber, ...payload } = data
 
     return transaction.transaction.create({
       data: {
         ...payload,
         userId,
         isRecurring: isRecurring || false,
-        creditCardId
+        creditCardId,
+        purchaseId,
+        totalInstallments,
+        installmentNumber
       }
     })
   }
@@ -120,5 +123,113 @@ export class PrismaTransactionRepository implements TransactionRepository {
     return this.prisma.transaction.delete({
       where: { id }
     })
+  }
+
+  async findByPurchaseId(purchaseId: string, userId: string): Promise<Transaction[]> {
+    if (!purchaseId) {
+      throw new NotFoundException('ID da compra não fornecido')
+    }
+
+    return this.prisma.transaction.findMany({
+      where: {
+        purchaseId,
+        userId
+      },
+      orderBy: {
+        installmentNumber: 'asc'
+      },
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        },
+        creditCard: true,
+        invoice: true
+      }
+    })
+  }
+
+  async deleteAllInstallments(purchaseId: string, userId: string, transaction?: Prisma.TransactionClient): Promise<{ count: number }> {
+    if (!purchaseId) {
+      throw new NotFoundException('ID da compra não fornecido')
+    }
+
+    // Verificar se as transações existem e pertencem ao usuário
+    const transactions = await this.prisma.transaction.findMany({
+      where: {
+        purchaseId,
+        userId
+      },
+      include: {
+        invoice: true
+      }
+    })
+
+    if (transactions.length === 0) {
+      throw new NotFoundException('Transações não encontradas')
+    }
+
+    // Se um cliente de transação foi fornecido, use-o
+    const prismaClient = transaction || this.prisma
+
+    // Executar dentro de uma transação se não foi fornecida uma
+    if (!transaction) {
+      return this.prisma.executeWithExtendedTimeout(() => {
+        return this.prisma.$transaction(async (tx) => {
+          return this._deleteInstallmentsWithTransaction(purchaseId, userId, transactions, tx)
+        }, {
+          timeout: 30000,
+          maxWait: 30000
+        })
+      })
+    }
+
+    // Se já estiver em uma transação, use-a diretamente
+    return this._deleteInstallmentsWithTransaction(purchaseId, userId, transactions, prismaClient)
+  }
+
+  private async _deleteInstallmentsWithTransaction(
+    purchaseId: string, 
+    userId: string, 
+    transactions: (Transaction & { invoice: any })[],
+    tx: Prisma.TransactionClient
+  ): Promise<{ count: number }> {
+    // Atualizar os valores totais das faturas
+    const invoiceUpdates = new Map<string, number>()
+
+    // Agrupar transações por fatura e calcular valores a deduzir
+    transactions.forEach(transaction => {
+      if (transaction.invoiceId) {
+        const amount = Number(transaction.totalAmount)
+        if (!invoiceUpdates.has(transaction.invoiceId)) {
+          invoiceUpdates.set(transaction.invoiceId, amount)
+        } else {
+          invoiceUpdates.set(transaction.invoiceId, invoiceUpdates.get(transaction.invoiceId) + amount)
+        }
+      }
+    })
+
+    // Atualizar os valores totais das faturas
+    for (const [invoiceId, amountToSubtract] of invoiceUpdates.entries()) {
+      await tx.invoice.update({
+        where: { id: invoiceId },
+        data: {
+          totalAmount: {
+            decrement: amountToSubtract
+          }
+        }
+      })
+    }
+
+    // Excluir todas as transações
+    const result = await tx.transaction.deleteMany({
+      where: {
+        purchaseId,
+        userId
+      }
+    })
+
+    return result
   }
 }
