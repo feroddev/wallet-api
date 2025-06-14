@@ -19,6 +19,8 @@ export abstract class TransactionRepository {
   abstract findMany(userId: string, payload: GetTransactionsDto): Promise<any>
 
   abstract find(data: Partial<Transaction>): Promise<any>
+
+  abstract getDetails(data:{id: string, userId: string}): Promise<any>
   
   abstract findByPurchaseId(purchaseId: string, userId: string): Promise<Transaction[]>
   

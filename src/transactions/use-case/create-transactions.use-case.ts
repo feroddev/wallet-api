@@ -118,19 +118,22 @@ export class CreateTransactionsUseCase {
     const transactionsData = [];
     const invoiceUpdates = new Map();
     
+    const originalPurchaseDate = new Date(data.date)
+    
     for (let i = 0; i < installments; i++) {
-      const invoiceDate = this.calculateInvoiceDate(purchaseDate, creditCard.closingDay, creditCard.dueDay, i)
+      const installmentDate = this.calculateInstallmentDate(originalPurchaseDate, i)
+      const invoiceDate = this.calculateInvoiceDate(installmentDate, creditCard.closingDay, creditCard.dueDay, 0)
       const invoiceMonth = invoiceDate.getMonth() + 1
       const invoiceYear = invoiceDate.getFullYear()
       const dateKey = `${invoiceMonth}-${invoiceYear}`;
       const invoice = invoiceCache.get(dateKey);
-
+      
       const transactionData = {
         userId,
         name: installments > 1 ? `${data.name} (${i+1}/${installments})` : data.name,
         description: data.description,
         totalAmount: installmentAmount,
-        date: data.date,
+        date: installmentDate.toISOString(),
         type: data.type,
         categoryId: data.categoryId,
         paymentMethod: PaymentMethod.CREDIT_CARD,
@@ -175,6 +178,36 @@ export class CreateTransactionsUseCase {
       count: transactions.length,
       transactions
     }
+  }
+
+  private calculateInstallmentDate(purchaseDate: Date, installmentOffset: number): Date {
+    const purchaseDay = purchaseDate.getDate()
+    const purchaseMonth = purchaseDate.getMonth()
+    const purchaseYear = purchaseDate.getFullYear()
+    
+    let installmentMonth = purchaseMonth
+    let installmentYear = purchaseYear
+    
+    // Para a primeira parcela (offset 0), usamos a data original da compra
+    // Para as demais parcelas, adicionamos meses
+    installmentMonth += installmentOffset
+    
+    while (installmentMonth > 11) {
+      installmentMonth -= 12
+      installmentYear += 1
+    }
+    
+    // Criamos a data com o mesmo dia da compra original, mas no mês seguinte
+    const installmentDate = new Date(installmentYear, installmentMonth, purchaseDay)
+    
+    // Verificar se o dia existe no mês (ex: 31 de fevereiro não existe)
+    const lastDayOfMonth = new Date(installmentYear, installmentMonth + 1, 0).getDate()
+    if (purchaseDay > lastDayOfMonth) {
+      // Se o dia não existir, usamos o último dia do mês
+      installmentDate.setDate(lastDayOfMonth)
+    }
+    
+    return installmentDate
   }
 
   private calculateInvoiceDate(purchaseDate: Date, closingDay: number, dueDay: number, installmentOffset = 0): Date {

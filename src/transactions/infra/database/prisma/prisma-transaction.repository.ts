@@ -150,6 +150,45 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
+  async getDetails(data: { id: string, userId: string }): Promise<any> {
+    const transaction = await this.prisma.transaction.findFirst({
+      where: { id: data.id, userId: data.userId },
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        },
+        creditCard: true,
+        invoice: true
+      }
+    })
+
+    if (!transaction) {
+      throw new NotFoundException('Transação não encontrada')
+    }
+
+    if (transaction.installmentNumber > 1) {
+      const installments = await this.prisma.transaction.findFirst({
+        where: {
+          purchaseId: transaction.purchaseId,
+          userId: data.userId,
+          installmentNumber: 1
+        },
+        select: {
+          date: true
+        }
+      })
+
+      return {
+        ...transaction,
+        date: installments.date
+      }
+    }
+
+    return transaction
+  }
+
   async deleteAllInstallments(purchaseId: string, userId: string, transaction?: Prisma.TransactionClient): Promise<{ count: number }> {
     if (!purchaseId) {
       throw new NotFoundException('ID da compra não fornecido')

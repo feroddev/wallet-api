@@ -20,12 +20,19 @@ export class PrismaCategoryRepository implements CategoryRepository {
 
   async findMany(data: Partial<Category>): Promise<Category[]> {
     return this.prisma.category.findMany({
-      where: data
+      where: data,
+      orderBy: {
+        name: 'asc'
+      }
     })
   }
-  
+
   async findAll(): Promise<Category[]> {
-    return this.prisma.category.findMany()
+    return this.prisma.category.findMany({
+      orderBy: {
+        name: 'asc'
+      }
+    })
   }
 
   async update(id: string, data: Partial<Category>): Promise<Category> {

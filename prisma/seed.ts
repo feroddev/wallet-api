@@ -1,4 +1,11 @@
-import { PrismaClient, CategoryType, PaymentMethod, TransactionType, Plan, Category } from '@prisma/client'
+import {
+  PrismaClient,
+  CategoryType,
+  PaymentMethod,
+  TransactionType,
+  Plan,
+  Category
+} from '@prisma/client'
 import { addDays, addMonths, subDays, subMonths } from 'date-fns'
 
 const prisma = new PrismaClient()
@@ -39,6 +46,7 @@ async function cleanDatabase() {
   // Limpar dados existentes para o usuário específico
   await prisma.transaction.deleteMany({ where: { userId } })
   await prisma.invoice.deleteMany({ where: { userId } })
+  await prisma.category.deleteMany()
   await prisma.creditCard.deleteMany({ where: { userId } })
   await prisma.userPlan.deleteMany({ where: { userId } })
   await prisma.budget.deleteMany({ where: { userId } })
@@ -49,7 +57,7 @@ async function cleanDatabase() {
 async function createCategories() {
   // Verificar categorias existentes
   const existingCategories = await prisma.category.findMany()
-  
+
   if (existingCategories.length === 0) {
     // Categorias de despesas
     const expenseCategories = [
@@ -58,8 +66,11 @@ async function createCategories() {
       'Moradia',
       'Saúde',
       'Educação',
-      'Lazer',
-      'Roupas',
+      'Lazer e Entretenimento',
+      'Roupas e Acessórios',
+      'Beleza e Cuidados Pessoais',
+      'Casa e Decoração',
+      'Tecnologia',
       'Serviços',
       'Outros'
     ]
@@ -79,7 +90,14 @@ async function createCategories() {
     }
 
     // Categorias de investimentos
-    const investmentCategories = ['Ações', 'Tesouro Direto', 'CDB', 'Fundos', 'Outros']
+    const investmentCategories = [
+      'Tesouro Direto',
+      'CDB',
+      'Fundo Imobiliário (FII)',
+      'Ações',
+      'Criptomoedas',
+      'Outros'
+    ]
     for (const name of investmentCategories) {
       await prisma.category.create({
         data: { name, type: CategoryType.INVESTMENT }
@@ -129,10 +147,10 @@ async function createInvoices(creditCards) {
       const invoiceDate = new Date(currentYear, currentMonth + i, 1)
       const month = invoiceDate.getMonth() + 1
       const year = invoiceDate.getFullYear()
-      
+
       const closingDate = new Date(year, month - 1, card.closingDay)
       const dueDate = new Date(year, month - 1, card.dueDay)
-      
+
       // Se a data de fechamento já passou, a fatura do próximo mês deve ser considerada
       if (closingDate < now && i === 0) {
         closingDate.setMonth(closingDate.getMonth() + 1)
@@ -167,15 +185,21 @@ async function createTransactions(categories, creditCards, invoices) {
   const now = new Date()
 
   // Obter categorias por tipo
-  const expenseCategories = categories.filter(c => c.type === CategoryType.EXPENSE)
-  const incomeCategories = categories.filter(c => c.type === CategoryType.INCOME)
-  const investmentCategories = categories.filter(c => c.type === CategoryType.INVESTMENT)
+  const expenseCategories = categories.filter(
+    (c) => c.type === CategoryType.EXPENSE
+  )
+  const incomeCategories = categories.filter(
+    (c) => c.type === CategoryType.INCOME
+  )
+  const investmentCategories = categories.filter(
+    (c) => c.type === CategoryType.INVESTMENT
+  )
 
   // Criar transações de despesas
   for (let i = 0; i < 10; i++) {
     const date = subDays(now, i * 3)
     const category = expenseCategories[i % expenseCategories.length]
-    
+
     const transaction = await prisma.transaction.create({
       data: {
         userId,
@@ -183,15 +207,17 @@ async function createTransactions(categories, creditCards, invoices) {
         name: `Despesa ${i + 1}`,
         type: TransactionType.EXPENSE,
         description: `Descrição da despesa ${i + 1}`,
-        paymentMethod: i % 2 === 0 ? PaymentMethod.CREDIT_CARD : PaymentMethod.DEBIT_CARD,
+        paymentMethod:
+          i % 2 === 0 ? PaymentMethod.CREDIT_CARD : PaymentMethod.DEBIT_CARD,
         date,
         totalAmount: 100 + i * 50,
         isPaid: true,
         isRecurring: i % 3 === 0,
-        creditCardId: i % 2 === 0 ? creditCards[i % creditCards.length].id : null
+        creditCardId:
+          i % 2 === 0 ? creditCards[i % creditCards.length].id : null
       }
     })
-    
+
     transactions.push(transaction)
   }
 
@@ -199,7 +225,7 @@ async function createTransactions(categories, creditCards, invoices) {
   for (let i = 0; i < 5; i++) {
     const date = subDays(now, i * 7)
     const category = incomeCategories[i % incomeCategories.length]
-    
+
     const transaction = await prisma.transaction.create({
       data: {
         userId,
@@ -214,14 +240,14 @@ async function createTransactions(categories, creditCards, invoices) {
         isRecurring: i === 0 // Apenas a primeira é recorrente (salário)
       }
     })
-    
+
     transactions.push(transaction)
   }
 
   for (let i = 0; i < 3; i++) {
     const date = subDays(now, i * 15)
     const category = investmentCategories[i % investmentCategories.length]
-    
+
     const transaction = await prisma.transaction.create({
       data: {
         userId,
@@ -236,7 +262,7 @@ async function createTransactions(categories, creditCards, invoices) {
         isRecurring: false
       }
     })
-    
+
     transactions.push(transaction)
   }
 
@@ -285,10 +311,10 @@ async function createBudgets(categories: Category[]) {
 
   const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1
   const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear
-  
+
   for (let i = 0; i < 5; i++) {
     const category = categories[i]
-    
+
     await prisma.budget.create({
       data: {
         userId,

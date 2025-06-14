@@ -45,7 +45,10 @@ export class TransactionsController {
   @ApiQuery({ name: 'endDate', required: false, type: Date })
   @ApiQuery({ name: 'type', required: false, enum: TransactionType })
   @ApiQuery({ name: 'categoryId', required: false })
-  @ApiResponse({ status: 200, description: 'Lista de transações' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de transações com total calculado (positivo para receitas, negativo para despesas e investimentos)' 
+  })
   async getTransactions(
     @Jwt() { userId }: JwtPayload,
     @Query() query: GetTransactionsDto
