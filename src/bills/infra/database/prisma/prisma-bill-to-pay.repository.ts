@@ -79,7 +79,7 @@ export class PrismaBillToPayRepository implements BillToPayRepository {
 
   async markAsPaid(id: string): Promise<BillToPay> {
     const now = new Date()
-    
+
     return this.prisma.billToPay.update({
       where: { id },
       data: {
@@ -91,7 +91,7 @@ export class PrismaBillToPayRepository implements BillToPayRepository {
 
   async createRecurringBill(originalBill: BillToPay): Promise<BillToPay> {
     const nextDueDate = new Date(originalBill.dueDate)
-    
+
     if (originalBill.recurrenceDay) {
       const nextMonth = addMonths(nextDueDate, 1)
       nextDueDate.setMonth(nextMonth.getMonth())

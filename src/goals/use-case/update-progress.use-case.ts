@@ -15,11 +15,11 @@ export class UpdateProgressUseCase {
     const { id, userId, amount } = request
 
     const goal = await this.goalRepository.findById(id)
-    
+
     if (!goal) {
       throw new Error('Meta não encontrada')
     }
-    
+
     if (goal.userId !== userId) {
       throw new Error('Você não tem permissão para atualizar esta meta')
     }

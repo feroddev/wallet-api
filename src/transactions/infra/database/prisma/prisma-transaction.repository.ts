@@ -20,11 +20,18 @@ export class PrismaTransactionRepository implements TransactionRepository {
     data,
     transaction
   }: {
-    userId: string,
-    data: CreateTransactionDto,
+    userId: string
+    data: CreateTransactionDto
     transaction: Prisma.TransactionClient
   }): Promise<Transaction> {
-    const { totalInstallments, isRecurring, creditCardId, purchaseId, installmentNumber, ...payload } = data
+    const {
+      totalInstallments,
+      isRecurring,
+      creditCardId,
+      purchaseId,
+      installmentNumber,
+      ...payload
+    } = data
 
     return transaction.transaction.create({
       data: {
@@ -88,7 +95,11 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async update(id: string, userId: string, data: UpdateTransactionDto): Promise<Transaction> {
+  async update(
+    id: string,
+    userId: string,
+    data: UpdateTransactionDto
+  ): Promise<Transaction> {
     const transaction = await this.prisma.transaction.findFirst({
       where: { id, userId }
     })
@@ -125,7 +136,10 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async findByPurchaseId(purchaseId: string, userId: string): Promise<Transaction[]> {
+  async findByPurchaseId(
+    purchaseId: string,
+    userId: string
+  ): Promise<Transaction[]> {
     if (!purchaseId) {
       throw new NotFoundException('ID da compra não fornecido')
     }
@@ -150,7 +164,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
   }
 
-  async getDetails(data: { id: string, userId: string }): Promise<any> {
+  async getDetails(data: { id: string; userId: string }): Promise<any> {
     const transaction = await this.prisma.transaction.findFirst({
       where: { id: data.id, userId: data.userId },
       include: {
@@ -189,7 +203,11 @@ export class PrismaTransactionRepository implements TransactionRepository {
     return transaction
   }
 
-  async deleteAllInstallments(purchaseId: string, userId: string, transaction?: Prisma.TransactionClient): Promise<{ count: number }> {
+  async deleteAllInstallments(
+    purchaseId: string,
+    userId: string,
+    transaction?: Prisma.TransactionClient
+  ): Promise<{ count: number }> {
     if (!purchaseId) {
       throw new NotFoundException('ID da compra não fornecido')
     }
@@ -215,22 +233,35 @@ export class PrismaTransactionRepository implements TransactionRepository {
     // Executar dentro de uma transação se não foi fornecida uma
     if (!transaction) {
       return this.prisma.executeWithExtendedTimeout(() => {
-        return this.prisma.$transaction(async (tx) => {
-          return this._deleteInstallmentsWithTransaction(purchaseId, userId, transactions, tx)
-        }, {
-          timeout: 30000,
-          maxWait: 30000
-        })
+        return this.prisma.$transaction(
+          async (tx) => {
+            return this._deleteInstallmentsWithTransaction(
+              purchaseId,
+              userId,
+              transactions,
+              tx
+            )
+          },
+          {
+            timeout: 30000,
+            maxWait: 30000
+          }
+        )
       })
     }
 
     // Se já estiver em uma transação, use-a diretamente
-    return this._deleteInstallmentsWithTransaction(purchaseId, userId, transactions, prismaClient)
+    return this._deleteInstallmentsWithTransaction(
+      purchaseId,
+      userId,
+      transactions,
+      prismaClient
+    )
   }
 
   private async _deleteInstallmentsWithTransaction(
-    purchaseId: string, 
-    userId: string, 
+    purchaseId: string,
+    userId: string,
     transactions: (Transaction & { invoice: any })[],
     tx: Prisma.TransactionClient
   ): Promise<{ count: number }> {
@@ -238,13 +269,16 @@ export class PrismaTransactionRepository implements TransactionRepository {
     const invoiceUpdates = new Map<string, number>()
 
     // Agrupar transações por fatura e calcular valores a deduzir
-    transactions.forEach(transaction => {
+    transactions.forEach((transaction) => {
       if (transaction.invoiceId) {
         const amount = Number(transaction.totalAmount)
         if (!invoiceUpdates.has(transaction.invoiceId)) {
           invoiceUpdates.set(transaction.invoiceId, amount)
         } else {
-          invoiceUpdates.set(transaction.invoiceId, invoiceUpdates.get(transaction.invoiceId) + amount)
+          invoiceUpdates.set(
+            transaction.invoiceId,
+            invoiceUpdates.get(transaction.invoiceId) + amount
+          )
         }
       }
     })

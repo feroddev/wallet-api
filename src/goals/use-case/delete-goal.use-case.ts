@@ -14,11 +14,11 @@ export class DeleteGoalUseCase {
     const { id, userId } = request
 
     const goal = await this.goalRepository.findById(id)
-    
+
     if (!goal) {
       throw new Error('Meta não encontrada')
     }
-    
+
     if (goal.userId !== userId) {
       throw new Error('Você não tem permissão para excluir esta meta')
     }

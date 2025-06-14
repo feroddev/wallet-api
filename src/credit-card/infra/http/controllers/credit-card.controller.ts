@@ -1,5 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -33,7 +39,10 @@ export class CreditCardController {
   @Post()
   @ApiOperation({ summary: 'Criar um novo cartão de crédito' })
   @ApiBody({ type: CreateCreditCardDto })
-  @ApiResponse({ status: 201, description: 'Cartão de crédito criado com sucesso' })
+  @ApiResponse({
+    status: 201,
+    description: 'Cartão de crédito criado com sucesso'
+  })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async createCreditCard(
     @Jwt() { userId }: JwtPayload,
@@ -58,7 +67,10 @@ export class CreditCardController {
   @ApiOperation({ summary: 'Atualizar dados de um cartão de crédito' })
   @ApiParam({ name: 'id', description: 'ID do cartão de crédito' })
   @ApiBody({ type: UpdateCreditCardDto })
-  @ApiResponse({ status: 200, description: 'Cartão de crédito atualizado com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cartão de crédito atualizado com sucesso'
+  })
   @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async updateCreditCard(
     @Jwt() { userId }: JwtPayload,
@@ -71,7 +83,10 @@ export class CreditCardController {
   @Delete('/:id')
   @ApiOperation({ summary: 'Excluir um cartão de crédito' })
   @ApiParam({ name: 'id', description: 'ID do cartão de crédito' })
-  @ApiResponse({ status: 200, description: 'Cartão de crédito excluído com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cartão de crédito excluído com sucesso'
+  })
   @ApiResponse({ status: 404, description: 'Cartão de crédito não encontrado' })
   async deleteCreditCard(
     @Jwt() { userId }: JwtPayload,

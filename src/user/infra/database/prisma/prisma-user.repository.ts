@@ -15,7 +15,7 @@ export class PrismaUserRepository implements UserRepository {
         name: true,
         email: true,
         createdAt: true,
-        plan: true,
+        plan: true
       }
     })
 
@@ -40,7 +40,7 @@ export class PrismaUserRepository implements UserRepository {
         name: true,
         email: true,
         createdAt: true,
-        plan: true,
+        plan: true
       }
     })
 
@@ -55,7 +55,7 @@ export class PrismaUserRepository implements UserRepository {
         name: true,
         email: true,
         createdAt: true,
-        plan: true,
+        plan: true
       }
     })
 
@@ -76,7 +76,7 @@ export class PrismaUserRepository implements UserRepository {
         name: true,
         email: true,
         createdAt: true,
-        plan: true,
+        plan: true
       }
     })
 

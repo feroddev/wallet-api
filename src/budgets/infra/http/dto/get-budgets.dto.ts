@@ -6,13 +6,13 @@ export class GetBudgetsDto {
   @IsInt()
   @Min(1)
   @Max(12)
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   month?: number
 
   @IsOptional()
   @IsInt()
   @Min(2000)
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   year?: number
 
   @IsOptional()

@@ -1,5 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -29,22 +45,21 @@ export class BudgetController {
   @ApiBody({ type: CreateBudgetDto })
   @ApiResponse({ status: 201, description: 'Orçamento criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(
-    @Jwt() { userId }: JwtPayload,
-    @Body() data: CreateBudgetDto
-  ) {
+  async create(@Jwt() { userId }: JwtPayload, @Body() data: CreateBudgetDto) {
     return this.createBudgetUseCase.execute(userId, data)
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar orçamentos do período' })
-  @ApiQuery({ name: 'month', required: false, type: Number, description: 'Mês (1-12)' })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    type: Number,
+    description: 'Mês (1-12)'
+  })
   @ApiQuery({ name: 'year', required: false, type: Number, description: 'Ano' })
   @ApiResponse({ status: 200, description: 'Lista de orçamentos' })
-  async getAll(
-    @Jwt() { userId }: JwtPayload,
-    @Query() filters: GetBudgetsDto
-  ) {
+  async getAll(@Jwt() { userId }: JwtPayload, @Query() filters: GetBudgetsDto) {
     return this.getBudgetsUseCase.execute(userId, filters)
   }
 
@@ -67,10 +82,7 @@ export class BudgetController {
   @ApiParam({ name: 'id', description: 'ID do orçamento' })
   @ApiResponse({ status: 200, description: 'Orçamento removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado' })
-  async delete(
-    @Jwt() { userId }: JwtPayload,
-    @Param('id') id: string
-  ) {
+  async delete(@Jwt() { userId }: JwtPayload, @Param('id') id: string) {
     return this.deleteBudgetUseCase.execute(id, userId)
   }
 }

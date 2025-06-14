@@ -13,7 +13,10 @@ export class AuthController {
   @Post('/login')
   @ApiOperation({ summary: 'Autenticar usuário' })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, description: 'Autenticação realizada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Autenticação realizada com sucesso'
+  })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
   async login(@Body() body: LoginDto) {
     return this.authService.login(body)

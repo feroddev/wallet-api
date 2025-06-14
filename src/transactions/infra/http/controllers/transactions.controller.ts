@@ -1,5 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -45,9 +61,10 @@ export class TransactionsController {
   @ApiQuery({ name: 'endDate', required: false, type: Date })
   @ApiQuery({ name: 'type', required: false, enum: TransactionType })
   @ApiQuery({ name: 'categoryId', required: false })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Lista de transações com total calculado (positivo para receitas, negativo para despesas e investimentos)' 
+  @ApiResponse({
+    status: 200,
+    description:
+      'Lista de transações com total calculado (positivo para receitas, negativo para despesas e investimentos)'
   })
   async getTransactions(
     @Jwt() { userId }: JwtPayload,
@@ -92,10 +109,22 @@ export class TransactionsController {
   }
 
   @Delete('/:id/installments')
-  @ApiOperation({ summary: 'Cancelar uma compra parcelada excluindo todas as parcelas' })
-  @ApiParam({ name: 'id', description: 'ID de qualquer transação da compra parcelada' })
-  @ApiResponse({ status: 200, description: 'Compra parcelada cancelada com sucesso' })
-  @ApiResponse({ status: 404, description: 'Transação não encontrada ou não é parte de uma compra parcelada' })
+  @ApiOperation({
+    summary: 'Cancelar uma compra parcelada excluindo todas as parcelas'
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de qualquer transação da compra parcelada'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Compra parcelada cancelada com sucesso'
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'Transação não encontrada ou não é parte de uma compra parcelada'
+  })
   async deleteInstallments(
     @Jwt() { userId }: JwtPayload,
     @Param('id') id: string

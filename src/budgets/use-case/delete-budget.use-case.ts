@@ -14,11 +14,11 @@ export class DeleteBudgetUseCase {
     const { id, userId } = request
 
     const budget = await this.budgetRepository.findById(id)
-    
+
     if (!budget) {
       throw new Error('Orçamento não encontrado')
     }
-    
+
     if (budget.userId !== userId) {
       throw new Error('Você não tem permissão para excluir este orçamento')
     }

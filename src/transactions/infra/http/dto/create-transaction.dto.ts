@@ -30,51 +30,53 @@ export class CreateTransactionDto {
   @IsString()
   description?: string
 
-  @ApiProperty({ 
-    description: 'Método de pagamento', 
+  @ApiProperty({
+    description: 'Método de pagamento',
     enum: PaymentMethod,
-    example: 'PIX' 
+    example: 'PIX'
   })
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod
-  
-  @ApiProperty({ 
-    description: 'Indica se a transação é recorrente', 
+
+  @ApiProperty({
+    description: 'Indica se a transação é recorrente',
     default: false,
-    required: false 
+    required: false
   })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean
-  
-  @ApiProperty({ 
-    description: 'Indica se a transação já foi paga', 
+
+  @ApiProperty({
+    description: 'Indica se a transação já foi paga',
     default: true,
-    required: false 
+    required: false
   })
   @IsOptional()
   @IsBoolean()
   isPaid?: boolean
 
-  @ApiProperty({ 
-    description: 'ID do cartão de crédito (obrigatório se paymentMethod for CREDIT_CARD)',
-    required: false 
+  @ApiProperty({
+    description:
+      'ID do cartão de crédito (obrigatório se paymentMethod for CREDIT_CARD)',
+    required: false
   })
   @ValidateIf((dto) => dto.paymentMethod === PaymentMethod.CREDIT_CARD)
   @IsString()
   @IsNotEmpty()
   creditCardId?: string
-  
-  @ApiProperty({ 
+
+  @ApiProperty({
     description: 'ID da fatura (opcional)',
-    required: false 
+    required: false
   })
   @IsOptional()
   @IsString()
   invoiceId?: string
 
-  @ApiProperty({ 
-    description: 'Número total de parcelas (obrigatório se paymentMethod for CREDIT_CARD)',
+  @ApiProperty({
+    description:
+      'Número total de parcelas (obrigatório se paymentMethod for CREDIT_CARD)',
     required: false,
     minimum: 1
   })
@@ -83,7 +85,7 @@ export class CreateTransactionDto {
   @Min(1)
   totalInstallments?: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID da compra para agrupar parcelas',
     required: false
   })
@@ -91,7 +93,7 @@ export class CreateTransactionDto {
   @IsString()
   purchaseId?: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Número da parcela atual',
     required: false,
     minimum: 1
@@ -101,25 +103,25 @@ export class CreateTransactionDto {
   @Min(1)
   installmentNumber?: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Data da transação',
-    example: '2025-06-01' 
+    example: '2025-06-01'
   })
   @IsDate()
   @Transform(({ value }) => new Date(value))
   date: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Valor total da transação',
-    example: 4500.00 
+    example: 4500.0
   })
   @IsNumber()
   totalAmount: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Tipo da transação',
     enum: TransactionType,
-    example: 'INCOME' 
+    example: 'INCOME'
   })
   @IsEnum(TransactionType)
   type: TransactionType

@@ -32,11 +32,7 @@ export class PrismaBudgetRepository implements BudgetRepository {
 
     return this.prisma.budget.findMany({
       where,
-      orderBy: [
-        { year: 'asc' },
-        { month: 'asc' },
-        { category: 'asc' }
-      ]
+      orderBy: [{ year: 'asc' }, { month: 'asc' }, { category: 'asc' }]
     })
   }
 

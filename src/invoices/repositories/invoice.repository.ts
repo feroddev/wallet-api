@@ -25,5 +25,9 @@ export abstract class InvoiceRepository {
     year: number
   ): Promise<Invoice>
 
-  abstract markAsPaid(id: string, paymentMethod: PaymentMethod, paidAt: Date): Promise<Invoice>
+  abstract markAsPaid(
+    id: string,
+    paymentMethod: PaymentMethod,
+    paidAt: Date
+  ): Promise<Invoice>
 }

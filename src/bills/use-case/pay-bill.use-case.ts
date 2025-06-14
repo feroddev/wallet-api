@@ -18,11 +18,11 @@ export class PayBillUseCase {
     const { id, userId } = request
 
     const bill = await this.billToPayRepository.findById(id)
-    
+
     if (!bill) {
       throw new Error('Conta não encontrada')
     }
-    
+
     if (bill.userId !== userId) {
       throw new Error('Você não tem permissão para pagar esta conta')
     }

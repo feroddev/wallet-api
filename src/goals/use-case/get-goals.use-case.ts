@@ -13,10 +13,11 @@ export class GetGoalsUseCase {
     const { userId } = request
 
     const goals = await this.goalRepository.findByUserId(userId)
-    
-    return goals.map(goal => {
-      const progress = Number(goal.savedValue) / Number(goal.targetValue) * 100
-      
+
+    return goals.map((goal) => {
+      const progress =
+        (Number(goal.savedValue) / Number(goal.targetValue)) * 100
+
       return {
         ...goal,
         progress: Math.min(progress, 100)

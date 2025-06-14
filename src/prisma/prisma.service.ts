@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit
+} from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 
 @Injectable()
@@ -13,8 +18,8 @@ export class PrismaService
       log: [
         { emit: 'event', level: 'error' },
         { emit: 'event', level: 'info' },
-        { emit: 'event', level: 'warn' },
-      ],
+        { emit: 'event', level: 'warn' }
+      ]
     })
 
     this.configurarLogs()
@@ -45,7 +50,7 @@ export class PrismaService
     await this.$disconnect()
     this.logger.log('Prisma desconectado com sucesso')
   }
-  
+
   async executeWithExtendedTimeout<T>(operation: () => Promise<T>): Promise<T> {
     const startTime = Date.now()
     try {

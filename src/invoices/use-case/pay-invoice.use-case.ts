@@ -15,13 +15,13 @@ export class PayInvoiceUseCase {
 
   async execute(request: PayInvoiceRequest) {
     const { id, paymentMethod, paidAt } = request
-    
+
     const invoice = await this.invoiceRepository.findById(id)
-    
+
     if (!invoice) {
       throw new Error('Fatura não encontrada')
     }
-    
+
     return this.invoiceRepository.markAsPaid(id, paymentMethod, paidAt)
   }
 }

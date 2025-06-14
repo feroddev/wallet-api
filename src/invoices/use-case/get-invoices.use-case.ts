@@ -14,7 +14,7 @@ export class GetInvoicesUseCase {
 
   async execute(request: GetInvoicesRequest) {
     const { userId, month, year } = request
-    
+
     const currentDate = new Date()
     const currentMonth = month || currentDate.getMonth() + 1
     const currentYear = year || currentDate.getFullYear()

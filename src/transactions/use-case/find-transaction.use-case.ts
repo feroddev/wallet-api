@@ -7,7 +7,10 @@ export class FindTransactionUseCase {
   constructor(private readonly transactionsRepository: TransactionRepository) {}
 
   async execute(id: string, userId: string) {
-    const transaction = await this.transactionsRepository.getDetails({ id, userId })
+    const transaction = await this.transactionsRepository.getDetails({
+      id,
+      userId
+    })
 
     if (!transaction) {
       throw new NotFoundException(errors.TRANSACTIONS_NOT_FOUND)

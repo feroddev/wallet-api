@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsInt, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator'
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Max,
+  Min
+} from 'class-validator'
 
 export class UpdateBudgetDto {
   @ApiProperty({

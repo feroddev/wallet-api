@@ -13,7 +13,10 @@ export class DashboardController {
 
   @Get()
   @ApiOperation({ summary: 'Obter dados do dashboard' })
-  @ApiResponse({ status: 200, description: 'Dados do dashboard obtidos com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do dashboard obtidos com sucesso'
+  })
   async getDashboard(@Jwt() { userId }: JwtPayload) {
     const dashboard = await this.getDashboardUseCase.execute({
       userId

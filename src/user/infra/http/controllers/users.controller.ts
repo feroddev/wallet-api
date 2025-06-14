@@ -18,7 +18,10 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Obter dados do usuário autenticado' })
-  @ApiResponse({ status: 200, description: 'Dados do usuário obtidos com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do usuário obtidos com sucesso'
+  })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async getUser(@Jwt() { userId }: JwtPayload) {
     return this.getUserUseCase.execute(userId)
@@ -27,7 +30,10 @@ export class UserController {
   @Put()
   @ApiOperation({ summary: 'Atualizar dados do usuário autenticado' })
   @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'Dados do usuário atualizados com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do usuário atualizados com sucesso'
+  })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async updateUser(@Body() data: UpdateUserDto, @Jwt() { userId }: JwtPayload) {

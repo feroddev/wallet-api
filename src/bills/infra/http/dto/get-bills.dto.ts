@@ -14,11 +14,11 @@ export class GetBillsDto {
 
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   dueDateStart?: Date
 
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   dueDateEnd?: Date
 }

@@ -22,7 +22,9 @@ export class DeleteInstallmentsUseCase {
 
     // Verificar se a transação tem purchaseId (é parte de uma compra parcelada)
     if (!transaction.purchaseId) {
-      throw new NotFoundException('Esta transação não faz parte de uma compra parcelada')
+      throw new NotFoundException(
+        'Esta transação não faz parte de uma compra parcelada'
+      )
     }
 
     // Excluir todas as parcelas relacionadas à mesma compra

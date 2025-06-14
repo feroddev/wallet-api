@@ -16,7 +16,15 @@ export class CreateBillUseCase {
   constructor(private billToPayRepository: BillToPayRepository) {}
 
   async execute(request: CreateBillRequest) {
-    const { userId, name, description, amount, dueDate, isRecurring, recurrenceDay } = request
+    const {
+      userId,
+      name,
+      description,
+      amount,
+      dueDate,
+      isRecurring,
+      recurrenceDay
+    } = request
 
     return this.billToPayRepository.create({
       userId,

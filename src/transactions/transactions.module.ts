@@ -20,10 +20,7 @@ import { PrismaInvoiceRepository } from '../invoices/infra/database/prisma/prism
 import { TransactionRepository } from './repositories/transaction.repository'
 
 @Module({
-  controllers: [
-    TransactionsController,
-    CategoriesController
-  ],
+  controllers: [TransactionsController, CategoriesController],
   providers: [
     CreateTransactionsUseCase,
     GetCategoriesUseCase,

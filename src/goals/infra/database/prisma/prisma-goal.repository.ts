@@ -40,7 +40,7 @@ export class PrismaGoalRepository implements GoalRepository {
 
   async updateProgress(id: string, amount: number): Promise<Goal> {
     const goal = await this.findById(id)
-    
+
     if (!goal) {
       throw new Error('Meta não encontrada')
     }

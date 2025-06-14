@@ -1,5 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -29,11 +45,9 @@ export class BillsController {
   @ApiBody({ type: CreateBillDto })
   @ApiResponse({ status: 201, description: 'Conta criada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(
-    @Body() body: CreateBillDto,
-    @Jwt() { userId }: JwtPayload
-  ) {
-    const { name, description, amount, dueDate, isRecurring, recurrenceDay } = body
+  async create(@Body() body: CreateBillDto, @Jwt() { userId }: JwtPayload) {
+    const { name, description, amount, dueDate, isRecurring, recurrenceDay } =
+      body
 
     const bill = await this.createBillUseCase.execute({
       userId,
@@ -57,10 +71,7 @@ export class BillsController {
   @ApiQuery({ name: 'dueDateStart', required: false, type: Date })
   @ApiQuery({ name: 'dueDateEnd', required: false, type: Date })
   @ApiResponse({ status: 200, description: 'Lista de contas' })
-  async getBills(
-    @Query() query: GetBillsDto,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async getBills(@Query() query: GetBillsDto, @Jwt() { userId }: JwtPayload) {
     const { isPaid, isRecurring, dueDateStart, dueDateEnd } = query
 
     const bills = await this.getBillsUseCase.execute({
@@ -87,7 +98,8 @@ export class BillsController {
     @Body() body: UpdateBillDto,
     @Jwt() { userId }: JwtPayload
   ) {
-    const { name, description, amount, dueDate, isRecurring, recurrenceDay } = body
+    const { name, description, amount, dueDate, isRecurring, recurrenceDay } =
+      body
 
     const bill = await this.updateBillUseCase.execute({
       id,
@@ -108,12 +120,12 @@ export class BillsController {
   @Patch(':id/pay')
   @ApiOperation({ summary: 'Marcar uma conta como paga' })
   @ApiParam({ name: 'id', description: 'ID da conta' })
-  @ApiResponse({ status: 200, description: 'Conta marcada como paga com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Conta marcada como paga com sucesso'
+  })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  async pay(
-    @Param('id') id: string,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async pay(@Param('id') id: string, @Jwt() { userId }: JwtPayload) {
     const bill = await this.payBillUseCase.execute({
       id,
       userId
@@ -129,10 +141,7 @@ export class BillsController {
   @ApiParam({ name: 'id', description: 'ID da conta' })
   @ApiResponse({ status: 200, description: 'Conta excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  async delete(
-    @Param('id') id: string,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async delete(@Param('id') id: string, @Jwt() { userId }: JwtPayload) {
     await this.deleteBillUseCase.execute({
       id,
       userId

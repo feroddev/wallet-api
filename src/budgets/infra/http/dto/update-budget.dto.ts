@@ -1,4 +1,12 @@
-import { IsInt, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator'
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Max,
+  Min
+} from 'class-validator'
 
 export class UpdateBudgetDto {
   @IsOptional()

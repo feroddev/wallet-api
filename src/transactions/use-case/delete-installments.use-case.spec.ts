@@ -38,13 +38,19 @@ describe('DeleteInstallmentsUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteInstallmentsUseCase>(DeleteInstallmentsUseCase)
-    transactionRepository = module.get<TransactionRepository>(TransactionRepository)
+    transactionRepository = module.get<TransactionRepository>(
+      TransactionRepository
+    )
     prismaService = module.get<PrismaService>(PrismaService)
   })
 
   it('deve excluir todas as parcelas de uma compra', async () => {
-    jest.spyOn(transactionRepository, 'find').mockResolvedValue(mockTransaction as any)
-    jest.spyOn(transactionRepository, 'deleteAllInstallments').mockResolvedValue({ count: 3 })
+    jest
+      .spyOn(transactionRepository, 'find')
+      .mockResolvedValue(mockTransaction as any)
+    jest
+      .spyOn(transactionRepository, 'deleteAllInstallments')
+      .mockResolvedValue({ count: 3 })
 
     const result = await useCase.execute('user-1', 'transaction-1')
 
@@ -58,7 +64,8 @@ describe('DeleteInstallmentsUseCase', () => {
     )
     expect(prismaService.executeWithExtendedTimeout).toHaveBeenCalled()
     expect(result).toEqual({
-      message: 'Compra parcelada cancelada com sucesso. 3 parcelas foram excluídas.',
+      message:
+        'Compra parcelada cancelada com sucesso. 3 parcelas foram excluídas.',
       count: 3
     })
   })
@@ -78,7 +85,9 @@ describe('DeleteInstallmentsUseCase', () => {
     } as any)
 
     await expect(useCase.execute('user-1', 'transaction-1')).rejects.toThrow(
-      new NotFoundException('Esta transação não faz parte de uma compra parcelada')
+      new NotFoundException(
+        'Esta transação não faz parte de uma compra parcelada'
+      )
     )
   })
 })

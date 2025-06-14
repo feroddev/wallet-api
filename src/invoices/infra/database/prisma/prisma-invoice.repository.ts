@@ -186,7 +186,11 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     return this.findById(invoice.id)
   }
 
-  async markAsPaid(id: string, paymentMethod: PaymentMethod, paidAt: Date): Promise<Invoice> {
+  async markAsPaid(
+    id: string,
+    paymentMethod: PaymentMethod,
+    paidAt: Date
+  ): Promise<Invoice> {
     return this.prisma.$transaction(async (prisma) => {
       const invoice = await prisma.invoice.update({
         where: { id },
@@ -198,7 +202,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
           transactions: true
         }
       })
-      
+
       if (invoice.transactions.length > 0) {
         await Promise.all(
           invoice.transactions.map((transaction) =>
@@ -209,26 +213,28 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
           )
         )
       }
-      
+
       const faturaCategory = await prisma.category.findFirst({
         where: {
           name: 'Fatura do Cartão',
           type: 'EXPENSE'
         }
       })
-      
+
       if (!faturaCategory) {
-        throw new NotFoundException('Categoria "Fatura do Cartão" não encontrada')
+        throw new NotFoundException(
+          'Categoria "Fatura do Cartão" não encontrada'
+        )
       }
 
       const creditCard = await prisma.creditCard.findUnique({
         where: { id: invoice.creditCardId }
       })
-      
+
       if (!creditCard) {
         throw new NotFoundException('Cartão de crédito não encontrado')
       }
-      
+
       await prisma.transaction.create({
         data: {
           userId: invoice.userId,
@@ -243,7 +249,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
           creditCardId: creditCard.id
         }
       })
-      
+
       return invoice
     })
   }

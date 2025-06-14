@@ -6,7 +6,7 @@ export abstract class CategoryRepository {
   abstract find(data: Partial<Category>): Promise<Category>
 
   abstract findMany(data: Partial<Category>): Promise<Category[]>
-  
+
   abstract findAll(): Promise<Category[]>
 
   abstract update(id: string, data: Partial<Category>): Promise<Category>

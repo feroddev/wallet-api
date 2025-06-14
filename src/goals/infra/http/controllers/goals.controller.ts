@@ -1,5 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -29,10 +43,7 @@ export class GoalsController {
   @ApiBody({ type: CreateGoalDto })
   @ApiResponse({ status: 201, description: 'Meta criada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(
-    @Body() body: CreateGoalDto,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async create(@Body() body: CreateGoalDto, @Jwt() { userId }: JwtPayload) {
     const { name, description, targetValue, savedValue, deadline } = body
 
     const goal = await this.createGoalUseCase.execute({
@@ -118,10 +129,7 @@ export class GoalsController {
   @ApiParam({ name: 'id', description: 'ID da meta' })
   @ApiResponse({ status: 200, description: 'Meta excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Meta não encontrada' })
-  async delete(
-    @Param('id') id: string,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async delete(@Param('id') id: string, @Jwt() { userId }: JwtPayload) {
     await this.deleteGoalUseCase.execute({
       id,
       userId

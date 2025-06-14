@@ -1,5 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -27,10 +43,7 @@ export class BudgetsController {
   @ApiBody({ type: CreateBudgetDto })
   @ApiResponse({ status: 201, description: 'Orçamento criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(
-    @Body() body: CreateBudgetDto,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async create(@Body() body: CreateBudgetDto, @Jwt() { userId }: JwtPayload) {
     const { category, limit, month, year } = body
 
     const budget = await this.createBudgetUseCase.execute({
@@ -48,9 +61,19 @@ export class BudgetsController {
 
   @Get()
   @ApiOperation({ summary: 'Listar orçamentos do período' })
-  @ApiQuery({ name: 'month', required: false, type: Number, description: 'Mês (1-12)' })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    type: Number,
+    description: 'Mês (1-12)'
+  })
   @ApiQuery({ name: 'year', required: false, type: Number, description: 'Ano' })
-  @ApiQuery({ name: 'category', required: false, type: String, description: 'Nome da categoria' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    type: String,
+    description: 'Nome da categoria'
+  })
   @ApiResponse({ status: 200, description: 'Lista de orçamentos' })
   async getBudgets(
     @Query() query: GetBudgetsDto,
@@ -66,7 +89,7 @@ export class BudgetsController {
     })
 
     return {
-      budgets: budgets.map(budget => ({
+      budgets: budgets.map((budget) => ({
         ...budget,
         available: Number(budget.limit) - budget.spent,
         percentUsed: Math.min(100, (budget.spent / Number(budget.limit)) * 100)
@@ -106,10 +129,7 @@ export class BudgetsController {
   @ApiParam({ name: 'id', description: 'ID do orçamento' })
   @ApiResponse({ status: 200, description: 'Orçamento removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado' })
-  async delete(
-    @Param('id') id: string,
-    @Jwt() { userId }: JwtPayload
-  ) {
+  async delete(@Param('id') id: string, @Jwt() { userId }: JwtPayload) {
     await this.deleteBudgetUseCase.execute({
       id,
       userId

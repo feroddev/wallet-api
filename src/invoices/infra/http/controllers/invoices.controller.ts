@@ -1,5 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Auth } from '../../../../auth/jwt/decorators/auth.decorator'
 import { Jwt } from '../../../../auth/jwt/decorators/jwt.decorator'
 import { JwtPayload } from '../../../../auth/jwt/interfaces/jwt-payload.interface'
@@ -46,9 +61,23 @@ export class InvoicesController {
 
   @Get()
   @ApiOperation({ summary: 'Listar faturas de cartões de crédito' })
-  @ApiQuery({ name: 'month', required: false, type: Number, description: 'Mês da fatura (1-12)' })
-  @ApiQuery({ name: 'year', required: false, type: Number, description: 'Ano da fatura' })
-  @ApiQuery({ name: 'creditCardId', required: false, description: 'ID do cartão de crédito' })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    type: Number,
+    description: 'Mês da fatura (1-12)'
+  })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    type: Number,
+    description: 'Ano da fatura'
+  })
+  @ApiQuery({
+    name: 'creditCardId',
+    required: false,
+    description: 'ID do cartão de crédito'
+  })
   @ApiResponse({ status: 200, description: 'Lista de faturas' })
   async getInvoices(
     @Query() query: GetInvoicesDto,

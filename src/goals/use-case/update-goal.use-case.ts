@@ -18,11 +18,11 @@ export class UpdateGoalUseCase {
     const { id, userId, name, description, targetValue, deadline } = request
 
     const goal = await this.goalRepository.findById(id)
-    
+
     if (!goal) {
       throw new Error('Meta não encontrada')
     }
-    
+
     if (goal.userId !== userId) {
       throw new Error('Você não tem permissão para atualizar esta meta')
     }

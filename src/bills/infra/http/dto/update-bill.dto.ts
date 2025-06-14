@@ -1,5 +1,13 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsDate, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator'
+import {
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min
+} from 'class-validator'
 
 export class UpdateBillDto {
   @IsOptional()

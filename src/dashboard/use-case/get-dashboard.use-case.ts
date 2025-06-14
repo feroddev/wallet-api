@@ -12,20 +12,40 @@ export class GetDashboardUseCase {
 
   async execute(request: GetDashboardRequest) {
     const { userId } = request
-    
+
     const now = new Date()
     const startMonth = startOfMonth(now)
     const endMonth = endOfMonth(now)
 
-    const financialSummary = await this.getFinancialSummary(userId, startMonth, endMonth)
-    
-    const recentTransactions = await this.getRecentTransactions(userId, startMonth, endMonth)
-    
-    const budgets = await this.getBudgets(userId, now.getMonth() + 1, now.getFullYear())
-    
-    const expensesByCategory = await this.getExpensesByCategory(userId, startMonth, endMonth)
+    const financialSummary = await this.getFinancialSummary(
+      userId,
+      startMonth,
+      endMonth
+    )
 
-    const nextCreditCardInvoice = await this.getNextCreditCardInvoice(userId, startMonth, endMonth)
+    const recentTransactions = await this.getRecentTransactions(
+      userId,
+      startMonth,
+      endMonth
+    )
+
+    const budgets = await this.getBudgets(
+      userId,
+      now.getMonth() + 1,
+      now.getFullYear()
+    )
+
+    const expensesByCategory = await this.getExpensesByCategory(
+      userId,
+      startMonth,
+      endMonth
+    )
+
+    const nextCreditCardInvoice = await this.getNextCreditCardInvoice(
+      userId,
+      startMonth,
+      endMonth
+    )
 
     const financialGoals = await this.getFinancialGoals(userId)
 
@@ -39,7 +59,11 @@ export class GetDashboardUseCase {
     }
   }
 
-  private async getFinancialSummary(userId: string, startMonth: Date, endMonth: Date) {
+  private async getFinancialSummary(
+    userId: string,
+    startMonth: Date,
+    endMonth: Date
+  ) {
     const incomeResult = await this.prisma.transaction.aggregate({
       where: {
         userId,
@@ -54,7 +78,7 @@ export class GetDashboardUseCase {
         totalAmount: true
       }
     })
-    
+
     const monthlyIncome = Number(incomeResult._sum.totalAmount || 0)
 
     const expensesResult = await this.prisma.transaction.aggregate({
@@ -70,7 +94,7 @@ export class GetDashboardUseCase {
         totalAmount: true
       }
     })
-    
+
     const monthlyExpenses = Number(expensesResult._sum.totalAmount || 0)
 
     const investmentsResult = await this.prisma.transaction.aggregate({
@@ -86,13 +110,13 @@ export class GetDashboardUseCase {
         totalAmount: true
       }
     })
-    
+
     const investments = Number(investmentsResult._sum.totalAmount || 0)
 
     const incomeTotal = await this.prisma.transaction.aggregate({
       where: {
         userId,
-        type: 'INCOME',
+        type: 'INCOME'
       },
       _sum: {
         totalAmount: true
@@ -102,7 +126,7 @@ export class GetDashboardUseCase {
     const expenseTotal = await this.prisma.transaction.aggregate({
       where: {
         userId,
-        type: 'EXPENSE',
+        type: 'EXPENSE'
       },
       _sum: {
         totalAmount: true
@@ -112,14 +136,17 @@ export class GetDashboardUseCase {
     const investmentTotal = await this.prisma.transaction.aggregate({
       where: {
         userId,
-        type: 'INVESTMENT',
+        type: 'INVESTMENT'
       },
       _sum: {
         totalAmount: true
       }
     })
 
-    const balance = Number(incomeTotal._sum.totalAmount || 0) - Number(expenseTotal._sum.totalAmount || 0) - Number(investmentTotal._sum.totalAmount || 0)
+    const balance =
+      Number(incomeTotal._sum.totalAmount || 0) -
+      Number(expenseTotal._sum.totalAmount || 0) -
+      Number(investmentTotal._sum.totalAmount || 0)
 
     return {
       monthlyIncome,
@@ -129,7 +156,11 @@ export class GetDashboardUseCase {
     }
   }
 
-  private async getRecentTransactions(userId: string, startMonth: Date, endMonth: Date) {
+  private async getRecentTransactions(
+    userId: string,
+    startMonth: Date,
+    endMonth: Date
+  ) {
     const transactions = await this.prisma.transaction.findMany({
       where: {
         userId,
@@ -156,7 +187,7 @@ export class GetDashboardUseCase {
       take: 6
     })
 
-    return transactions.map(transaction => ({
+    return transactions.map((transaction) => ({
       id: transaction.id,
       amount: Number(transaction.totalAmount),
       date: transaction.date.toISOString(),
@@ -172,16 +203,21 @@ export class GetDashboardUseCase {
         userId,
         month,
         year
-      },
+      }
     })
 
     const budgetsWithSpent = await Promise.all(
       budgets.map(async (budget) => {
-        const spent = await this.calculateSpentForBudget(userId, budget.category, month, year)
+        const spent = await this.calculateSpentForBudget(
+          userId,
+          budget.category,
+          month,
+          year
+        )
         const limit = Number(budget.limit)
         const percentage = limit > 0 ? (spent / limit) * 100 : 0
         const available = Math.max(0, limit - spent)
-        
+
         return {
           id: budget.id,
           category: budget.category,
@@ -227,7 +263,11 @@ export class GetDashboardUseCase {
     }, 0)
   }
 
-  private async getExpensesByCategory(userId: string, startMonth: Date, endMonth: Date) {
+  private async getExpensesByCategory(
+    userId: string,
+    startMonth: Date,
+    endMonth: Date
+  ) {
     const transactions = await this.prisma.transaction.groupBy({
       by: ['categoryId'],
       where: {
@@ -242,9 +282,9 @@ export class GetDashboardUseCase {
         totalAmount: true
       }
     })
-    
+
     // Buscar os nomes das categorias
-    const categoryIds = transactions.map(t => t.categoryId)
+    const categoryIds = transactions.map((t) => t.categoryId)
     const categories = await this.prisma.category.findMany({
       where: {
         id: { in: categoryIds }
@@ -254,15 +294,17 @@ export class GetDashboardUseCase {
         name: true
       }
     })
-    
+
     // Mapear os resultados
-    const expensesByCategory = transactions.map(t => {
-      const category = categories.find(c => c.id === t.categoryId)
-      return {
-        category: category?.name || 'Sem categoria',
-        amount: Number(t._sum.totalAmount || 0)
-      }
-    }).sort((a, b) => b.amount - a.amount)
+    const expensesByCategory = transactions
+      .map((t) => {
+        const category = categories.find((c) => c.id === t.categoryId)
+        return {
+          category: category?.name || 'Sem categoria',
+          amount: Number(t._sum.totalAmount || 0)
+        }
+      })
+      .sort((a, b) => b.amount - a.amount)
 
     // Calcular o total de despesas
     const totalExpenses = (expensesByCategory as any[]).reduce(
@@ -272,19 +314,32 @@ export class GetDashboardUseCase {
 
     // Adicionar percentual e cor para cada categoria
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA5A5', '#A5FFD6',
-      '#FFC154', '#47B39C', '#EC6B56', '#FFC154', '#47B39C'
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#FFA5A5',
+      '#A5FFD6',
+      '#FFC154',
+      '#47B39C',
+      '#EC6B56',
+      '#FFC154',
+      '#47B39C'
     ]
 
     return (expensesByCategory as any[]).map((item, index) => ({
       category: item.category,
       amount: Number(item.amount),
-      percentage: totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0,
+      percentage:
+        totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0,
       color: colors[index % colors.length]
     }))
   }
 
-  private async getNextCreditCardInvoice(userId: string, startMonth: Date, endMonth: Date) {
+  private async getNextCreditCardInvoice(
+    userId: string,
+    startMonth: Date,
+    endMonth: Date
+  ) {
     // Buscar todos os cartões do usuário
     const creditCards = await this.prisma.creditCard.findMany({
       where: {
@@ -294,7 +349,7 @@ export class GetDashboardUseCase {
 
     if (creditCards.length === 0) {
       return null
-    }    
+    }
 
     const invoicesPromises = creditCards.map(async (card) => {
       const invoice = await this.prisma.invoice.findFirst({
@@ -313,7 +368,7 @@ export class GetDashboardUseCase {
         }
       })
 
-      if (!invoice) return null     
+      if (!invoice) return null
 
       return {
         id: invoice.id,
@@ -326,13 +381,15 @@ export class GetDashboardUseCase {
 
     const invoices = await Promise.all(invoicesPromises)
 
-    const validInvoices = invoices.filter(invoice => invoice !== null)
+    const validInvoices = invoices.filter((invoice) => invoice !== null)
 
     if (validInvoices.length === 0) return null
 
-    return validInvoices.sort((a, b) => 
-      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    ).slice(0, 2)
+    return validInvoices
+      .sort(
+        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+      )
+      .slice(0, 2)
   }
 
   private async getFinancialGoals(userId: string) {
@@ -345,7 +402,7 @@ export class GetDashboardUseCase {
       }
     })
 
-    return goals.map(goal => ({
+    return goals.map((goal) => ({
       id: goal.id,
       title: goal.name,
       targetAmount: Number(goal.targetValue),
@@ -354,5 +411,4 @@ export class GetDashboardUseCase {
       icon: '🎯' // Emoji padrão para meta
     }))
   }
-
 }

@@ -6,8 +6,6 @@ import { GetDashboardUseCase } from './use-case/get-dashboard.use-case'
 @Module({
   imports: [AuthModule],
   controllers: [DashboardController],
-  providers: [
-    GetDashboardUseCase
-  ]
+  providers: [GetDashboardUseCase]
 })
 export class DashboardModule {}

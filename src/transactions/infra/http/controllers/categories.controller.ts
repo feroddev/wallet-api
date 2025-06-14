@@ -16,8 +16,15 @@ export class CategoriesController {
 
   @Get()
   @ApiOperation({ summary: 'Listar categorias de transações' })
-  @ApiQuery({ name: 'type', required: false, description: 'Tipo de categoria (EXPENSE, INCOME, INVESTMENT)' })
-  @ApiResponse({ status: 200, description: 'Lista de categorias filtradas por tipo' })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'Tipo de categoria (EXPENSE, INCOME, INVESTMENT)'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de categorias filtradas por tipo'
+  })
   async getCategories(@Query() query: GetCategoriesDto) {
     return this.getCategoriesUseCase.execute(query)
   }

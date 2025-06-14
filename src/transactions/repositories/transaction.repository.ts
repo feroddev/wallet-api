@@ -9,8 +9,8 @@ export abstract class TransactionRepository {
     data,
     transaction
   }: {
-    userId: string,
-    data: CreateTransactionDto,
+    userId: string
+    data: CreateTransactionDto
     transaction: Prisma.TransactionClient
   }): Promise<Transaction>
 
@@ -20,13 +20,24 @@ export abstract class TransactionRepository {
 
   abstract find(data: Partial<Transaction>): Promise<any>
 
-  abstract getDetails(data:{id: string, userId: string}): Promise<any>
-  
-  abstract findByPurchaseId(purchaseId: string, userId: string): Promise<Transaction[]>
-  
-  abstract update(id: string, userId: string, data: UpdateTransactionDto): Promise<Transaction>
-  
+  abstract getDetails(data: { id: string; userId: string }): Promise<any>
+
+  abstract findByPurchaseId(
+    purchaseId: string,
+    userId: string
+  ): Promise<Transaction[]>
+
+  abstract update(
+    id: string,
+    userId: string,
+    data: UpdateTransactionDto
+  ): Promise<Transaction>
+
   abstract delete(id: string, userId: string): Promise<Transaction>
-  
-  abstract deleteAllInstallments(purchaseId: string, userId: string, transaction?: Prisma.TransactionClient): Promise<{ count: number }>
-  }
+
+  abstract deleteAllInstallments(
+    purchaseId: string,
+    userId: string,
+    transaction?: Prisma.TransactionClient
+  ): Promise<{ count: number }>
+}
