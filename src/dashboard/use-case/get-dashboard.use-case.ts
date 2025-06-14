@@ -61,8 +61,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'EXPENSE',
-        isPaid: true,
-        creditCardId: null,
         date: {
           gte: startMonth,
           lte: endMonth
@@ -78,7 +76,6 @@ export class GetDashboardUseCase {
     const investmentsResult = await this.prisma.transaction.aggregate({
       where: {
         userId,
-        isPaid: true,
         type: 'INVESTMENT',
         date: {
           gte: startMonth,
@@ -96,7 +93,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'INCOME',
-        isPaid: true
       },
       _sum: {
         totalAmount: true
@@ -107,7 +103,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'EXPENSE',
-        isPaid: true
       },
       _sum: {
         totalAmount: true
@@ -118,7 +113,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'INVESTMENT',
-        isPaid: true
       },
       _sum: {
         totalAmount: true
@@ -139,7 +133,6 @@ export class GetDashboardUseCase {
     const transactions = await this.prisma.transaction.findMany({
       where: {
         userId,
-        isPaid: true,
         date: {
           gte: startMonth,
           lte: endMonth
@@ -158,9 +151,9 @@ export class GetDashboardUseCase {
         }
       },
       orderBy: {
-        date: 'desc'
+        createdAt: 'desc'
       },
-      take: 5
+      take: 6
     })
 
     return transactions.map(transaction => ({
@@ -240,7 +233,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'EXPENSE',
-        isPaid: true,
         date: {
           gte: startMonth,
           lte: endMonth
