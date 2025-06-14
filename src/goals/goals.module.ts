@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
-import { PrismaService } from '../prisma/prisma.service'
 import { PrismaGoalRepository } from './infra/database/prisma/prisma-goal.repository'
 import { GoalsController } from './infra/http/controllers/goals.controller'
 import { GoalRepository } from './repositories/goal.repository'

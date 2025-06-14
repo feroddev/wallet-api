@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
-import { PrismaService } from '../prisma/prisma.service'
 import { PrismaBudgetRepository } from './infra/database/prisma/prisma-budget.repository'
 import { BudgetsController } from './infra/http/controllers/budgets.controller'
 import { BudgetRepository } from './repositories/budget.repository'

@@ -18,7 +18,6 @@ import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case
 import { InvoiceRepository } from '../invoices/repositories/invoice.repository'
 import { PrismaInvoiceRepository } from '../invoices/infra/database/prisma/prisma-invoice.repository'
 import { TransactionRepository } from './repositories/transaction.repository'
-import { PrismaService } from '../prisma/prisma.service'
 
 @Module({
   controllers: [
@@ -34,7 +33,6 @@ import { PrismaService } from '../prisma/prisma.service'
     UpdateTransactionUseCase,
     DeleteTransactionUseCase,
     DeleteInstallmentsUseCase,
-    PrismaService,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository

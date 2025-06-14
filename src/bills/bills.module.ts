@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
-import { PrismaService } from '../prisma/prisma.service'
 import { TransactionRepository } from '../transactions/repositories/transaction.repository'
 import { TransactionsModule } from '../transactions/transactions.module'
 import { PrismaBillToPayRepository } from './infra/database/prisma/prisma-bill-to-pay.repository'
