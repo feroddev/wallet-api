@@ -73,7 +73,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: true
+        creditCard: true,
+        invoice: true
       },
       orderBy: {
         date: 'asc'

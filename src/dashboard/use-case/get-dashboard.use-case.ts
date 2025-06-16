@@ -172,6 +172,7 @@ export class GetDashboardUseCase {
       select: {
         id: true,
         totalAmount: true,
+        name: true,
         date: true,
         description: true,
         type: true,
@@ -190,6 +191,7 @@ export class GetDashboardUseCase {
     return transactions.map((transaction) => ({
       id: transaction.id,
       amount: Number(transaction.totalAmount),
+      name: transaction.name,
       date: transaction.date.toISOString(),
       description: transaction.description || '',
       category: transaction.category.name,
@@ -307,31 +309,16 @@ export class GetDashboardUseCase {
       .sort((a, b) => b.amount - a.amount)
 
     // Calcular o total de despesas
-    const totalExpenses = (expensesByCategory as any[]).reduce(
+    const totalExpenses = expensesByCategory.reduce(
       (sum, item) => sum + Number(item.amount),
       0
     )
 
-    // Adicionar percentual e cor para cada categoria
-    const colors = [
-      '#FF6B6B',
-      '#4ECDC4',
-      '#45B7D1',
-      '#FFA5A5',
-      '#A5FFD6',
-      '#FFC154',
-      '#47B39C',
-      '#EC6B56',
-      '#FFC154',
-      '#47B39C'
-    ]
-
-    return (expensesByCategory as any[]).map((item, index) => ({
+    return expensesByCategory.map((item) => ({
       category: item.category,
       amount: Number(item.amount),
       percentage:
-        totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0,
-      color: colors[index % colors.length]
+        totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0
     }))
   }
 
