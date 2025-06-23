@@ -19,8 +19,7 @@ export class UpdateCreditCardDto {
   })
   @IsNumber()
   @IsOptional()
-  @Transform(({ value }) => Number(value))
-  limit?: number
+  limit?: number | null
 
   @ApiProperty({
     description: 'Dia do fechamento da fatura',

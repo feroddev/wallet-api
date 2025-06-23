@@ -5,6 +5,7 @@ import { TransactionRepository } from '../../../repositories/transaction.reposit
 import { CreateTransactionDto } from '../../http/dto/create-transaction.dto'
 import { GetTransactionsDto } from '../../http/dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../../http/dto/update-transaction.dto'
+import { errors } from '../../../../../constants/errors'
 @Injectable()
 export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -106,7 +107,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
 
     if (!transaction) {
-      throw new NotFoundException('Transação não encontrada')
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     return this.prisma.transaction.update({
@@ -129,7 +130,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
 
     if (!transaction) {
-      throw new NotFoundException('Transação não encontrada')
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     return this.prisma.transaction.delete({
@@ -142,7 +143,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     userId: string
   ): Promise<Transaction[]> {
     if (!purchaseId) {
-      throw new NotFoundException('ID da compra não fornecido')
+      throw new NotFoundException(errors.ID_PURCHASE_NOT_FOUND)
     }
 
     return this.prisma.transaction.findMany({
@@ -180,7 +181,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
 
     if (!transaction) {
-      throw new NotFoundException('Transação não encontrada')
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     if (transaction.installmentNumber > 1) {
@@ -210,7 +211,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     transaction?: Prisma.TransactionClient
   ): Promise<{ count: number }> {
     if (!purchaseId) {
-      throw new NotFoundException('ID da compra não fornecido')
+      throw new NotFoundException(errors.ID_PURCHASE_NOT_FOUND)
     }
 
     // Verificar se as transações existem e pertencem ao usuário
@@ -225,7 +226,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
 
     if (transactions.length === 0) {
-      throw new NotFoundException('Transações não encontradas')
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     // Se um cliente de transação foi fornecido, use-o

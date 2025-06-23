@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { BudgetRepository } from '../repositories/budget.repository'
+import { errors } from '../../../constants/errors'
 
 @Injectable()
 export class DeleteBudgetUseCase {
@@ -9,7 +10,7 @@ export class DeleteBudgetUseCase {
     const budget = await this.budgetRepository.findById(id, userId)
 
     if (!budget) {
-      throw new NotFoundException('Orçamento não encontrado')
+      throw new NotFoundException(errors.BUDGET_NOT_FOUND)
     }
 
     return this.budgetRepository.delete(id, userId)

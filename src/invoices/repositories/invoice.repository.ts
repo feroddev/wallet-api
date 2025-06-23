@@ -1,4 +1,4 @@
-import { Invoice, PaymentMethod } from '@prisma/client'
+import { Invoice, PaymentMethod, Prisma } from '@prisma/client'
 
 export abstract class InvoiceRepository {
   abstract create(data: Partial<Invoice>): Promise<Invoice>
@@ -17,6 +17,8 @@ export abstract class InvoiceRepository {
     year: number
   ): Promise<Invoice | null>
 
+  abstract findPendingByCreditCardId(creditCardId: string): Promise<Invoice[]>
+
   abstract update(id: string, data: Partial<Invoice>): Promise<Invoice>
 
   abstract generateInvoice(
@@ -29,5 +31,12 @@ export abstract class InvoiceRepository {
     id: string,
     paymentMethod: PaymentMethod,
     paidAt: Date
+  ): Promise<Invoice>
+
+  abstract markAsPaidWithTransaction(
+    id: string,
+    paymentMethod: PaymentMethod,
+    paidAt: Date,
+    transaction: Prisma.TransactionClient
   ): Promise<Invoice>
 }

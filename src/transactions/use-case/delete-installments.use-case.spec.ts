@@ -3,6 +3,7 @@ import { DeleteInstallmentsUseCase } from './delete-installments.use-case'
 import { TransactionRepository } from '../repositories/transaction.repository'
 import { PrismaService } from '../../prisma/prisma.service'
 import { NotFoundException } from '@nestjs/common'
+import { errors } from '../../../constants/errors'
 
 describe('DeleteInstallmentsUseCase', () => {
   let useCase: DeleteInstallmentsUseCase
@@ -74,7 +75,7 @@ describe('DeleteInstallmentsUseCase', () => {
     jest.spyOn(transactionRepository, 'find').mockResolvedValue(null)
 
     await expect(useCase.execute('user-1', 'transaction-1')).rejects.toThrow(
-      new NotFoundException('Transação não encontrada')
+      new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     )
   })
 
@@ -85,9 +86,7 @@ describe('DeleteInstallmentsUseCase', () => {
     } as any)
 
     await expect(useCase.execute('user-1', 'transaction-1')).rejects.toThrow(
-      new NotFoundException(
-        'Esta transação não faz parte de uma compra parcelada'
-      )
+      new NotFoundException(errors.NOT_PART_OF_A_PARCELIZED_PURCHASE)
     )
   })
 })

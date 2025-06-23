@@ -15,6 +15,7 @@ import { GetAllCategoriesUseCase } from './use-case/get-all-categories.use-case'
 import { GetCategoriesUseCase } from './use-case/get-categories.use-case'
 import { GetTransactionsUseCase } from './use-case/get-transactions.use-case'
 import { UpdateTransactionUseCase } from './use-case/update-transaction.use-case'
+import { PayTransactionUseCase } from './use-case/pay-transaction.use-case'
 import { InvoiceRepository } from '../invoices/repositories/invoice.repository'
 import { PrismaInvoiceRepository } from '../invoices/infra/database/prisma/prisma-invoice.repository'
 import { TransactionRepository } from './repositories/transaction.repository'
@@ -30,6 +31,7 @@ import { TransactionRepository } from './repositories/transaction.repository'
     UpdateTransactionUseCase,
     DeleteTransactionUseCase,
     DeleteInstallmentsUseCase,
+    PayTransactionUseCase,
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository

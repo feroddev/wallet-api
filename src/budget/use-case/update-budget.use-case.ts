@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { BudgetRepository } from '../repositories/budget.repository'
 import { UpdateBudgetDto } from '../infra/http/dto/update-budget.dto'
+import { errors } from '../../../constants/errors'
 
 @Injectable()
 export class UpdateBudgetUseCase {
@@ -10,7 +11,7 @@ export class UpdateBudgetUseCase {
     const budget = await this.budgetRepository.findById(id, userId)
 
     if (!budget) {
-      throw new NotFoundException('Orçamento não encontrado')
+      throw new NotFoundException(errors.BUDGET_NOT_FOUND)
     }
 
     return this.budgetRepository.update(id, userId, data)

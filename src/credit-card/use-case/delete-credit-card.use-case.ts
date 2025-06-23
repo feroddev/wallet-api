@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreditCardRepository } from '../repositories/credit-card.repository'
+import { errors } from '../../../constants/errors'
 
 @Injectable()
 export class DeleteCreditCardUseCase {
@@ -11,7 +12,7 @@ export class DeleteCreditCardUseCase {
     })
 
     if (!creditCard) {
-      throw new NotFoundException('Credit card not found')
+      throw new NotFoundException(errors.CREDIT_CARD_NOT_FOUND)
     }
 
     await this.creditCardRepository.delete(creditCardId)

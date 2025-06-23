@@ -25,6 +25,7 @@ import { DeleteInstallmentsUseCase } from '../../../use-case/delete-installments
 import { FindTransactionUseCase } from '../../../use-case/find-transaction.use-case'
 import { GetTransactionsUseCase } from '../../../use-case/get-transactions.use-case'
 import { UpdateTransactionUseCase } from '../../../use-case/update-transaction.use-case'
+import { PayTransactionUseCase } from '../../../use-case/pay-transaction.use-case'
 import { CreateTransactionDto } from '../dto/create-transaction.dto'
 import { GetTransactionsDto } from '../dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../dto/update-transaction.dto'
@@ -40,7 +41,8 @@ export class TransactionsController {
     private readonly findTransactionUseCase: FindTransactionUseCase,
     private readonly updateTransactionUseCase: UpdateTransactionUseCase,
     private readonly deleteTransactionUseCase: DeleteTransactionUseCase,
-    private readonly deleteInstallmentsUseCase: DeleteInstallmentsUseCase
+    private readonly deleteInstallmentsUseCase: DeleteInstallmentsUseCase,
+    private readonly payTransactionUseCase: PayTransactionUseCase
   ) {}
 
   @Post()
@@ -130,5 +132,14 @@ export class TransactionsController {
     @Param('id') id: string
   ) {
     return this.deleteInstallmentsUseCase.execute(userId, id)
+  }
+
+  @Patch('/:id/pay')
+  @ApiOperation({ summary: 'Marcar uma transação como paga' })
+  @ApiParam({ name: 'id', description: 'ID da transação' })
+  @ApiResponse({ status: 200, description: 'Transação paga com sucesso' })
+  @ApiResponse({ status: 404, description: 'Transação não encontrada' })
+  async payTransaction(@Jwt() { userId }: JwtPayload, @Param('id') id: string) {
+    return this.payTransactionUseCase.execute(id, userId)
   }
 }

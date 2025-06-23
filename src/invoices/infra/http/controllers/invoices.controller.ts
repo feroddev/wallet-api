@@ -24,6 +24,7 @@ import { PayInvoiceUseCase } from '../../../use-case/pay-invoice.use-case'
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto'
 import { GetInvoicesDto } from '../dto/get-invoices.dto'
 import { PayInvoiceDto } from '../dto/pay-invoice.dto'
+import { PaymentMethod } from '@prisma/client'
 
 @Auth()
 @ApiTags('Faturas')
@@ -97,7 +98,7 @@ export class InvoicesController {
     }
   }
 
-  @Post(':id/pay')
+  @Patch(':id/pay')
   @ApiOperation({ summary: 'Pagar fatura de cartão de crédito' })
   @ApiParam({ name: 'id', description: 'ID da fatura' })
   @ApiResponse({ status: 200, description: 'Fatura paga com sucesso' })
@@ -109,8 +110,8 @@ export class InvoicesController {
     const invoice = await this.payInvoiceUseCase.execute({
       id,
       userId,
-      paymentMethod: payInvoiceDto.paymentMethod,
-      paidAt: payInvoiceDto.paidAt
+      paymentMethod: payInvoiceDto.paymentMethod || PaymentMethod.CASH,
+      paidAt: new Date()
     })
 
     return {

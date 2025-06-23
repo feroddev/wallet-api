@@ -13,7 +13,7 @@ export class FindTransactionUseCase {
     })
 
     if (!transaction) {
-      throw new NotFoundException(errors.TRANSACTIONS_NOT_FOUND)
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     return transaction

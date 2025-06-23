@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
 import { TransactionRepository } from '../repositories/transaction.repository'
+import { errors } from '../../../constants/errors'
 
 @Injectable()
 export class DeleteInstallmentsUseCase {
@@ -17,14 +18,12 @@ export class DeleteInstallmentsUseCase {
     })
 
     if (!transaction) {
-      throw new NotFoundException('Transação não encontrada')
+      throw new NotFoundException(errors.TRANSACTION_NOT_FOUND)
     }
 
     // Verificar se a transação tem purchaseId (é parte de uma compra parcelada)
     if (!transaction.purchaseId) {
-      throw new NotFoundException(
-        'Esta transação não faz parte de uma compra parcelada'
-      )
+      throw new NotFoundException(errors.NOT_PART_OF_A_PARCELIZED_PURCHASE)
     }
 
     // Excluir todas as parcelas relacionadas à mesma compra

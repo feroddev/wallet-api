@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { GoalRepository } from '../repositories/goal.repository'
+import { errors } from '../../../constants/errors'
 
 @Injectable()
 export class FindGoalUseCase {
@@ -9,7 +10,7 @@ export class FindGoalUseCase {
     const goal = await this.goalRepository.findById(id, userId)
 
     if (!goal) {
-      throw new NotFoundException('Meta não encontrada')
+      throw new NotFoundException(errors.GOAL_NOT_FOUND)
     }
 
     return goal

@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { Invoice, PaymentMethod } from '@prisma/client'
+import { Invoice, PaymentMethod, Prisma } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InvoiceRepository } from '../../../repositories/invoice.repository'
+import { errors } from '../../../../../constants/errors'
 
 @Injectable()
 export class PrismaInvoiceRepository implements InvoiceRepository {
@@ -66,6 +67,20 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     })
   }
 
+  async findPendingByCreditCardId(creditCardId: string): Promise<Invoice[]> {
+    const currentDate = new Date()
+
+    return this.prisma.invoice.findMany({
+      where: {
+        creditCardId,
+        isPaid: false,
+        dueDate: {
+          gte: currentDate
+        }
+      }
+    })
+  }
+
   async update(id: string, data: Partial<Invoice>): Promise<Invoice> {
     return this.prisma.invoice.update({
       where: { id },
@@ -83,7 +98,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     })
 
     if (!creditCard) {
-      throw new Error('Cartão de crédito não encontrado')
+      throw new NotFoundException(errors.CREDIT_CARD_NOT_FOUND)
     }
 
     const { closingDay, dueDay } = creditCard
@@ -192,65 +207,81 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     paidAt: Date
   ): Promise<Invoice> {
     return this.prisma.$transaction(async (prisma) => {
-      const invoice = await prisma.invoice.update({
-        where: { id },
-        data: {
-          isPaid: true,
-          paidAt
-        },
-        include: {
-          transactions: true
-        }
-      })
-
-      if (invoice.transactions.length > 0) {
-        await Promise.all(
-          invoice.transactions.map((transaction) =>
-            prisma.transaction.update({
-              where: { id: transaction.id },
-              data: { isPaid: true }
-            })
-          )
-        )
-      }
-
-      const faturaCategory = await prisma.category.findFirst({
-        where: {
-          name: 'Fatura do Cartão',
-          type: 'EXPENSE'
-        }
-      })
-
-      if (!faturaCategory) {
-        throw new NotFoundException(
-          'Categoria "Fatura do Cartão" não encontrada'
-        )
-      }
-
-      const creditCard = await prisma.creditCard.findUnique({
-        where: { id: invoice.creditCardId }
-      })
-
-      if (!creditCard) {
-        throw new NotFoundException('Cartão de crédito não encontrado')
-      }
-
-      await prisma.transaction.create({
-        data: {
-          userId: invoice.userId,
-          name: `Pagamento de fatura do cartão ${creditCard.cardName}`,
-          description: `Pagamento do mês ${invoice.month}/${invoice.year}`,
-          type: 'EXPENSE',
-          paymentMethod,
-          date: paidAt,
-          totalAmount: invoice.totalAmount,
-          isPaid: true,
-          categoryId: faturaCategory.id,
-          creditCardId: creditCard.id
-        }
-      })
-
-      return invoice
+      return this._markAsPaid(id, paymentMethod, paidAt, prisma)
     })
+  }
+
+  async markAsPaidWithTransaction(
+    id: string,
+    paymentMethod: PaymentMethod,
+    paidAt: Date,
+    transaction: Prisma.TransactionClient
+  ): Promise<Invoice> {
+    return this._markAsPaid(id, paymentMethod, paidAt, transaction)
+  }
+
+  private async _markAsPaid(
+    id: string,
+    paymentMethod: PaymentMethod,
+    paidAt: Date,
+    prisma: Prisma.TransactionClient
+  ): Promise<Invoice> {
+    const invoice = await prisma.invoice.update({
+      where: { id },
+      data: {
+        isPaid: true,
+        paidAt
+      },
+      include: {
+        transactions: true
+      }
+    })
+
+    if (invoice.transactions.length > 0) {
+      await Promise.all(
+        invoice.transactions.map((transaction) =>
+          prisma.transaction.update({
+            where: { id: transaction.id },
+            data: { isPaid: true }
+          })
+        )
+      )
+    }
+
+    const faturaCategory = await prisma.category.findFirst({
+      where: {
+        name: 'Fatura do Cartão',
+        type: 'EXPENSE'
+      }
+    })
+
+    if (!faturaCategory) {
+      throw new NotFoundException(errors.CATEGORY_NOT_FOUND)
+    }
+
+    const creditCard = await prisma.creditCard.findUnique({
+      where: { id: invoice.creditCardId }
+    })
+
+    if (!creditCard) {
+      throw new NotFoundException(errors.CREDIT_CARD_NOT_FOUND)
+    }
+
+    await prisma.transaction.create({
+      data: {
+        userId: invoice.userId,
+        name: `Pagamento de fatura do cartão ${creditCard.cardName}`,
+        description: `Pagamento do mês ${invoice.month}/${invoice.year}`,
+        type: 'EXPENSE',
+        paymentMethod,
+        date: paidAt,
+        totalAmount: invoice.totalAmount,
+        isPaid: true,
+        categoryId: faturaCategory.id,
+        creditCardId: creditCard.id
+      }
+    })
+
+    return invoice
   }
 }

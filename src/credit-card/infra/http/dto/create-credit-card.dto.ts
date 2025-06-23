@@ -12,12 +12,14 @@ export class CreateCreditCardDto {
 
   @ApiProperty({
     description: 'Limite do cartão',
-    example: 5000
+    example: 5000,
+    required: false
   })
   @IsNumber()
   @IsPositive()
+  @IsOptional()
   @Transform(({ value }) => Number(value))
-  limit: number
+  limit?: number
 
   @ApiProperty({
     description: 'Dia do fechamento da fatura',

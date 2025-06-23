@@ -68,7 +68,6 @@ export class GetDashboardUseCase {
       where: {
         userId,
         type: 'INCOME',
-        isPaid: true,
         date: {
           gte: startMonth,
           lte: endMonth
@@ -113,40 +112,8 @@ export class GetDashboardUseCase {
 
     const investments = Number(investmentsResult._sum.totalAmount || 0)
 
-    const incomeTotal = await this.prisma.transaction.aggregate({
-      where: {
-        userId,
-        type: 'INCOME'
-      },
-      _sum: {
-        totalAmount: true
-      }
-    })
-
-    const expenseTotal = await this.prisma.transaction.aggregate({
-      where: {
-        userId,
-        type: 'EXPENSE'
-      },
-      _sum: {
-        totalAmount: true
-      }
-    })
-
-    const investmentTotal = await this.prisma.transaction.aggregate({
-      where: {
-        userId,
-        type: 'INVESTMENT'
-      },
-      _sum: {
-        totalAmount: true
-      }
-    })
-
     const balance =
-      Number(incomeTotal._sum.totalAmount || 0) -
-      Number(expenseTotal._sum.totalAmount || 0) -
-      Number(investmentTotal._sum.totalAmount || 0)
+      Number(monthlyIncome) - Number(monthlyExpenses) - Number(investments)
 
     return {
       monthlyIncome,
