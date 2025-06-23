@@ -99,7 +99,7 @@ model CreditCard {
   userId      String        @map("user_id")
   cardName    String        @map("card_name")
   lastDigits  Int?          @map("last_digits")
-  limit       Decimal       @db.Money
+  limit       Decimal?      @db.Money
   closingDay  Int           @map("closing_day")
   dueDay      Int           @map("due_day")
   createdAt   DateTime      @default(now()) @map("created_at")
