@@ -77,22 +77,46 @@ export class CreateTransactionsUseCase {
   /**
    * Aplica regras de pagamento automático:
    * - Transações do tipo INCOME são sempre pagas
-   * - Transações com data atual ou anterior são sempre pagas
+   * - Transações com data anterior são sempre pagas
+   * - Transações do dia atual são pagas apenas se forem criadas até as 23h
    * - Transações futuras que não sejam INCOME podem ser não pagas
    */
   private applyPaymentRules(data: CreateTransactionDto) {
-    const currentDate = new Date()
+    const currentDateTime = new Date()
+    const currentDate = new Date(currentDateTime)
     currentDate.setHours(0, 0, 0, 0)
+
+    const currentHour = currentDateTime.getHours()
 
     const transactionDate = new Date(data.date)
     transactionDate.setHours(0, 0, 0, 0)
 
-    // Se for receita ou data atual/passada, marca como pago
-    if (
-      data.type === TransactionType.INCOME ||
-      transactionDate <= currentDate
-    ) {
+    const tomorrow = new Date(currentDate)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    // Se for receita, marca como pago
+    if (data.type === TransactionType.INCOME) {
       data.isPaid = true
+      return
+    }
+
+    // Se for cartão de crédito, não marca como pago automaticamente
+    if (data.paymentMethod === PaymentMethod.CREDIT_CARD) {
+      return
+    }
+
+    // Para datas passadas, sempre marca como pago
+    if (transactionDate < currentDate) {
+      data.isPaid = true
+      return
+    }
+
+    // Para o dia atual, marca como pago apenas se for antes das 23h
+    if (transactionDate.getTime() === currentDate.getTime()) {
+      if (currentHour < 23) {
+        data.isPaid = true
+      }
+      return
     }
   }
 
@@ -212,12 +236,9 @@ export class CreateTransactionsUseCase {
       const dateKey = `${invoiceMonth}-${invoiceYear}`
       const invoice = invoiceCache.get(dateKey)
 
-      // Verifica se a parcela deve ser marcada como paga (se for do dia atual ou anterior)
-      const currentDate = new Date()
-      currentDate.setHours(0, 0, 0, 0)
-      const isPaidInstallment =
-        data.type === TransactionType.INCOME ||
-        new Date(installmentDate) <= currentDate
+      // Para transações de cartão de crédito, apenas receitas são marcadas como pagas automaticamente
+      // Outras transações de cartão de crédito nunca são marcadas como pagas automaticamente
+      const isPaidInstallment = data.type === TransactionType.INCOME
 
       transactionsToCreate.push({
         userId,
