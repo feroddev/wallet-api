@@ -301,16 +301,11 @@ async function createBudgets(categories: Category[]) {
     await prisma.budget.create({
       data: {
         userId,
-        category: categories[i].name,
-        limit: 500 + i * 200,
-        month: currentMonth,
-        year: currentYear
+        categoryId: categories[i].id,
+        limit: 500 + i * 200
       }
     })
   }
-
-  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1
-  const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear
 
   for (let i = 0; i < 5; i++) {
     const category = categories[i]
@@ -318,10 +313,8 @@ async function createBudgets(categories: Category[]) {
     await prisma.budget.create({
       data: {
         userId,
-        category: category.name,
-        limit: 600 + i * 200,
-        month: nextMonth,
-        year: nextYear
+        categoryId: category.id,
+        limit: 600 + i * 200
       }
     })
   }

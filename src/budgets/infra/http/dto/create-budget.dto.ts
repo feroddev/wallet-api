@@ -17,7 +17,7 @@ export class CreateBudgetDto {
   })
   @IsNotEmpty()
   @IsString()
-  category: string
+  categoryId: string
 
   @ApiProperty({
     description: 'Limite do orçamento',
@@ -29,25 +29,4 @@ export class CreateBudgetDto {
   @Min(0.01)
   @Transform(({ value }) => Number(value))
   limit: number
-
-  @ApiProperty({
-    description: 'Mês do orçamento (1-12)',
-    example: 6
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(12)
-  @Transform(({ value }) => Number(value))
-  month: number
-
-  @ApiProperty({
-    description: 'Ano do orçamento',
-    example: 2025
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(2000)
-  @Transform(({ value }) => Number(value))
-  year: number
 }

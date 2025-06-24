@@ -24,7 +24,7 @@ export class PrismaBudgetRepository implements BudgetRepository {
     filters?: {
       month?: number
       year?: number
-      category?: string
+      categoryId?: string
     }
   ): Promise<Budget[]> {
     const where: any = { userId }
@@ -38,14 +38,21 @@ export class PrismaBudgetRepository implements BudgetRepository {
         where.year = filters.year
       }
 
-      if (filters.category) {
-        where.category = filters.category
+      if (filters.categoryId) {
+        where.categoryId = filters.categoryId
       }
     }
 
     return this.prisma.budget.findMany({
       where,
-      orderBy: [{ year: 'desc' }, { month: 'desc' }, { category: 'asc' }]
+      orderBy: {
+        category: {
+          name: 'asc'
+        }
+      },
+      include: {
+        category: true
+      }
     })
   }
 
@@ -54,7 +61,7 @@ export class PrismaBudgetRepository implements BudgetRepository {
     filters?: {
       month?: number
       year?: number
-      category?: string
+      categoryId?: string
     }
   ): Promise<(Budget & { spent: number })[]> {
     const budgets = await this.findByUserId(userId, filters)
@@ -85,17 +92,26 @@ export class PrismaBudgetRepository implements BudgetRepository {
     })
   }
 
-  private async calculateSpentForBudget(budget: Budget): Promise<number> {
-    const { userId, category, month, year } = budget
+  private async calculateSpentForBudget(
+    budget: Budget & { month?: number; year?: number }
+  ): Promise<number> {
+    const { userId, categoryId, month, year } = budget
+    const currentMonth = new Date().getMonth() + 1
+    const currentYear = new Date().getFullYear()
 
-    const startDate = new Date(year, month - 1, 1)
-    const endDate = new Date(year, month, 0)
+    const startDate =
+      month && year
+        ? new Date(year, month - 1, 1)
+        : new Date(currentYear, currentMonth - 1, 1)
+    const endDate =
+      month && year
+        ? new Date(year, month, 0)
+        : new Date(currentYear, currentMonth, 0, 21)
 
-    // Buscar transações da categoria específica
     const transactions = await this.prisma.transaction.findMany({
       where: {
         userId,
-        categoryId: category,
+        categoryId,
         type: 'EXPENSE',
         date: {
           gte: startDate,
@@ -107,7 +123,6 @@ export class PrismaBudgetRepository implements BudgetRepository {
       }
     })
 
-    // Calcular o total manualmente
     const total = transactions.reduce((sum, transaction) => {
       return sum + Number(transaction.totalAmount)
     }, 0)

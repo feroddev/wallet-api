@@ -44,14 +44,12 @@ export class BudgetsController {
   @ApiResponse({ status: 201, description: 'Orçamento criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async create(@Body() body: CreateBudgetDto, @Jwt() { userId }: JwtPayload) {
-    const { category, limit, month, year } = body
+    const { categoryId, limit } = body
 
     const budget = await this.createBudgetUseCase.execute({
       userId,
-      category,
-      limit,
-      month,
-      year
+      categoryId,
+      limit
     })
 
     return {
@@ -79,13 +77,13 @@ export class BudgetsController {
     @Query() query: GetBudgetsDto,
     @Jwt() { userId }: JwtPayload
   ) {
-    const { month, year, category } = query
+    const { month, year, categoryId } = query
 
     const budgets = await this.getBudgetsUseCase.execute({
       userId,
       month,
       year,
-      category
+      categoryId
     })
 
     return {
@@ -108,15 +106,13 @@ export class BudgetsController {
     @Body() body: UpdateBudgetDto,
     @Jwt() { userId }: JwtPayload
   ) {
-    const { category, limit, month, year } = body
+    const { categoryId, limit } = body
 
     const budget = await this.updateBudgetUseCase.execute({
       id,
       userId,
-      category,
-      limit,
-      month,
-      year
+      categoryId,
+      limit
     })
 
     return {

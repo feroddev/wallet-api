@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { BudgetRepository } from '../repositories/budget.repository'
+import { Decimal } from '@prisma/client/runtime/library'
 
 interface UpdateBudgetRequest {
   id: string
   userId: string
-  category?: string
+  categoryId?: string
   limit?: number
-  month?: number
-  year?: number
 }
 
 @Injectable()
@@ -15,7 +14,7 @@ export class UpdateBudgetUseCase {
   constructor(private budgetRepository: BudgetRepository) {}
 
   async execute(request: UpdateBudgetRequest) {
-    const { id, userId, category, limit, month, year } = request
+    const { id, userId, categoryId, limit } = request
 
     const budget = await this.budgetRepository.findById(id)
 
@@ -28,10 +27,8 @@ export class UpdateBudgetUseCase {
     }
 
     return this.budgetRepository.update(id, {
-      category,
-      limit: limit as any,
-      month,
-      year
+      categoryId,
+      limit: new Decimal(limit)
     })
   }
 }

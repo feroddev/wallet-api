@@ -4,6 +4,8 @@ import { endOfMonth, startOfMonth } from 'date-fns'
 
 interface GetDashboardRequest {
   userId: string
+  month?: number
+  year?: number
 }
 
 @Injectable()
@@ -11,11 +13,17 @@ export class GetDashboardUseCase {
   constructor(private prisma: PrismaService) {}
 
   async execute(request: GetDashboardRequest) {
-    const { userId } = request
+    const { userId, month: requestMonth, year: requestYear } = request
 
     const now = new Date()
-    const startMonth = startOfMonth(now)
-    const endMonth = endOfMonth(now)
+    const month = requestMonth || now.getMonth() + 1
+    const year = requestYear || now.getFullYear()
+    
+    const startDate = new Date(year, month - 1, 1)
+    const endDate = new Date(year, month, 0)
+    
+    const startMonth = startOfMonth(startDate)
+    const endMonth = endOfMonth(startDate)
 
     const financialSummary = await this.getFinancialSummary(
       userId,
@@ -31,8 +39,8 @@ export class GetDashboardUseCase {
 
     const budgets = await this.getBudgets(
       userId,
-      now.getMonth() + 1,
-      now.getFullYear()
+      month,
+      year
     )
 
     const expensesByCategory = await this.getExpensesByCategory(
@@ -169,9 +177,10 @@ export class GetDashboardUseCase {
   private async getBudgets(userId: string, month: number, year: number) {
     const budgets = await this.prisma.budget.findMany({
       where: {
-        userId,
-        month,
-        year
+        userId
+      },
+      include: {
+        category: true
       }
     })
 
@@ -179,7 +188,7 @@ export class GetDashboardUseCase {
       budgets.map(async (budget) => {
         const spent = await this.calculateSpentForBudget(
           userId,
-          budget.category,
+          budget.categoryId,
           month,
           year
         )
@@ -189,7 +198,8 @@ export class GetDashboardUseCase {
 
         return {
           id: budget.id,
-          category: budget.category,
+          categoryId: budget.categoryId,
+          categoryName: budget.category.name,
           limit,
           spent,
           percentage,
@@ -203,7 +213,7 @@ export class GetDashboardUseCase {
 
   private async calculateSpentForBudget(
     userId: string,
-    category: string,
+    categoryId: string,
     month: number,
     year: number
   ): Promise<number> {
@@ -218,9 +228,7 @@ export class GetDashboardUseCase {
           gte: startDate,
           lte: endDate
         },
-        category: {
-          name: category
-        }
+        categoryId
       },
       select: {
         totalAmount: true

@@ -17,5 +17,5 @@ export class GetBudgetsDto {
 
   @IsOptional()
   @IsString()
-  category?: string
+  categoryId?: string
 }

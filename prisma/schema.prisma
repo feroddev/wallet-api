@@ -53,13 +53,13 @@ model User {
   password     String
   plan         Plan          @default(FREE)
   createdAt    DateTime      @default(now()) @map("created_at")
-  CreditCards  CreditCard[]
-  Transactions Transaction[]
-  UserPlan     UserPlan[]
-  Invoice      Invoice[]
-  Goal         Goal[]
-  BillToPay    BillToPay[]
-  Budget       Budget[]
+  creditCards  CreditCard[]
+  transactions Transaction[]
+  userPlan     UserPlan[]
+  invoices     Invoice[]
+  goals        Goal[]
+  billToPay    BillToPay[]
+  budgets      Budget[]
 
   @@map("users")
 }
@@ -105,8 +105,8 @@ model CreditCard {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Transaction Transaction[]
-  Invoice     Invoice[]
+  transaction Transaction[]
+  invoice     Invoice[]
 
   @@map("credit_cards")
 }
@@ -130,7 +130,7 @@ model Category {
   type         CategoryType
   createdAt    DateTime      @default(now()) @map("created_at")
   transactions Transaction[]
-  Budget       Budget[]
+  budget       Budget[]
 
   @@map("categories")
 }
