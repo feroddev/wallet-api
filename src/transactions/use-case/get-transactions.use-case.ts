@@ -6,6 +6,7 @@ import { TransactionType } from '../infra/http/dto/enum'
 @Injectable()
 export class GetTransactionsUseCase {
   constructor(private readonly transactionsRepository: TransactionRepository) {}
+
   async execute(userId: string, payload: GetTransactionsDto) {
     const transactions = await this.transactionsRepository.findMany(
       userId,

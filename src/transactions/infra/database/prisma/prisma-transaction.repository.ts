@@ -48,13 +48,19 @@ export class PrismaTransactionRepository implements TransactionRepository {
   }
 
   async findMany(userId: string, payload: GetTransactionsDto): Promise<any> {
-    const { categoryId, creditCardId, paymentMethod, type } = payload
-    const date = payload.date || new Date()
-    const month = new Date(date).getUTCMonth()
-    const year = new Date(date).getUTCFullYear()
-
-    const startDate = new Date(year, month, 1)
-    const endDate = new Date(year, month + 1, 0)
+    const { categoryId, creditCardId, paymentMethod, type, startDate: inputStartDate, endDate: inputEndDate } = payload
+    
+    // Se não forem fornecidas datas, usa o mês atual como padrão
+    const currentDate = new Date()
+    const currentMonth = currentDate.getMonth()
+    const currentYear = currentDate.getFullYear()
+    
+    const startDate = inputStartDate || new Date(currentYear, currentMonth, 1)
+    const endDate = inputEndDate || new Date(currentYear, currentMonth + 1, 0)
+    
+    // Ajusta o horário para incluir todo o período
+    startDate.setHours(0, 0, 0, 0)
+    endDate.setHours(23, 59, 59, 999)
 
     return this.prisma.transaction.findMany({
       where: {
