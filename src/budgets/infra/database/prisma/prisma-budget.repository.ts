@@ -8,8 +8,21 @@ export class PrismaBudgetRepository implements BudgetRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(data: Partial<Budget>): Promise<Budget> {
-    return this.prisma.budget.create({
-      data: data as any
+    return this.prisma.budget.upsert({
+      where: {
+        userId_categoryId: {
+          userId: data.userId,
+          categoryId: data.categoryId
+        }
+      },
+      create: {
+        userId: data.userId,
+        categoryId: data.categoryId,
+        limit: data.limit
+      },
+      update: {
+        limit: data.limit
+      }
     })
   }
 

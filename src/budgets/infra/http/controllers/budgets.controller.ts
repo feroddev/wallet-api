@@ -56,21 +56,6 @@ export class BudgetsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar orçamentos do período' })
-  @ApiQuery({
-    name: 'month',
-    required: false,
-    type: Number,
-    description: 'Mês (1-12)'
-  })
-  @ApiQuery({ name: 'year', required: false, type: Number, description: 'Ano' })
-  @ApiQuery({
-    name: 'category',
-    required: false,
-    type: String,
-    description: 'Nome da categoria'
-  })
-  @ApiResponse({ status: 200, description: 'Lista de orçamentos' })
   async getBudgets(
     @Query() query: GetBudgetsDto,
     @Jwt() { userId }: JwtPayload
