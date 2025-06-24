@@ -130,6 +130,7 @@ model Category {
   type         CategoryType
   createdAt    DateTime      @default(now()) @map("created_at")
   transactions Transaction[]
+  Budget       Budget[]
 
   @@map("categories")
 }
@@ -156,17 +157,16 @@ model Invoice {
 }
 
 model Budget {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  category  String
-  limit     Decimal  @db.Money
-  month     Int
-  year      Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  categoryId String   @map("category_id")
+  limit      Decimal  @db.Money
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, category, month, year])
+  @@unique([userId, categoryId])
   @@map("budgets")
 }
 
