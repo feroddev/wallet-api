@@ -52,9 +52,7 @@ export class BudgetsController {
       limit
     })
 
-    return {
-      budget
-    }
+    return budget
   }
 
   @Get()
@@ -86,13 +84,11 @@ export class BudgetsController {
       categoryId
     })
 
-    return {
-      budgets: budgets.map((budget) => ({
-        ...budget,
-        available: Number(budget.limit) - budget.spent,
-        percentUsed: Math.min(100, (budget.spent / Number(budget.limit)) * 100)
-      }))
-    }
+    return budgets.map((budget) => ({
+      ...budget,
+      available: Number(budget.limit) - budget.spent,
+      percentUsed: Math.min(100, (budget.spent / Number(budget.limit)) * 100)
+    }))
   }
 
   @Patch(':id')
@@ -115,9 +111,7 @@ export class BudgetsController {
       limit
     })
 
-    return {
-      budget
-    }
+    return budget
   }
 
   @Delete(':id')
