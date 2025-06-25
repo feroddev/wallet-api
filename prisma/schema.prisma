@@ -47,19 +47,19 @@ enum CategoryType {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  password     String
-  plan         Plan          @default(FREE)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  creditCards  CreditCard[]
-  transactions Transaction[]
-  userPlan     UserPlan[]
-  invoices     Invoice[]
-  goals        Goal[]
-  billToPay    BillToPay[]
-  budgets      Budget[]
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  plan           Plan            @default(FREE)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  creditCards    CreditCard[]
+  transactions   Transaction[]
+  userPlan       UserPlan[]
+  invoices       Invoice[]
+  goals          Goal[]
+  recurringBills RecurringBill[]
+  budgets        Budget[]
 
   @@map("users")
 }
@@ -78,17 +78,17 @@ model Transaction {
   isRecurring       Boolean         @default(false) @map("is_recurring")
   creditCardId      String?         @map("credit_card_id")
   invoiceId         String?         @map("invoice_id")
-  purchaseId        String?         @map("purchase_id") // ID para agrupar parcelas da mesma compra
-  totalInstallments Int?            @map("total_installments") // Número total de parcelas
-  installmentNumber Int?            @map("installment_number") // Número da parcela atual
+  purchaseId        String?         @map("purchase_id")
+  totalInstallments Int?            @map("total_installments")
+  installmentNumber Int?            @map("installment_number")
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
-  billToPayId       String?
+  recurringBillId   String?
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   category          Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   creditCard        CreditCard?     @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
   invoice           Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-  billToPay         BillToPay?      @relation(fields: [billToPayId], references: [id])
+  recurringBill     RecurringBill?  @relation(fields: [recurringBillId], references: [id], onDelete: SetNull)
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
@@ -170,7 +170,7 @@ model Budget {
   @@map("budgets")
 }
 
-model BillToPay {
+model RecurringBill {
   id            String        @id @default(uuid())
   userId        String        @map("user_id")
   name          String
@@ -179,14 +179,13 @@ model BillToPay {
   dueDate       DateTime      @map("due_date")
   isPaid        Boolean       @default(false) @map("is_paid")
   paidAt        DateTime?     @map("paid_at")
-  isRecurring   Boolean       @default(false) @map("is_recurring")
   recurrenceDay Int?          @map("recurrence_day")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions  Transaction[]
 
-  @@map("bills_to_pay")
+  @@map("recurring_bills")
 }
 
 model Goal {

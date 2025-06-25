@@ -42,18 +42,8 @@ export class PrismaBudgetRepository implements BudgetRepository {
   ): Promise<Budget[]> {
     const where: any = { userId }
 
-    if (filters) {
-      if (filters.month !== undefined) {
-        where.month = filters.month
-      }
-
-      if (filters.year !== undefined) {
-        where.year = filters.year
-      }
-
-      if (filters.categoryId) {
-        where.categoryId = filters.categoryId
-      }
+    if (filters.categoryId) {
+      where.categoryId = filters.categoryId
     }
 
     return this.prisma.budget.findMany({
@@ -79,15 +69,19 @@ export class PrismaBudgetRepository implements BudgetRepository {
   ): Promise<(Budget & { spent: number })[]> {
     const budgets = await this.findByUserId(userId, filters)
 
-    const budgetsWithSpent = await Promise.all(
-      budgets.map(async (budget) => {
-        const spent = await this.calculateSpentForBudget(budget)
-        return {
-          ...budget,
-          spent
-        }
+    const budgetsWithSpent = []
+
+    for (const budget of budgets) {
+      const spent = await this.calculateSpentForBudget({
+        ...budget,
+        month: filters?.month,
+        year: filters?.year
       })
-    )
+      budgetsWithSpent.push({
+        ...budget,
+        spent
+      })
+    }
 
     return budgetsWithSpent
   }

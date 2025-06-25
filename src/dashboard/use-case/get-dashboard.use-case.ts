@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
 import { endOfMonth, startOfMonth } from 'date-fns'
+import { RecurringBillsService } from '../../recurring-bills/services/recurring-bills.service'
 
 interface GetDashboardRequest {
   userId: string
@@ -10,7 +11,10 @@ interface GetDashboardRequest {
 
 @Injectable()
 export class GetDashboardUseCase {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private recurringBillsService: RecurringBillsService
+  ) {}
 
   async execute(request: GetDashboardRequest) {
     const { userId, month: requestMonth, year: requestYear } = request
@@ -18,10 +22,10 @@ export class GetDashboardUseCase {
     const now = new Date()
     const month = requestMonth || now.getMonth() + 1
     const year = requestYear || now.getFullYear()
-    
+
     const startDate = new Date(year, month - 1, 1)
     const endDate = new Date(year, month, 0)
-    
+
     const startMonth = startOfMonth(startDate)
     const endMonth = endOfMonth(startDate)
 
@@ -37,11 +41,7 @@ export class GetDashboardUseCase {
       endMonth
     )
 
-    const budgets = await this.getBudgets(
-      userId,
-      month,
-      year
-    )
+    const budgets = await this.getBudgets(userId, month, year)
 
     const expensesByCategory = await this.getExpensesByCategory(
       userId,
@@ -72,6 +72,9 @@ export class GetDashboardUseCase {
     startMonth: Date,
     endMonth: Date
   ) {
+    const month = startMonth.getMonth() + 1
+    const year = startMonth.getFullYear()
+    
     const incomeResult = await this.prisma.transaction.aggregate({
       where: {
         userId,
@@ -103,6 +106,14 @@ export class GetDashboardUseCase {
     })
 
     const monthlyExpenses = Number(expensesResult._sum.totalAmount || 0)
+    
+    const pendingRecurringBillsAmount = await this.recurringBillsService.getTotalPendingAmountForMonth(
+      userId,
+      month,
+      year
+    )
+    
+    const totalMonthlyExpenses = monthlyExpenses + pendingRecurringBillsAmount
 
     const investmentsResult = await this.prisma.transaction.aggregate({
       where: {
@@ -121,11 +132,11 @@ export class GetDashboardUseCase {
     const investments = Number(investmentsResult._sum.totalAmount || 0)
 
     const balance =
-      Number(monthlyIncome) - Number(monthlyExpenses) - Number(investments)
+      Number(monthlyIncome) - Number(totalMonthlyExpenses) - Number(investments)
 
     return {
       monthlyIncome,
-      monthlyExpenses,
+      monthlyExpenses: totalMonthlyExpenses,
       investments,
       balance
     }

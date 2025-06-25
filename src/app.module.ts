@@ -4,7 +4,6 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
-import { BillsModule } from './bills/bills.module'
 import { BudgetsModule } from './budgets/budgets.module'
 import { CreditCardModule } from './credit-card/credit-card.module'
 import { DashboardModule } from './dashboard/dashboard.module'
@@ -23,7 +22,6 @@ import { UserModule } from './user/user.module'
     CreditCardModule,
     InvoicesModule,
     GoalsModule,
-    BillsModule,
     BudgetsModule,
     DashboardModule,
     ScheduleModule.forRoot(),

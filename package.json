@@ -9,7 +9,7 @@
     "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "seed:categories": "npx ts-node ./prisma/seed.categories.ts",
-    "seed:transactions": "npx ts-node ./prisma/seed.ts",
+    "seed:transactions": "npx ts-node ./prisma/seed.bank.ts",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

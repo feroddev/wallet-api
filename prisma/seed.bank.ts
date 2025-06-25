@@ -9,7 +9,7 @@ import {
 import { addDays, addMonths, subDays, subMonths } from 'date-fns'
 
 const prisma = new PrismaClient()
-const userId = 'd3e42b93-fdeb-45fc-8d1b-acb2e2191a97'
+const userId = '96b7c31e-a953-4fbc-9992-0f8cbd1c56aa'
 
 async function main() {
   // Limpar dados existentes
@@ -50,7 +50,7 @@ async function cleanDatabase() {
   await prisma.creditCard.deleteMany({ where: { userId } })
   await prisma.userPlan.deleteMany({ where: { userId } })
   await prisma.budget.deleteMany({ where: { userId } })
-  await prisma.billToPay.deleteMany({ where: { userId } })
+  await prisma.recurringBill.deleteMany({ where: { userId } })
   await prisma.goal.deleteMany({ where: { userId } })
 }
 
@@ -66,6 +66,7 @@ async function createCategories() {
       'Moradia',
       'Saúde',
       'Educação',
+      'Contas fixas',
       'Lazer e Entretenimento',
       'Roupas e Acessórios',
       'Beleza e Cuidados Pessoais',
@@ -298,8 +299,19 @@ async function createBudgets(categories: Category[]) {
 
   // Criar orçamentos para o mês atual
   for (let i = 0; i < 5; i++) {
-    await prisma.budget.create({
-      data: {
+    await prisma.budget.upsert({
+      where: {
+        userId_categoryId: {
+          userId,
+          categoryId: categories[i].id
+        }
+      },
+      create: {
+        userId,
+        categoryId: categories[i].id,
+        limit: 500 + i * 200
+      },
+      update: {
         userId,
         categoryId: categories[i].id,
         limit: 500 + i * 200
@@ -310,8 +322,19 @@ async function createBudgets(categories: Category[]) {
   for (let i = 0; i < 5; i++) {
     const category = categories[i]
 
-    await prisma.budget.create({
-      data: {
+    await prisma.budget.upsert({
+      where: {
+        userId_categoryId: {
+          userId,
+          categoryId: category.id
+        }
+      },
+      create: {
+        userId,
+        categoryId: category.id,
+        limit: 600 + i * 200
+      },
+      update: {
         userId,
         categoryId: category.id,
         limit: 600 + i * 200
@@ -324,7 +347,7 @@ async function createBillsToPay() {
   const now = new Date()
 
   // Conta recorrente
-  await prisma.billToPay.create({
+  await prisma.recurringBill.create({
     data: {
       userId,
       name: 'Aluguel',
@@ -332,26 +355,24 @@ async function createBillsToPay() {
       amount: 1200,
       dueDate: addDays(now, 10),
       isPaid: false,
-      isRecurring: true,
       recurrenceDay: 10
     }
   })
 
   // Conta não recorrente
-  await prisma.billToPay.create({
+  await prisma.recurringBill.create({
     data: {
       userId,
       name: 'IPTU',
       description: 'Imposto anual',
       amount: 800,
       dueDate: addDays(now, 20),
-      isPaid: false,
-      isRecurring: false
+      isPaid: false
     }
   })
 
   // Conta já paga
-  await prisma.billToPay.create({
+  await prisma.recurringBill.create({
     data: {
       userId,
       name: 'Internet',
@@ -360,7 +381,6 @@ async function createBillsToPay() {
       dueDate: subDays(now, 5),
       isPaid: true,
       paidAt: subDays(now, 2),
-      isRecurring: true,
       recurrenceDay: 15
     }
   })
