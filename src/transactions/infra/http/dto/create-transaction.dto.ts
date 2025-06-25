@@ -125,4 +125,12 @@ export class CreateTransactionDto {
   })
   @IsEnum(TransactionType)
   type: TransactionType
+
+  @ApiProperty({
+    description: 'ID da conta recorrente (opcional)',
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  recurringBillId?: string
 }

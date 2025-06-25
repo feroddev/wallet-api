@@ -9,7 +9,10 @@ import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns'
 export class PrismaRecurringBillRepository implements RecurringBillRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(userId: string, data: CreateRecurringBillDto): Promise<RecurringBill> {
+  async create(
+    userId: string,
+    data: CreateRecurringBillDto
+  ): Promise<RecurringBill> {
     return this.prisma.recurringBill.create({
       data: {
         userId,
@@ -27,7 +30,7 @@ export class PrismaRecurringBillRepository implements RecurringBillRepository {
         userId
       },
       orderBy: {
-        recurrenceDay: 'asc'
+        createdAt: 'asc'
       }
     })
   }
@@ -41,7 +44,10 @@ export class PrismaRecurringBillRepository implements RecurringBillRepository {
     })
   }
 
-  async update(id: string, data: UpdateRecurringBillDto): Promise<RecurringBill> {
+  async update(
+    id: string,
+    data: UpdateRecurringBillDto
+  ): Promise<RecurringBill> {
     return this.prisma.recurringBill.update({
       where: { id },
       data: {
@@ -59,7 +65,11 @@ export class PrismaRecurringBillRepository implements RecurringBillRepository {
     })
   }
 
-  async findPendingForMonth(userId: string, month: number, year: number): Promise<RecurringBill[]> {
+  async findPendingForMonth(
+    userId: string,
+    month: number,
+    year: number
+  ): Promise<RecurringBill[]> {
     const startDate = startOfMonth(new Date(year, month - 1))
     const endDate = endOfMonth(new Date(year, month - 1))
 

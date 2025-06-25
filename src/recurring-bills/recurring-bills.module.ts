@@ -15,6 +15,8 @@ import { RecurringBillRepository } from './repositories/recurring-bill.repositor
 import { PrismaRecurringBillRepository } from './repositories/prisma/prisma-recurring-bill.repository'
 import { TransactionRepository } from '../transactions/repositories/transaction.repository'
 import { PrismaTransactionRepository } from '../transactions/infra/database/prisma/prisma-transaction.repository'
+import { CategoryRepository } from '../transactions/repositories/category.repository'
+import { PrismaCategoryRepository } from '../transactions/infra/database/prisma/prisma-category.repository'
 
 @Module({
   imports: [ScheduleModule.forRoot(), PrismaModule],
@@ -34,6 +36,10 @@ import { PrismaTransactionRepository } from '../transactions/infra/database/pris
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
+    },
+    {
+      provide: CategoryRepository,
+      useClass: PrismaCategoryRepository
     }
   ],
   exports: [RecurringBillsService]
