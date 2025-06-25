@@ -22,7 +22,7 @@ export class RecurringBillsCron {
     const endDate = endOfMonth(new Date(currentYear, currentMonth, 1))
 
     try {
-      // Buscar todas as contas recorrentes (ativas e pagas)
+      // Buscar todas as contas recorrentes
       const recurringBills = await this.prisma.recurringBill.findMany()
 
       this.logger.log(
@@ -30,6 +30,7 @@ export class RecurringBillsCron {
       )
 
       for (const bill of recurringBills) {
+        // Verificar se já existe uma transação para esta conta neste mês
         const existingTransaction = await this.prisma.transaction.findFirst({
           where: {
             recurringBillId: bill.id,
@@ -60,7 +61,7 @@ export class RecurringBillsCron {
           const dueDate = new Date(
             currentYear,
             currentMonth,
-            bill.recurrenceDay || bill.dueDate.getDate()
+            bill.recurrenceDay
           )
 
           await this.prisma.transaction.create({
@@ -104,7 +105,7 @@ export class RecurringBillsCron {
             const nextDueDate = new Date(
               nextMonthYear,
               nextMonthMonth,
-              bill.recurrenceDay || bill.dueDate.getDate()
+              bill.recurrenceDay
             )
 
             await this.prisma.transaction.create({

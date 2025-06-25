@@ -6,7 +6,7 @@ import {
   Plan,
   Category
 } from '@prisma/client'
-import { addDays, addMonths, subDays, subMonths } from 'date-fns'
+import { addMonths, subDays, subMonths } from 'date-fns'
 
 const prisma = new PrismaClient()
 const userId = '96b7c31e-a953-4fbc-9992-0f8cbd1c56aa'
@@ -353,8 +353,6 @@ async function createBillsToPay() {
       name: 'Aluguel',
       description: 'Pagamento mensal do aluguel',
       amount: 1200,
-      dueDate: addDays(now, 10),
-      isPaid: false,
       recurrenceDay: 10
     }
   })
@@ -366,8 +364,7 @@ async function createBillsToPay() {
       name: 'IPTU',
       description: 'Imposto anual',
       amount: 800,
-      dueDate: addDays(now, 20),
-      isPaid: false
+      recurrenceDay: 10
     }
   })
 
@@ -378,9 +375,6 @@ async function createBillsToPay() {
       name: 'Internet',
       description: 'Fatura mensal de internet',
       amount: 120,
-      dueDate: subDays(now, 5),
-      isPaid: true,
-      paidAt: subDays(now, 2),
       recurrenceDay: 15
     }
   })

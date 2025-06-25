@@ -176,10 +176,7 @@ model RecurringBill {
   name          String
   description   String?
   amount        Decimal       @db.Money
-  dueDate       DateTime      @map("due_date")
-  isPaid        Boolean       @default(false) @map("is_paid")
-  paidAt        DateTime?     @map("paid_at")
-  recurrenceDay Int?          @map("recurrence_day")
+  recurrenceDay Int           @map("recurrence_day")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
