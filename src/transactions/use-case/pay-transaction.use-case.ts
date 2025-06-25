@@ -94,8 +94,7 @@ export class PayTransactionUseCase {
                   date: new Date(
                     nextMonth.getFullYear(),
                     nextMonth.getMonth(),
-                    recurringBill.recurrenceDay ||
-                      new Date(recurringBill.dueDate).getDate()
+                    recurringBill.recurrenceDay
                   ),
                   totalAmount: transaction.totalAmount,
                   isPaid: false,

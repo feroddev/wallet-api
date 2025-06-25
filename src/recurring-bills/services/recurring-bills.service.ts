@@ -24,6 +24,7 @@ export class RecurringBillsService {
     const pendingBills = []
 
     for (const bill of recurringBills) {
+      // Verificar se já existe uma transação para esta conta neste mês
       const existingTransaction = await this.prisma.transaction.findFirst({
         where: {
           recurringBillId: bill.id,
@@ -34,13 +35,10 @@ export class RecurringBillsService {
         }
       })
 
-      if (!existingTransaction) {
+      // Se não existir transação ou se existir e não estiver paga, considerar como pendente
+      if (!existingTransaction || !existingTransaction.isPaid) {
         // Calcular a data de vencimento para o mês atual
-        const dueDate = new Date(
-          year,
-          month - 1,
-          bill.recurrenceDay || bill.dueDate.getDate()
-        )
+        const dueDate = new Date(year, month - 1, bill.recurrenceDay)
 
         // Verificar se a data de vencimento está dentro do mês atual
         if (isWithinInterval(dueDate, { start: startDate, end: endDate })) {
@@ -51,8 +49,6 @@ export class RecurringBillsService {
             description: bill.description,
             amount: bill.amount,
             dueDate,
-            isPaid: bill.isPaid,
-            paidAt: bill.paidAt,
             recurrenceDay: bill.recurrenceDay,
             createdAt: bill.createdAt,
             updatedAt: bill.updatedAt
