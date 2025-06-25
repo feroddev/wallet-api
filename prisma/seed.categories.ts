@@ -10,6 +10,7 @@ async function main() {
     'Saúde',
     'Educação',
     'Lazer e Entretenimento',
+    'Contas fixas',
     'Roupas e Acessórios',
     'Beleza e Cuidados Pessoais',
     'Casa e Decoração',
