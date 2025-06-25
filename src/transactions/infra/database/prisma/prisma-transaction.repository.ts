@@ -48,16 +48,23 @@ export class PrismaTransactionRepository implements TransactionRepository {
   }
 
   async findMany(userId: string, payload: GetTransactionsDto): Promise<any> {
-    const { categoryId, creditCardId, paymentMethod, type, startDate: inputStartDate, endDate: inputEndDate } = payload
-    
+    const {
+      categoryId,
+      creditCardId,
+      paymentMethod,
+      type,
+      startDate: inputStartDate,
+      endDate: inputEndDate
+    } = payload
+
     // Se não forem fornecidas datas, usa o mês atual como padrão
     const currentDate = new Date()
     const currentMonth = currentDate.getMonth()
     const currentYear = currentDate.getFullYear()
-    
+
     const startDate = inputStartDate || new Date(currentYear, currentMonth, 1)
     const endDate = inputEndDate || new Date(currentYear, currentMonth + 1, 0)
-    
+
     // Ajusta o horário para incluir todo o período
     startDate.setHours(0, 0, 0, 0)
     endDate.setHours(23, 59, 59, 999)
@@ -81,7 +88,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
           }
         },
         creditCard: true,
-        invoice: true
+        invoice: true,
+        recurringBill: true
       },
       orderBy: {
         date: 'asc'
@@ -98,7 +106,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: true
+        creditCard: true,
+        recurringBill: true
       }
     })
   }
@@ -125,7 +134,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
             name: true
           }
         },
-        creditCard: true
+        creditCard: true,
+        recurringBill: true
       }
     })
   }
@@ -167,7 +177,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
           }
         },
         creditCard: true,
-        invoice: true
+        invoice: true,
+        recurringBill: true
       }
     })
   }
@@ -182,7 +193,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
           }
         },
         creditCard: true,
-        invoice: true
+        invoice: true,
+        recurringBill: true
       }
     })
 
