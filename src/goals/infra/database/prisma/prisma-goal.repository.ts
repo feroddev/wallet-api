@@ -2,14 +2,15 @@ import { Injectable } from '@nestjs/common'
 import { Goal } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { GoalRepository } from '../../../repositories/goal.repository'
+import { CreateGoalDto } from '../../http/dto/create-goal.dto'
 
 @Injectable()
 export class PrismaGoalRepository implements GoalRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Partial<Goal>): Promise<Goal> {
+  async create(data: CreateGoalDto & { userId: string }): Promise<Goal> {
     return this.prisma.goal.create({
-      data: data as any
+      data
     })
   }
 

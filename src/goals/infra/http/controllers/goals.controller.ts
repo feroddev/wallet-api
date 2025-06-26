@@ -44,15 +44,9 @@ export class GoalsController {
   @ApiResponse({ status: 201, description: 'Meta criada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async create(@Body() body: CreateGoalDto, @Jwt() { userId }: JwtPayload) {
-    const { name, description, targetValue, savedValue, deadline } = body
-
     const goal = await this.createGoalUseCase.execute({
-      userId,
-      name,
-      description,
-      targetValue,
-      savedValue,
-      deadline
+      ...body,
+      userId
     })
 
     return goal
@@ -80,15 +74,10 @@ export class GoalsController {
     @Body() body: UpdateGoalDto,
     @Jwt() { userId }: JwtPayload
   ) {
-    const { name, description, targetValue, deadline } = body
-
     const goal = await this.updateGoalUseCase.execute({
       id,
       userId,
-      name,
-      description,
-      targetValue,
-      deadline
+      ...body
     })
 
     return goal

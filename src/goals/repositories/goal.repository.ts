@@ -1,7 +1,8 @@
 import { Goal } from '@prisma/client'
+import { CreateGoalDto } from '../infra/http/dto/create-goal.dto'
 
 export abstract class GoalRepository {
-  abstract create(data: Partial<Goal>): Promise<Goal>
+  abstract create(data: CreateGoalDto & { userId: string }): Promise<Goal>
 
   abstract findById(id: string): Promise<Goal | null>
 

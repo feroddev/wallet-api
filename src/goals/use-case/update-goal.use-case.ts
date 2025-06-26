@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common'
 import { GoalRepository } from '../repositories/goal.repository'
 
 interface UpdateGoalRequest {
@@ -20,11 +24,13 @@ export class UpdateGoalUseCase {
     const goal = await this.goalRepository.findById(id)
 
     if (!goal) {
-      throw new Error('Meta não encontrada')
+      throw new NotFoundException('Meta não encontrada')
     }
 
     if (goal.userId !== userId) {
-      throw new Error('Você não tem permissão para atualizar esta meta')
+      throw new BadRequestException(
+        'Você não tem permissão para atualizar esta meta'
+      )
     }
 
     return this.goalRepository.update(id, {

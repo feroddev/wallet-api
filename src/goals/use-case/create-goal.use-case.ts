@@ -19,12 +19,12 @@ export class CreateGoalUseCase {
       request
 
     return this.goalRepository.create({
-      userId,
       name,
       description,
-      targetValue: targetValue as any,
-      savedValue: (savedValue || 0) as any,
-      deadline
+      targetValue,
+      savedValue: savedValue || 0,
+      deadline,
+      userId
     })
   }
 }
