@@ -55,47 +55,18 @@ export class InvoicesController {
       userId
     })
 
-    return {
-      invoice
-    }
+    return invoice
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar faturas de cartões de crédito' })
-  @ApiQuery({
-    name: 'month',
-    required: false,
-    type: Number,
-    description: 'Mês da fatura (1-12)'
-  })
-  @ApiQuery({
-    name: 'year',
-    required: false,
-    type: Number,
-    description: 'Ano da fatura'
-  })
-  @ApiQuery({
-    name: 'creditCardId',
-    required: false,
-    description: 'ID do cartão de crédito'
-  })
   @ApiResponse({ status: 200, description: 'Lista de faturas' })
-  async getInvoices(
-    @Query() query: GetInvoicesDto,
-    @Jwt() { userId }: JwtPayload
-  ) {
-    const { month, year, creditCardId } = query
-
+  async getInvoices(@Jwt() { userId }: JwtPayload) {
     const invoices = await this.getInvoicesUseCase.execute({
-      userId,
-      month,
-      year,
-      creditCardId
+      userId
     })
 
-    return {
-      invoices
-    }
+    return invoices
   }
 
   @Patch(':id/pay')
@@ -114,8 +85,6 @@ export class InvoicesController {
       paidAt: new Date()
     })
 
-    return {
-      invoice
-    }
+    return invoice
   }
 }

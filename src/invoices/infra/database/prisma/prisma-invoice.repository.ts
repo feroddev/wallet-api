@@ -24,6 +24,25 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     })
   }
 
+  async getInvoicesWithTransactions(userId: string): Promise<Invoice[]> {
+    return this.prisma.invoice.findMany({
+      where: {
+        userId,
+        totalAmount: {
+          gt: 0
+        }
+      },
+      include: {
+        creditCard: true,
+        transactions: {
+          include: {
+            category: true
+          }
+        }
+      }
+    })
+  }
+
   async findByUserIdAndMonth(
     userId: string,
     month: number,
