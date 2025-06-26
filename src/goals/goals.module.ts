@@ -8,6 +8,8 @@ import { DeleteGoalUseCase } from './use-case/delete-goal.use-case'
 import { GetGoalsUseCase } from './use-case/get-goals.use-case'
 import { UpdateGoalUseCase } from './use-case/update-goal.use-case'
 import { UpdateProgressUseCase } from './use-case/update-progress.use-case'
+import { TransactionRepository } from '../transactions/repositories/transaction.repository'
+import { PrismaTransactionRepository } from '../transactions/infra/database/prisma/prisma-transaction.repository'
 
 @Module({
   imports: [AuthModule],
@@ -21,6 +23,10 @@ import { UpdateProgressUseCase } from './use-case/update-progress.use-case'
     {
       provide: GoalRepository,
       useClass: PrismaGoalRepository
+    },
+    {
+      provide: TransactionRepository,
+      useClass: PrismaTransactionRepository
     }
   ],
   exports: [GoalRepository]

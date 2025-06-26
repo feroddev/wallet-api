@@ -55,9 +55,7 @@ export class GoalsController {
       deadline
     })
 
-    return {
-      goal
-    }
+    return goal
   }
 
   @Get()
@@ -68,9 +66,7 @@ export class GoalsController {
       userId
     })
 
-    return {
-      goals
-    }
+    return goals
   }
 
   @Patch(':id')
@@ -95,9 +91,7 @@ export class GoalsController {
       deadline
     })
 
-    return {
-      goal
-    }
+    return goal
   }
 
   @Patch(':id/progress')
@@ -119,9 +113,7 @@ export class GoalsController {
       amount
     })
 
-    return {
-      goal
-    }
+    return goal
   }
 
   @Delete(':id')

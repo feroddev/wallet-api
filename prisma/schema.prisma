@@ -47,12 +47,13 @@ enum CategoryType {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  name           String
-  email          String          @unique
-  password       String
-  plan           Plan            @default(FREE)
-  createdAt      DateTime        @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  plan      Plan     @default(FREE)
+  createdAt DateTime @default(now()) @map("created_at")
+
   creditCards    CreditCard[]
   transactions   Transaction[]
   userPlan       UserPlan[]
@@ -84,26 +85,30 @@ model Transaction {
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
   recurringBillId   String?
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category          Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  creditCard        CreditCard?     @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
-  invoice           Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-  recurringBill     RecurringBill?  @relation(fields: [recurringBillId], references: [id], onDelete: SetNull)
+  goalId            String?
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  creditCard    CreditCard?    @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  invoice       Invoice?       @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  recurringBill RecurringBill? @relation(fields: [recurringBillId], references: [id], onDelete: SetNull)
+  goal          Goal?          @relation(fields: [goalId], references: [id], onDelete: SetNull)
 
   @@index([userId, date], name: "idx_user_date")
   @@map("transactions")
 }
 
 model CreditCard {
-  id          String        @id @default(uuid())
-  userId      String        @map("user_id")
-  cardName    String        @map("card_name")
-  lastDigits  Int?          @map("last_digits")
-  limit       Decimal?      @db.Money
-  closingDay  Int           @map("closing_day")
-  dueDay      Int           @map("due_day")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  cardName   String   @map("card_name")
+  lastDigits Int?     @map("last_digits")
+  limit      Decimal? @db.Money
+  closingDay Int      @map("closing_day")
+  dueDay     Int      @map("due_day")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transaction Transaction[]
   invoice     Invoice[]
@@ -119,16 +124,18 @@ model UserPlan {
   endDate   DateTime? @map("end_date")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_plans")
 }
 
 model Category {
-  id           String        @id @default(uuid())
-  name         String
-  type         CategoryType
-  createdAt    DateTime      @default(now()) @map("created_at")
+  id        String       @id @default(uuid())
+  name      String
+  type      CategoryType
+  createdAt DateTime     @default(now()) @map("created_at")
+
   transactions Transaction[]
   budget       Budget[]
 
@@ -136,18 +143,19 @@ model Category {
 }
 
 model Invoice {
-  id           String        @id @default(uuid())
-  userId       String        @map("user_id")
-  creditCardId String        @map("credit_card_id")
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  creditCardId String    @map("credit_card_id")
   month        Int
   year         Int
-  totalAmount  Decimal       @map("total_amount") @db.Money
-  isPaid       Boolean       @default(false) @map("is_paid")
-  paidAt       DateTime?     @map("paid_at")
-  dueDate      DateTime      @map("due_date")
-  closingDate  DateTime      @map("closing_date")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  totalAmount  Decimal   @map("total_amount") @db.Money
+  isPaid       Boolean   @default(false) @map("is_paid")
+  paidAt       DateTime? @map("paid_at")
+  dueDate      DateTime  @map("due_date")
+  closingDate  DateTime  @map("closing_date")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   creditCard   CreditCard    @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
   transactions Transaction[]
@@ -163,24 +171,26 @@ model Budget {
   limit      Decimal  @db.Money
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([userId, categoryId])
   @@map("budgets")
 }
 
 model RecurringBill {
-  id            String        @id @default(uuid())
-  userId        String        @map("user_id")
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
   name          String
   description   String?
-  amount        Decimal       @db.Money
-  recurrenceDay Int           @map("recurrence_day")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions  Transaction[]
+  amount        Decimal  @db.Money
+  recurrenceDay Int      @map("recurrence_day")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@map("recurring_bills")
 }
@@ -195,7 +205,9 @@ model Goal {
   deadline    DateTime @map("deadline")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@map("goals")
 }

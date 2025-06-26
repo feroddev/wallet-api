@@ -39,6 +39,7 @@ async function main() {
     'Tesouro Direto',
     'CDB',
     'Fundo Imobiliário (FII)',
+    'Meta Financeira',
     'Ações',
     'Criptomoedas',
     'Outros'
