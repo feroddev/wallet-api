@@ -5,7 +5,9 @@ export abstract class InvoiceRepository {
 
   abstract findById(id: string): Promise<Invoice | null>
 
-  abstract getInvoicesWithTransactions(userId: string): Promise<Invoice[]>
+  abstract getInvoicesWithTransactions(
+    userId: string
+  ): Promise<{ paid: Invoice[]; pending: Invoice[] }>
 
   abstract findByUserIdAndMonth(
     userId: string,

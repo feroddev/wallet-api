@@ -24,10 +24,13 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     })
   }
 
-  async getInvoicesWithTransactions(userId: string): Promise<Invoice[]> {
-    return this.prisma.invoice.findMany({
+  async getInvoicesWithTransactions(
+    userId: string
+  ): Promise<{ paid: Invoice[]; pending: Invoice[] }> {
+    const paid = await this.prisma.invoice.findMany({
       where: {
         userId,
+        isPaid: true,
         totalAmount: {
           gt: 0
         }
@@ -39,8 +42,34 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
             category: true
           }
         }
+      },
+      orderBy: {
+        paidAt: 'desc'
       }
     })
+
+    const pending = await this.prisma.invoice.findMany({
+      where: {
+        userId,
+        isPaid: false,
+        totalAmount: {
+          gt: 0
+        }
+      },
+      include: {
+        creditCard: true,
+        transactions: {
+          include: {
+            category: true
+          }
+        }
+      },
+      orderBy: {
+        dueDate: 'asc'
+      }
+    })
+
+    return { paid, pending }
   }
 
   async findByUserIdAndMonth(
