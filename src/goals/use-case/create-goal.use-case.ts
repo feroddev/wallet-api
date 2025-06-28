@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { GoalRepository } from '../repositories/goal.repository'
 import { TransactionRepository } from '../../transactions/repositories/transaction.repository'
 import { CategoryRepository } from '../../transactions/repositories/category.repository'
@@ -45,7 +45,7 @@ export class CreateGoalUseCase {
       })
 
       if (!category) {
-        throw new Error(errors.CATEGORY_NOT_FOUND)
+        throw new NotFoundException(errors.CATEGORY_NOT_FOUND)
       }
 
       await this.transactionRepository.create({
@@ -53,7 +53,7 @@ export class CreateGoalUseCase {
         categoryId: category.id,
         type: TransactionType.INVESTMENT,
         userId,
-        name: 'Investimento na meta' + goal.name,
+        name: goal.name,
         description: 'Investimento na meta',
         paymentMethod: PaymentMethod.BANK_TRANSFER,
         date: new Date(),

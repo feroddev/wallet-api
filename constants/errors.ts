@@ -19,5 +19,6 @@ export const errors = {
   TRANSACTION_NOT_FOUND: 'Transação não encontrada',
   ID_PURCHASE_NOT_FOUND: 'ID da compra não encontrado',
   NOT_PART_OF_A_PARCELIZED_PURCHASE:
-    'Esta transação não faz parte de uma compra parcelada'
+    'Esta transação não faz parte de uma compra parcelada',
+  UNAUTHORIZED: 'Você não tem permissão para essa ação'
 }

@@ -10,6 +10,8 @@ import { UpdateGoalUseCase } from './use-case/update-goal.use-case'
 import { UpdateProgressUseCase } from './use-case/update-progress.use-case'
 import { TransactionRepository } from '../transactions/repositories/transaction.repository'
 import { PrismaTransactionRepository } from '../transactions/infra/database/prisma/prisma-transaction.repository'
+import { CategoryRepository } from '../transactions/repositories/category.repository'
+import { PrismaCategoryRepository } from '../transactions/infra/database/prisma/prisma-category.repository'
 
 @Module({
   imports: [AuthModule],
@@ -27,6 +29,10 @@ import { PrismaTransactionRepository } from '../transactions/infra/database/pris
     {
       provide: TransactionRepository,
       useClass: PrismaTransactionRepository
+    },
+    {
+      provide: CategoryRepository,
+      useClass: PrismaCategoryRepository
     }
   ],
   exports: [GoalRepository]
