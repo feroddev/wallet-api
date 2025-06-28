@@ -15,8 +15,7 @@ async function main() {
   // Limpar dados existentes
   await cleanDatabase()
 
-  // Criar categorias
-  const categories = await createCategories()
+  const categories = await getCategories()
 
   // Criar cartões de crédito
   const creditCards = await createCreditCards()
@@ -54,58 +53,7 @@ async function cleanDatabase() {
   await prisma.goal.deleteMany({ where: { userId } })
 }
 
-async function createCategories() {
-  // Verificar categorias existentes
-  const existingCategories = await prisma.category.findMany()
-
-  if (existingCategories.length === 0) {
-    // Categorias de despesas
-    const expenseCategories = [
-      'Alimentação',
-      'Transporte',
-      'Moradia',
-      'Saúde',
-      'Educação',
-      'Contas fixas',
-      'Lazer e Entretenimento',
-      'Roupas e Acessórios',
-      'Beleza e Cuidados Pessoais',
-      'Casa e Decoração',
-      'Tecnologia',
-      'Serviços',
-      'Outros'
-    ]
-
-    for (const name of expenseCategories) {
-      await prisma.category.create({
-        data: { name, type: CategoryType.EXPENSE }
-      })
-    }
-
-    // Categorias de receitas
-    const incomeCategories = ['Salário', 'Freelance', 'Investimentos', 'Outros']
-    for (const name of incomeCategories) {
-      await prisma.category.create({
-        data: { name, type: CategoryType.INCOME }
-      })
-    }
-
-    // Categorias de investimentos
-    const investmentCategories = [
-      'Tesouro Direto',
-      'CDB',
-      'Fundo Imobiliário (FII)',
-      'Ações',
-      'Criptomoedas',
-      'Outros'
-    ]
-    for (const name of investmentCategories) {
-      await prisma.category.create({
-        data: { name, type: CategoryType.INVESTMENT }
-      })
-    }
-  }
-
+async function getCategories() {
   return await prisma.category.findMany()
 }
 
