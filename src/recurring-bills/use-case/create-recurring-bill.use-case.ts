@@ -30,7 +30,8 @@ export class CreateRecurringBillUseCase {
     const transactionDate = new Date(
       currentYear,
       currentMonth,
-      dto.recurrenceDay
+      dto.recurrenceDay,
+      3
     )
 
     // Se o dia de recorrência já passou neste mês, criar para o próximo mês
