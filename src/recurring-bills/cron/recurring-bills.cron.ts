@@ -61,7 +61,8 @@ export class RecurringBillsCron {
           const dueDate = new Date(
             currentYear,
             currentMonth,
-            bill.recurrenceDay
+            bill.recurrenceDay,
+            3
           )
 
           await this.prisma.transaction.create({
@@ -105,7 +106,8 @@ export class RecurringBillsCron {
             const nextDueDate = new Date(
               nextMonthYear,
               nextMonthMonth,
-              bill.recurrenceDay
+              bill.recurrenceDay,
+              3
             )
 
             await this.prisma.transaction.create({
