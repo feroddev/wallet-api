@@ -19,11 +19,11 @@ export class DashboardController {
     type: Number,
     description: 'Mês (1-12)'
   })
-  @ApiQuery({ 
-    name: 'year', 
-    required: false, 
-    type: Number, 
-    description: 'Ano' 
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    type: Number,
+    description: 'Ano'
   })
   @ApiResponse({
     status: 200,

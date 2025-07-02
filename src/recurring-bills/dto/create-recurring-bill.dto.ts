@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator'
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Max,
+  Min
+} from 'class-validator'
 
 export class CreateRecurringBillDto {
   @ApiProperty({ description: 'Nome da conta recorrente' })
@@ -7,7 +15,10 @@ export class CreateRecurringBillDto {
   @IsString()
   name: string
 
-  @ApiProperty({ description: 'Descrição da conta recorrente', required: false })
+  @ApiProperty({
+    description: 'Descrição da conta recorrente',
+    required: false
+  })
   @IsOptional()
   @IsString()
   description?: string
@@ -18,7 +29,11 @@ export class CreateRecurringBillDto {
   @IsPositive()
   amount: number
 
-  @ApiProperty({ description: 'Dia de recorrência mensal', minimum: 1, maximum: 31 })
+  @ApiProperty({
+    description: 'Dia de recorrência mensal',
+    minimum: 1,
+    maximum: 31
+  })
   @IsNotEmpty()
   @IsNumber()
   @Min(1)

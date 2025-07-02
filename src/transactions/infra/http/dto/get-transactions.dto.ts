@@ -14,12 +14,20 @@ export class GetTransactionsDto {
   @IsString()
   creditCardId?: string
 
-  @ApiProperty({ description: 'Método de pagamento', required: false, enum: PaymentMethod })
+  @ApiProperty({
+    description: 'Método de pagamento',
+    required: false,
+    enum: PaymentMethod
+  })
   @IsOptional()
   @IsString()
   paymentMethod?: PaymentMethod
 
-  @ApiProperty({ description: 'Tipo de transação', required: false, enum: TransactionType })
+  @ApiProperty({
+    description: 'Tipo de transação',
+    required: false,
+    enum: TransactionType
+  })
   @IsOptional()
   @IsString()
   type?: TransactionType
@@ -27,12 +35,12 @@ export class GetTransactionsDto {
   @ApiProperty({ description: 'Data inicial para filtro', required: false })
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   startDate?: Date
 
   @ApiProperty({ description: 'Data final para filtro', required: false })
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   endDate?: Date
 }
