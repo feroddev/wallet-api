@@ -248,7 +248,7 @@ export class CreateTransactionsUseCase {
             : data.name,
         description: data.description,
         totalAmount: installmentAmount,
-        date: installmentDate.toISOString(),
+        date: installmentDate,
         type: data.type,
         categoryId: data.categoryId,
         paymentMethod: PaymentMethod.CREDIT_CARD,
