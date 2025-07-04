@@ -331,10 +331,14 @@ export class CreateTransactionsUseCase {
     }
 
     // Criamos a data com o mesmo dia da compra original, mas no mês seguinte
+    // Preservamos a hora, minuto e segundo da data original
     const installmentDate = new Date(
       installmentYear,
       installmentMonth,
-      purchaseDay
+      purchaseDay,
+      purchaseDate.getHours(),
+      purchaseDate.getMinutes(),
+      purchaseDate.getSeconds()
     )
 
     // Verificar se o dia existe no mês (ex: 31 de fevereiro não existe)
@@ -364,8 +368,20 @@ export class CreateTransactionsUseCase {
     let invoiceMonth = purchaseMonth
     let invoiceYear = purchaseYear
 
-    if (purchaseDay > closingDay) {
-      invoiceMonth += 1
+    // Se o dia da compra for maior que o dia de fechamento, a compra vai para a fatura do próximo mês
+    // Comparamos com o dia atual para decisões mais precisas sobre a fatura
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Se estamos no mesmo mês/ano da compra e o dia atual já passou do fechamento
+    if (currentMonth === purchaseMonth && currentYear === purchaseYear && currentDay > closingDay) {
+      invoiceMonth += 1;
+    }
+    // Ou se o dia da compra é posterior ao fechamento
+    else if (purchaseDay > closingDay) {
+      invoiceMonth += 1;
     }
 
     invoiceMonth += installmentOffset
