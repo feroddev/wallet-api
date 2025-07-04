@@ -181,8 +181,7 @@ export class CreateTransactionsUseCase {
       const invoiceDate = this.calculateInvoiceDate(
         installmentDate,
         creditCard.closingDay,
-        creditCard.dueDay,
-        0
+        creditCard.dueDay
       )
       const invoiceMonth = invoiceDate.getMonth() + 1
       const invoiceYear = invoiceDate.getFullYear()
