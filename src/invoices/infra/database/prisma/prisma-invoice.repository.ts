@@ -3,6 +3,7 @@ import { Invoice, PaymentMethod, Prisma } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { InvoiceRepository } from '../../../repositories/invoice.repository'
 import { errors } from '../../../../../constants/errors'
+import { DateUtils } from '../../../../utils/date.utils'
 
 @Injectable()
 export class PrismaInvoiceRepository implements InvoiceRepository {
@@ -151,8 +152,9 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
 
     const { closingDay, dueDay } = creditCard
 
-    const closingDate = new Date(year, month - 1, closingDay)
-    const dueDate = new Date(year, month - 1, dueDay)
+    // Criamos as datas preservando o fuso horário local usando o utilitário de datas
+    const closingDate = DateUtils.createLocalDate(year, month - 1, closingDay)
+    const dueDate = DateUtils.createLocalDate(year, month - 1, dueDay)
 
     if (dueDay < closingDay) {
       dueDate.setMonth(dueDate.getMonth() + 1)

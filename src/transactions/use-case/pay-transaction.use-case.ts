@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { TransactionRepository } from '../repositories/transaction.repository'
+import { RecurringBillRepository } from '../../recurring-bills/repositories/recurring-bill.repository'
+import { DateUtils } from '../../utils/date.utils'
+import { addMonths, startOfMonth, endOfMonth } from 'date-fns'
 import { errors } from '../../../constants/errors'
 import { PrismaService } from '../../prisma/prisma.service'
-import { addMonths, startOfMonth, endOfMonth } from 'date-fns'
 
 @Injectable()
 export class PayTransactionUseCase {
@@ -58,7 +60,7 @@ export class PayTransactionUseCase {
 
         if (defaultCategory) {
           // Obter a data da transação atual
-          const currentDate = new Date(transaction.date)
+          const currentDate = DateUtils.fromDate(transaction.date)
           const nextMonth = addMonths(currentDate, 1)
 
           // Verificar se já existe uma transação para o próximo mês

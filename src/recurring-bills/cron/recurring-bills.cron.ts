@@ -3,6 +3,7 @@ import * as crypto from 'crypto'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { PrismaService } from '../../prisma/prisma.service'
 import { startOfMonth, endOfMonth, format, addMonths } from 'date-fns'
+import { DateUtils } from '../../utils/date.utils'
 import { TransactionType } from '@prisma/client'
 
 @Injectable()
@@ -58,11 +59,10 @@ export class RecurringBillsCron {
 
         if (!existingTransaction) {
           // Criar nova transação para a conta recorrente no mês atual
-          const dueDate = new Date(
+          const dueDate = DateUtils.createLocalDate(
             currentYear,
             currentMonth,
-            bill.recurrenceDay,
-            3
+            bill.recurrenceDay
           )
 
           await this.prisma.transaction.create({
@@ -103,11 +103,10 @@ export class RecurringBillsCron {
 
           if (!nextMonthTransaction) {
             // Criar nova transação para o próximo mês
-            const nextDueDate = new Date(
+            const nextDueDate = DateUtils.createLocalDate(
               nextMonthYear,
               nextMonthMonth,
-              bill.recurrenceDay,
-              3
+              bill.recurrenceDay
             )
 
             await this.prisma.transaction.create({

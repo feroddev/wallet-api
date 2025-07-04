@@ -1,16 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common'
-import { Prisma } from '@prisma/client'
-import { CreditCardRepository } from '../../credit-card/repositories/credit-card.repository'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { Prisma, PaymentMethod, TransactionType } from '@prisma/client'
 import { PrismaService } from '../../prisma/prisma.service'
-import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
-import { PaymentMethod, TransactionType } from '../infra/http/dto/enum'
 import { TransactionRepository } from '../repositories/transaction.repository'
+import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
+import { CreditCardRepository } from '../../credit-card/repositories/credit-card.repository'
 import { InvoiceRepository } from '../../invoices/repositories/invoice.repository'
 import { errors } from '../../../constants/errors'
+import { DateUtils } from '../../utils/date.utils'
 
 @Injectable()
 export class CreateTransactionsUseCase {
@@ -331,28 +327,15 @@ export class CreateTransactionsUseCase {
     }
 
     // Criamos a data com o mesmo dia da compra original, mas no mês seguinte
-    // Preservamos a hora, minuto e segundo da data original
-    const installmentDate = new Date(
-      installmentYear,
+    // Preservamos o fuso horário usando o utilitário de datas
+    const installmentDate = DateUtils.createDateInMonth(
+      purchaseDate,
       installmentMonth,
-      purchaseDay,
-      purchaseDate.getHours(),
-      purchaseDate.getMinutes(),
-      purchaseDate.getSeconds()
+      installmentYear
     )
 
     // Verificar se o dia existe no mês (ex: 31 de fevereiro não existe)
-    const lastDayOfMonth = new Date(
-      installmentYear,
-      installmentMonth + 1,
-      0
-    ).getDate()
-    if (purchaseDay > lastDayOfMonth) {
-      // Se o dia não existir, usamos o último dia do mês
-      installmentDate.setDate(lastDayOfMonth)
-    }
-
-    return installmentDate
+    return DateUtils.setDayOfMonth(installmentDate, purchaseDay)
   }
 
   private calculateInvoiceDate(
@@ -391,8 +374,9 @@ export class CreateTransactionsUseCase {
       invoiceYear += 1
     }
 
-    const invoiceDate = new Date(invoiceYear, invoiceMonth, dueDay)
-    return invoiceDate
+    // Criamos a data da fatura preservando o fuso horário local usando o utilitário de datas
+    const invoiceDate = DateUtils.createDateInMonth(purchaseDate, invoiceMonth, invoiceYear);
+    return DateUtils.setDayOfMonth(invoiceDate, dueDay);
   }
 
   private validateTransactionData(data: CreateTransactionDto) {

@@ -2,10 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma, Transaction } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { TransactionRepository } from '../../../repositories/transaction.repository'
+import { DateUtils } from '../../../../utils/date.utils'
 import { CreateTransactionDto } from '../../http/dto/create-transaction.dto'
 import { GetTransactionsDto } from '../../http/dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../../http/dto/update-transaction.dto'
 import { errors } from '../../../../../constants/errors'
+
 @Injectable()
 export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -62,8 +64,8 @@ export class PrismaTransactionRepository implements TransactionRepository {
     const currentMonth = currentDate.getMonth()
     const currentYear = currentDate.getFullYear()
 
-    const startDate = inputStartDate || new Date(currentYear, currentMonth, 1)
-    const endDate = inputEndDate || new Date(currentYear, currentMonth + 1, 0)
+    const startDate = inputStartDate || DateUtils.createLocalDate(currentYear, currentMonth, 1)
+    const endDate = inputEndDate || DateUtils.createLocalDate(currentYear, currentMonth + 1, 0)
 
     // Ajusta o horário para incluir todo o período
     startDate.setHours(0, 0, 0, 0)

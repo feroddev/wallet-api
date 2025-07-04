@@ -7,6 +7,7 @@ import { PaymentMethod, Prisma } from '@prisma/client'
 import { PrismaService } from '../../prisma/prisma.service'
 import { InvoiceRepository } from '../repositories/invoice.repository'
 import { errors } from '../../../constants/errors'
+import { DateUtils } from '../../utils/date.utils'
 
 interface PayInvoiceRequest {
   id: string
@@ -23,7 +24,7 @@ export class PayInvoiceUseCase {
   ) {}
 
   async execute(request: PayInvoiceRequest) {
-    const { id, userId, paymentMethod, paidAt = new Date() } = request
+    const { id, userId, paymentMethod, paidAt = DateUtils.fromDate(new Date()) } = request
 
     const invoice = await this.invoiceRepository.findById(id)
 
@@ -43,7 +44,7 @@ export class PayInvoiceUseCase {
     }
 
     // Verificar se a fatura já foi fechada
-    const currentDate = new Date()
+    const currentDate = DateUtils.fromDate(new Date())
     if (currentDate < invoice.closingDate) {
       throw new BadRequestException(
         errors.CANNOT_PAY_INVOICE_BEFORE_CLOSING_DATE

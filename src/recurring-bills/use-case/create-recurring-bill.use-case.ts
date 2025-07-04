@@ -8,6 +8,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 import { CategoryRepository } from '../../transactions/repositories/category.repository'
 import { PrismaService } from '../../prisma/prisma.service'
 import { errors } from '../../../constants/errors'
+import { DateUtils } from '../../utils/date.utils'
 
 @Injectable()
 export class CreateRecurringBillUseCase {
@@ -27,11 +28,10 @@ export class CreateRecurringBillUseCase {
     const currentYear = currentDate.getFullYear()
 
     // Definir a data da transação com o dia de recorrência no mês atual
-    const transactionDate = new Date(
+    const transactionDate = DateUtils.createLocalDate(
       currentYear,
       currentMonth,
-      dto.recurrenceDay,
-      3
+      dto.recurrenceDay
     )
 
     // Se o dia de recorrência já passou neste mês, criar para o próximo mês

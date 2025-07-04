@@ -5,7 +5,8 @@ import {
   Param,
   Patch,
   Post,
-  Query
+  Query,
+  UseGuards
 } from '@nestjs/common'
 import {
   ApiBody,
@@ -25,6 +26,7 @@ import { GenerateInvoiceDto } from '../dto/generate-invoice.dto'
 import { GetInvoicesDto } from '../dto/get-invoices.dto'
 import { PayInvoiceDto } from '../dto/pay-invoice.dto'
 import { PaymentMethod } from '@prisma/client'
+import { DateUtils } from '../../../../utils/date.utils'
 
 @Auth()
 @ApiTags('Faturas')
@@ -82,7 +84,7 @@ export class InvoicesController {
       id,
       userId,
       paymentMethod: payInvoiceDto.paymentMethod || PaymentMethod.CASH,
-      paidAt: new Date()
+      paidAt: DateUtils.fromDate(new Date())
     })
 
     return invoice

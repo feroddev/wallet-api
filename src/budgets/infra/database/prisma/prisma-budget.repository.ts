@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { Budget } from '@prisma/client'
+import { Budget, Prisma } from '@prisma/client'
 import { PrismaService } from '../../../../prisma/prisma.service'
 import { BudgetRepository } from '../../../repositories/budget.repository'
+import { DateUtils } from '../../../../utils/date.utils'
 
 @Injectable()
 export class PrismaBudgetRepository implements BudgetRepository {
@@ -106,14 +107,13 @@ export class PrismaBudgetRepository implements BudgetRepository {
     const currentMonth = new Date().getMonth() + 1
     const currentYear = new Date().getFullYear()
 
-    const startDate =
-      month && year
-        ? new Date(year, month - 1, 1)
-        : new Date(currentYear, currentMonth - 1, 1)
-    const endDate =
-      month && year
-        ? new Date(year, month, 0)
-        : new Date(currentYear, currentMonth, 0, 21)
+    const startDate = month && year
+      ? DateUtils.createLocalDate(year, month - 1, 1)
+      : DateUtils.createLocalDate(currentYear, currentMonth - 1, 1)
+
+    const endDate = month && year
+      ? DateUtils.createLocalDate(year, month, 0)
+      : DateUtils.createLocalDate(currentYear, currentMonth, 0)
 
     const transactions = await this.prisma.transaction.findMany({
       where: {

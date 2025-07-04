@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
-import { endOfMonth, startOfMonth } from 'date-fns'
+import { TransactionType } from '@prisma/client'
+import { DateUtils } from '../../utils/date.utils'
 import { RecurringBillsService } from '../../recurring-bills/services/recurring-bills.service'
 
 interface GetDashboardRequest {
@@ -20,14 +21,14 @@ export class GetDashboardUseCase {
     const { userId, month: requestMonth, year: requestYear } = request
 
     const now = new Date()
-    const month = requestMonth || now.getMonth() + 1
     const year = requestYear || now.getFullYear()
+    const month = requestMonth || now.getMonth() + 1
 
-    const startDate = new Date(year, month - 1, 1)
-    const endDate = new Date(year, month, 0)
+    const startDate = DateUtils.createLocalDate(year, month - 1, 1)
+    const endDate = DateUtils.createLocalDate(year, month, 0)
 
-    const startMonth = startOfMonth(startDate)
-    const endMonth = endOfMonth(startDate)
+    const startMonth = DateUtils.startOfMonth(startDate)
+    const endMonth = DateUtils.endOfMonth(startDate)
 
     const financialSummary = await this.getFinancialSummary(
       userId,
@@ -229,8 +230,8 @@ export class GetDashboardUseCase {
     month: number,
     year: number
   ): Promise<number> {
-    const startDate = new Date(year, month - 1, 1)
-    const endDate = new Date(year, month, 0)
+    const startDate = DateUtils.createLocalDate(year, month - 1, 1)
+    const endDate = DateUtils.createLocalDate(year, month, 0)
 
     const transactions = await this.prisma.transaction.findMany({
       where: {
