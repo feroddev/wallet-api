@@ -302,12 +302,14 @@ export class GetDashboardUseCase {
       0
     )
 
-    return expensesByCategory.map((item) => ({
-      category: item.category,
-      amount: Number(item.amount),
-      percentage:
-        totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0
-    }))
+    return expensesByCategory
+      .map((item) => ({
+        category: item.category,
+        amount: Number(item.amount),
+        percentage:
+          totalExpenses !== 0 ? (Number(item.amount) / totalExpenses) * 100 : 0
+      }))
+      .slice(0, 5)
   }
 
   private async getNextCreditCardInvoice(

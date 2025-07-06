@@ -23,7 +23,6 @@ import { GenerateInvoiceUseCase } from '../../../use-case/generate-invoice.use-c
 import { GetInvoicesUseCase } from '../../../use-case/get-invoices.use-case'
 import { PayInvoiceUseCase } from '../../../use-case/pay-invoice.use-case'
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto'
-import { GetInvoicesDto } from '../dto/get-invoices.dto'
 import { PayInvoiceDto } from '../dto/pay-invoice.dto'
 import { PaymentMethod } from '@prisma/client'
 import { DateUtils } from '../../../../utils/date.utils'
