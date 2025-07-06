@@ -20,11 +20,7 @@ interface CreateGoalRequest {
 
 @Injectable()
 export class CreateGoalUseCase {
-  constructor(
-    private goalRepository: GoalRepository,
-    private transactionRepository: TransactionRepository,
-    private categoryRepository: CategoryRepository
-  ) {}
+  constructor(private goalRepository: GoalRepository) {}
 
   async execute(request: CreateGoalRequest) {
     const { userId, name, description, targetValue, savedValue, deadline } =
@@ -38,30 +34,6 @@ export class CreateGoalUseCase {
       deadline,
       userId
     })
-
-    if (savedValue) {
-      const category = await this.categoryRepository.find({
-        name: 'Meta Financeira'
-      })
-
-      if (!category) {
-        throw new NotFoundException(errors.CATEGORY_NOT_FOUND)
-      }
-
-      await this.transactionRepository.create({
-        goalId: goal.id,
-        categoryId: category.id,
-        type: TransactionType.INVESTMENT,
-        userId,
-        name: goal.name,
-        description: 'Investimento na meta',
-        paymentMethod: PaymentMethod.BANK_TRANSFER,
-        date: new Date(),
-        totalAmount: new Decimal(savedValue),
-        isPaid: true,
-        isRecurring: false
-      })
-    }
 
     return goal
   }
