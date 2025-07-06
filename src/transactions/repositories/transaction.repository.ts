@@ -2,6 +2,7 @@ import { Prisma, Transaction } from '@prisma/client'
 import { CreateTransactionDto } from '../infra/http/dto/create-transaction.dto'
 import { GetTransactionsDto } from '../infra/http/dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../infra/http/dto/update-transaction.dto'
+import { UpdateRecurringBillDto } from '../../recurring-bills/dto'
 
 export abstract class TransactionRepository {
   abstract createWithTransaction({
@@ -32,6 +33,11 @@ export abstract class TransactionRepository {
     userId: string,
     data: UpdateTransactionDto
   ): Promise<Transaction>
+
+  abstract updateByRecurringBillId(
+    id: string,
+    data: UpdateRecurringBillDto
+  ): Promise<any>
 
   abstract delete(id: string, userId: string): Promise<Transaction>
 

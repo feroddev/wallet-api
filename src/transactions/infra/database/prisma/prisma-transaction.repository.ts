@@ -7,6 +7,7 @@ import { CreateTransactionDto } from '../../http/dto/create-transaction.dto'
 import { GetTransactionsDto } from '../../http/dto/get-transactions.dto'
 import { UpdateTransactionDto } from '../../http/dto/update-transaction.dto'
 import { errors } from '../../../../../constants/errors'
+import { UpdateRecurringBillDto } from '../../../../recurring-bills/dto'
 
 @Injectable()
 export class PrismaTransactionRepository implements TransactionRepository {
@@ -64,8 +65,11 @@ export class PrismaTransactionRepository implements TransactionRepository {
     const currentMonth = currentDate.getMonth()
     const currentYear = currentDate.getFullYear()
 
-    const startDate = inputStartDate || DateUtils.createLocalDate(currentYear, currentMonth, 1)
-    const endDate = inputEndDate || DateUtils.createLocalDate(currentYear, currentMonth + 1, 0)
+    const startDate =
+      inputStartDate || DateUtils.createLocalDate(currentYear, currentMonth, 1)
+    const endDate =
+      inputEndDate ||
+      DateUtils.createLocalDate(currentYear, currentMonth + 1, 0)
 
     // Ajusta o horário para incluir todo o período
     startDate.setHours(0, 0, 0, 0)
@@ -326,5 +330,19 @@ export class PrismaTransactionRepository implements TransactionRepository {
     })
 
     return result
+  }
+
+  async updateByRecurringBillId(id: string, data: UpdateRecurringBillDto) {
+    await this.prisma.transaction.updateMany({
+      where: {
+        recurringBillId: id,
+        date: {
+          gte: new Date()
+        }
+      },
+      data: {
+        totalAmount: data.amount
+      }
+    })
   }
 }
